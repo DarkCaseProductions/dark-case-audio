@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Audiobook | Dark Case Audio</title>
+
+<style>
+body {
+    margin: 0;
+    background: #111;
+    color: #eee;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 760px;
+    margin: 50px auto;
+    padding: 25px;
+}
+
+h1 {
+    font-size: 30px;
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+.note {
+    color: #aaa;
+    line-height: 1.6;
+}
+
+.track {
+    display: block;
+    margin: 12px 0;
+    padding: 15px;
+    background: #222;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.track:hover {
+    background: #333;
+}
+
+.error {
+    color: #ffb3b3;
+}
+
+.loading {
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Dark Case Audio</h1>
+
+<div id="message" class="loading">
+Preparing your audiobook...
+</div>
+
+<div id="content"></div>
+
+</div>
+
+<script>
+const FUNCTION_URL =
+"https://inhiiamepxwjtfyqlqir.supabase.co/functions/v1/audiobook-access";
+
+const params = new URLSearchParams(window.location.search);
+const sessionId = params.get("session_id");
+
+const message = document.getElementById("message");
+const content = document.getElementById("content");
+
+if (!sessionId) {
+
+    message.className = "error";
+    message.textContent =
+        "No payment session was supplied. Please return to Dark Case Audio and contact support if you need help.";
+
+} else {
+
+    fetch(
+        FUNCTION_URL +
+        "?session_id=" +
+        encodeURIComponent(sessionId)
+    )
+    .then(response => response.json())
+    .then(data => {
+
+        if (!data.ok) {
+
+            message.className = "error";
+            message.textContent =
+                data.error ||
+                "We could not verify your payment.";
+
+            return;
+        }
+
+        message.className = "note";
+        message.textContent =
+            "Your payment has been verified. Your audiobook is ready below.";
+
+        const title = document.createElement("h2");
+        title.textContent = data.title;
+        content.appendChild(title);
+
+        data.links.forEach((track, index) => {
+
+            const link = document.createElement("a");
+
+            link.className = "track";
+            link.href = track.url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.textContent =
+                (index + 1) + ". " + track.name;
+
+            content.appendChild(link);
+        });
+
+        const note = document.createElement("p");
+
+        note.className = "note";
+        note.textContent =
+            "These secure download links expire after 1 hour.";
+
+        content.appendChild(note);
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        message.className = "error";
+        message.textContent =
+            "Something went wrong while preparing your audiobook. Please contact Dark Case Audio support.";
+    });
+}
+</script>
+
+</body>
+</html>
