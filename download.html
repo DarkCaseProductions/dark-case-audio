@@ -32,17 +32,19 @@ h2 {
     line-height: 1.6;
 }
 
-.track {
+.download {
     display: block;
-    margin: 12px 0;
-    padding: 15px;
+    margin: 25px 0;
+    padding: 18px;
     background: #222;
     border-radius: 8px;
     color: #fff;
     text-decoration: none;
+    font-size: 18px;
+    text-align: center;
 }
 
-.track:hover {
+.download:hover {
     background: #333;
 }
 
@@ -71,6 +73,7 @@ Preparing your audiobook...
 </div>
 
 <script>
+
 const FUNCTION_URL =
 "https://inhiiamepxwjtfyqlqir.supabase.co/functions/v1/audiobook-access";
 
@@ -83,6 +86,7 @@ const content = document.getElementById("content");
 if (!sessionId) {
 
     message.className = "error";
+
     message.textContent =
         "No payment session was supplied. Please return to Dark Case Audio and contact support if you need help.";
 
@@ -93,12 +97,15 @@ if (!sessionId) {
         "?session_id=" +
         encodeURIComponent(sessionId)
     )
+
     .then(response => response.json())
+
     .then(data => {
 
         if (!data.ok) {
 
             message.className = "error";
+
             message.textContent =
                 data.error ||
                 "We could not verify your payment.";
@@ -107,45 +114,50 @@ if (!sessionId) {
         }
 
         message.className = "note";
+
         message.textContent =
             "Your payment has been verified. Your audiobook is ready below.";
 
         const title = document.createElement("h2");
+
         title.textContent = data.title;
+
         content.appendChild(title);
 
-        data.links.forEach((track, index) => {
+        const downloadLink = document.createElement("a");
 
-            const link = document.createElement("a");
+        downloadLink.className = "download";
 
-            link.className = "track";
-            link.href = track.url;
-            link.target = "_blank";
-            link.rel = "noopener";
-            link.textContent =
-                (index + 1) + ". " + track.name;
+        downloadLink.href = data.download.url;
 
-            content.appendChild(link);
-        });
+        downloadLink.textContent =
+            "Download Complete Audiobook";
+
+        content.appendChild(downloadLink);
 
         const note = document.createElement("p");
 
         note.className = "note";
+
         note.textContent =
-            "These secure download links expire after 1 hour.";
+            "This secure download link expires after 1 hour.";
 
         content.appendChild(note);
 
     })
+
     .catch(error => {
 
         console.error(error);
 
         message.className = "error";
+
         message.textContent =
             "Something went wrong while preparing your audiobook. Please contact Dark Case Audio support.";
+
     });
 }
+
 </script>
 
 </body>
