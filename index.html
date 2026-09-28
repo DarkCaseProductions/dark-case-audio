@@ -25,7 +25,7 @@ nav a:hover{background:var(--red);color:#fff}
 .sectionhead h2{margin:0;font-family:Georgia,serif;font-size:2rem}
 .sectionhead p{margin:0;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:22px}
-.ebook-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ebook-grid,.free-case-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 32px rgba(0,0,0,.28);transition:transform .2s,border-color .2s,box-shadow .2s}
 .card:hover{transform:translateY(-4px);border-color:#4a515d;box-shadow:0 18px 38px rgba(0,0,0,.4)}
 .product img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;margin-bottom:16px;border:1px solid #343943}
@@ -46,7 +46,7 @@ nav a:hover{background:var(--red);color:#fff}
 .badge{display:inline-block;color:#fff;background:#242830;border:1px solid #3a404a;border-radius:999px;padding:4px 10px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px}
 footer{border-top:1px solid var(--line);margin-top:55px;padding:28px 0 40px;text-align:center;color:#9298a3}
 footer a{color:#c9cdd3}
-@media(max-width:900px){.ebook-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.ebook-grid,.free-case-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){header{padding-top:18px}.logo{width:100%;height:auto}.hero{padding:30px 22px}.sectionhead{display:block}.sectionhead p{margin-top:5px}nav a{padding:9px 10px;font-size:.84rem}.card{padding:16px}}
 </style>
 </head>
@@ -91,7 +91,7 @@ footer a{color:#c9cdd3}
 
 <section id="free-case-files" class="section">
 <div class="sectionhead"><h2>🆓 Free Crime Case Files</h2><p>No payment or registration required</p></div>
-<div class="grid">
+<div class="grid free-case-grid">
 <article class="card product"><img src="ChatGPT%20Image%20Sep%2028,%202026,%2006_18_01%20PM.png" alt="Solve With Me"><span class="badge">Free Case File</span><h3>Solve With Me</h3><p class="desc">A free downloadable crime case file from Dark Case Productions.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/Solve%20with%20me.zip?download=Solve%20with%20me.zip">Download Free Case File</a></article>
 </div>
 </section>
