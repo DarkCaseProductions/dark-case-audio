@@ -69,7 +69,12 @@ nav a:hover{background:var(--red);color:#fff}
 footer{border-top:1px solid var(--line);margin-top:55px;padding:28px 0 40px;text-align:center;color:#9298a3}
 footer a{color:#c9cdd3}
 @media(max-width:900px){.ebook-grid,.free-case-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:650px){header{padding-top:18px}.logo{width:100%;height:auto}.hero{padding:30px 22px}.sectionhead{display:block}.sectionhead p{margin-top:5px}nav a{padding:9px 10px;font-size:.84rem}.card{padding:16px}}
+.radioBanner{position:relative;width:100%;max-width:100%;aspect-ratio:2/1;overflow:hidden;border-radius:18px;border:1px solid #343a46;box-shadow:0 20px 55px rgba(0,0,0,.5);background:#050609}
+.radioBanner img{display:block;width:100%;height:100%;object-fit:cover}
+.radioBannerPlayer{position:absolute;left:17.2%;top:42.3%;width:70.8%;height:18%;display:flex;align-items:center}
+.radioBannerPlayer audio{width:100%;height:48px;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55))}
+.radioBannerStatus{position:absolute;left:17.2%;bottom:7.5%;color:#d7d9de;font-size:.78rem;letter-spacing:.3px;text-shadow:0 2px 5px #000}
+@media(max-width:650px){header{padding-top:18px}.logo{width:100%;height:auto}.hero{padding:30px 22px}.sectionhead{display:block}.sectionhead p{margin-top:5px}nav a{padding:9px 10px;font-size:.84rem}.card{padding:16px}.radioBanner{border-radius:12px}.radioBannerPlayer{left:17.2%;top:42.3%;width:70.8%;height:18%}.radioBannerPlayer audio{height:36px}.radioBannerStatus{font-size:.55rem;bottom:7.5%}}
 </style>
 </head>
 <body>
@@ -112,29 +117,15 @@ footer a{color:#c9cdd3}
 <section id="free-paranormal-case-files" class="section"><div class="sectionhead"><h2>👻 Free Paranormal Case Files</h2><p>No payment or registration required</p></div><div class="grid free-case-grid"><article class="card product"><img src="cover%20with%20logo.png" alt="The Poltergeist of South Shields"><span class="badge">Free Paranormal Case File</span><h3>The Poltergeist of South Shields</h3><p class="meta"><b>Written by Robert D Jones</b></p><p class="desc">Inside the South Shields Poltergeist Case — the family, the house and the unexplained.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/The_Poltergeist_of_South_Shields_FREE.zip?download=The_Poltergeist_of_South_Shields_FREE.zip">Download Free Case File</a></article></div></section>
 <section id="free-audio" class="section">
 <div class="sectionhead"><h2>📻 Dark Case Radio</h2><p>Live 24/7 crime, true crime and paranormal audio</p></div>
-<div class="audioBox radioBox">
-<div class="radioTop">
-<div class="radioBrand">
-<div class="radioIcon">📻</div>
-<div><h3 class="radioTitle">Dark Case Radio</h3><p class="radioSub">Crime · True Crime · Paranormal · Real Stories</p></div>
-</div>
-<div class="liveBadge"><span class="liveDot"></span> LIVE 24/7</div>
-</div>
-<div class="radioMain">
-<div class="radioIntro">
-<p>Listen live from Dark Case Productions.</p>
-<div class="equalizer" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-</div>
-<div class="radioPlayer">
+<div class="radioBanner">
+<img src="radio%20box%20picture.png" alt="Dark Case Radio — Live 24/7">
+<div class="radioBannerPlayer">
 <audio id="dark-case-radio-player" controls preload="none">
 <source src="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" type="audio/mpeg">
 Your browser does not support the audio player.
 </audio>
 </div>
-<div class="radioFooter">
-<p class="radioHint">Press play to join the live broadcast.</p>
-</div>
-</div>
+<div class="radioBannerStatus">Press play to join the live broadcast.</div>
 </div>
 </section>
 <section id="crime-forum" class="section"><div class="card"><span class="badge">Coming Soon</span><h2>🕵️ Crime Forum</h2><p>A dedicated place for discussions about crime, cases, investigations and related subjects.</p></div></section>
