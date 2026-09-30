@@ -14,7 +14,7 @@
 <style>
 :root{--bg:#08090c;--panel:#12151b;--panel2:#181c23;--red:#d71920;--red2:#ff3038;--text:#f2f2f2;--muted:#aeb3bd;--line:#292e37}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top,#1a1d24 0,#08090c 42%,#050609 100%);color:var(--text);line-height:1.7}.container{width:min(980px,92%);margin:auto}header{padding:24px 0;text-align:center}.logo{display:block;width:min(520px,100%);height:auto;margin:auto;border-radius:14px}.tagline{color:#d7d9de;letter-spacing:2px;text-transform:uppercase;font-size:.9rem}.hero,.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 45px rgba(0,0,0,.3)}.hero{padding:42px 34px;margin:20px 0 28px}.hero h1{font-family:Georgia,serif;font-size:clamp(2rem,5vw,3.4rem);line-height:1.1;margin:0 0 15px}.hero p{color:#c5c9d0;font-size:1.05rem}.section{margin:28px 0}.card{padding:28px}.card h2{font-family:Georgia,serif;font-size:1.7rem;margin-top:0}.card h3{font-family:Georgia,serif;font-size:1.25rem}.card p{color:#bfc4cc}.links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}.button{display:block;text-align:center;background:linear-gradient(180deg,var(--red2),#b80f16);color:#fff;padding:12px 16px;border-radius:9px;text-decoration:none;font-weight:800;border:1px solid #ff4b52}.back{text-align:center;margin:30px 0}a{color:#fff}footer{border-top:1px solid var(--line);margin-top:45px;padding:25px 0 35px;text-align:center;color:#9298a3}footer a{color:#c9cdd3}@media(max-width:650px){.hero{padding:30px 22px}.card{padding:22px}.links{grid-template-columns:1fr}}
-</style>
+.breadcrumb{margin:8px 0 18px;font-size:.9rem;color:#aeb3bd}.breadcrumb a{color:#d7d9de;text-decoration:none}.breadcrumb a:hover{color:#fff}</style>
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -26,6 +26,16 @@
   "publisher":{"@type":"Organization","@id":"https://darkcaseaudio.com/#organization","name":"Dark Case Audio","url":"https://darkcaseaudio.com/"}
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"BreadcrumbList",
+  "itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Dark Case Audio","item":"https://darkcaseaudio.com/"},
+    {"@type":"ListItem","position":2,"name":"True Crime & Real Cases","item":"https://darkcaseaudio.com/true-crime.html"}
+  ]
+}
+</script>
 </head>
 <body>
 <div class="container">
@@ -33,6 +43,7 @@
 <a href="https://darkcaseaudio.com/"><img class="logo" src="banner%20size%20logo.png" alt="Dark Case Audio"></a>
 <p class="tagline">True Crime · Real Cases · Paranormal · Stories From Around The World</p>
 </header>
+<nav class="breadcrumb" aria-label="Breadcrumb"><a href="https://darkcaseaudio.com/">Dark Case Audio</a> &nbsp;›&nbsp; True Crime &amp; Real Cases</nav>
 <main>
 <section class="hero">
 <h1>True Crime & Real Cases</h1>
