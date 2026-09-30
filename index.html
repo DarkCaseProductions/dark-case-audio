@@ -36,7 +36,29 @@ nav a:hover{background:var(--red);color:#fff}
 .button:hover{filter:brightness(1.1)}
 .feature{background:linear-gradient(135deg,#161a21,#0e1116);border:1px solid #343a44;border-radius:18px;padding:24px}
 .feature img{display:block;width:min(360px,100%);margin:0 auto 18px;border-radius:12px}
-.audioBox{background:#0b0d11;border:1px solid #303640;border-radius:14px;padding:18px}
+.audioBox{background:linear-gradient(145deg,#151922 0%,#0b0d12 55%,#090a0e 100%);border:1px solid #343a46;border-radius:18px;padding:0;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.42);position:relative}
+.radioBox{position:relative;overflow:hidden}
+.radioBox:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(215,25,32,.18),transparent 34%),radial-gradient(circle at 88% 80%,rgba(40,85,130,.13),transparent 35%);pointer-events:none}
+.radioTop{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.radioBrand{display:flex;align-items:center;gap:15px}
+.radioIcon{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#e51b23,#8f0b11);border:1px solid #ff4a51;box-shadow:0 8px 24px rgba(215,25,32,.25);font-size:1.55rem}
+.radioTitle{margin:0;font-family:Georgia,serif;font-size:1.45rem}
+.radioSub{margin:3px 0 0;color:#9da3ae;font-size:.9rem}
+.liveBadge{display:inline-flex;align-items:center;gap:7px;background:rgba(215,25,32,.12);border:1px solid rgba(255,60,68,.38);color:#ff6970;border-radius:999px;padding:7px 11px;font-size:.75rem;font-weight:800;letter-spacing:1px}
+.liveDot{width:7px;height:7px;border-radius:50%;background:#ff3038;box-shadow:0 0 10px #ff3038}
+.radioMain{position:relative;padding:24px 26px 26px}
+.radioIntro{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:17px}
+.radioIntro p{margin:0;color:#c2c6ce;font-size:.95rem}
+.equalizer{display:flex;align-items:flex-end;gap:3px;height:24px}
+.equalizer span{width:4px;border-radius:4px;background:#d71920;animation:radioBars .9s ease-in-out infinite alternate}
+.equalizer span:nth-child(1){height:9px}.equalizer span:nth-child(2){height:18px;animation-delay:.15s}.equalizer span:nth-child(3){height:13px;animation-delay:.3s}.equalizer span:nth-child(4){height:22px;animation-delay:.08s}.equalizer span:nth-child(5){height:11px;animation-delay:.24s}.equalizer span:nth-child(6){height:17px;animation-delay:.4s}
+@keyframes radioBars{from{transform:scaleY(.45);opacity:.55}to{transform:scaleY(1);opacity:1}}
+.radioPlayer{background:#07080b;border:1px solid #303641;border-radius:12px;padding:13px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.radioPlayer audio{display:block;width:100%;height:42px}
+.radioFooter{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:17px}
+.radioHint{margin:0;color:#858b96;font-size:.82rem}
+.radioLink{display:inline-flex!important;width:auto!important;min-width:190px;align-items:center;justify-content:center}
+@media(max-width:650px){.radioTop{padding:20px}.radioMain{padding:20px}.radioIntro{align-items:flex-start}.equalizer{display:none}.liveBadge{font-size:.68rem;padding:6px 9px}.radioFooter{display:block}.radioLink{width:100%!important;margin-top:12px}}
 .player{position:relative;width:100%;height:min(300px,52vw);overflow:hidden;border-radius:10px;background:#000}
 .player>div{position:absolute;inset:0}
 .queue{display:flex;flex-direction:column;gap:8px;margin-top:15px}
@@ -90,15 +112,30 @@ footer a{color:#c9cdd3}
 <section id="free-paranormal-case-files" class="section"><div class="sectionhead"><h2>👻 Free Paranormal Case Files</h2><p>No payment or registration required</p></div><div class="grid free-case-grid"><article class="card product"><img src="cover%20with%20logo.png" alt="The Poltergeist of South Shields"><span class="badge">Free Paranormal Case File</span><h3>The Poltergeist of South Shields</h3><p class="meta"><b>Written by Robert D Jones</b></p><p class="desc">Inside the South Shields Poltergeist Case — the family, the house and the unexplained.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/The_Poltergeist_of_South_Shields_FREE.zip?download=The_Poltergeist_of_South_Shields_FREE.zip">Download Free Case File</a></article></div></section>
 <section id="free-audio" class="section">
 <div class="sectionhead"><h2>📻 Dark Case Radio</h2><p>Live 24/7 crime, true crime and paranormal audio</p></div>
-<div class="audioBox">
-<h3 style="font-family:Georgia,serif">Dark Case Radio — Live 24/7</h3>
-<p style="color:#aeb3bd;margin-top:0">Listen live to Dark Case Radio from Dark Case Productions.</p>
-<audio id="dark-case-radio-player" controls preload="none" style="width:100%;margin:12px 0 8px">
+<div class="audioBox radioBox">
+<div class="radioTop">
+<div class="radioBrand">
+<div class="radioIcon">📻</div>
+<div><h3 class="radioTitle">Dark Case Radio</h3><p class="radioSub">Crime · True Crime · Paranormal · Real Stories</p></div>
+</div>
+<div class="liveBadge"><span class="liveDot"></span> LIVE 24/7</div>
+</div>
+<div class="radioMain">
+<div class="radioIntro">
+<p>Listen live from Dark Case Productions.</p>
+<div class="equalizer" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</div>
+<div class="radioPlayer">
+<audio id="dark-case-radio-player" controls preload="none">
 <source src="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" type="audio/mpeg">
 Your browser does not support the audio player.
 </audio>
-<p style="margin:10px 0 0;color:#9298a3;font-size:.9rem">If the player does not start, use the link below to open the live stream directly.</p>
-<a class="button" href="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" target="_blank" rel="noopener">Open Dark Case Radio Stream</a>
+</div>
+<div class="radioFooter">
+<p class="radioHint">Press play to join the live broadcast.</p>
+<a class="button radioLink" href="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" target="_blank" rel="noopener">Open Stream ↗</a>
+</div>
+</div>
 </div>
 </section>
 <section id="crime-forum" class="section"><div class="card"><span class="badge">Coming Soon</span><h2>🕵️ Crime Forum</h2><p>A dedicated place for discussions about crime, cases, investigations and related subjects.</p></div></section>
