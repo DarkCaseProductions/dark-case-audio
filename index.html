@@ -73,7 +73,7 @@ footer a{color:#c9cdd3}
 .radioBanner img{display:block;width:100%;height:100%;object-fit:cover}
 .radioBannerPlayer{position:absolute;left:17.2%;top:69%;width:70.8%;height:10%;display:flex;align-items:center}
 .radioBannerPlayer audio{width:100%;height:48px;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55))}
-.radioBannerStatus{position:absolute;left:17.2%;bottom:7.5%;color:#d7d9de;font-size:.78rem;letter-spacing:.3px;text-shadow:0 2px 5px #000}
+.radioNowPlaying{position:absolute;left:17.2%;top:80.5%;width:70.8%;text-align:center;color:#f2f2f2;font-size:.82rem;font-weight:700;letter-spacing:.3px;text-shadow:0 2px 6px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.radioNowPlaying span{color:#ff6970}@media(max-width:650px){.radioNowPlaying{left:17.2%;top:80.5%;width:70.8%;font-size:.55rem}}.radioBannerStatus{position:absolute;left:17.2%;bottom:7.5%;color:#d7d9de;font-size:.78rem;letter-spacing:.3px;text-shadow:0 2px 5px #000}
 @media(max-width:650px){header{padding-top:18px}.logo{width:100%;height:auto}.hero{padding:30px 22px}.sectionhead{display:block}.sectionhead p{margin-top:5px}nav a{padding:9px 10px;font-size:.84rem}.card{padding:16px}.radioBanner{border-radius:12px}.radioBannerPlayer{left:17.2%;top:69%;width:70.8%;height:10%}.radioBannerPlayer audio{height:36px}.radioBannerStatus{font-size:.55rem;bottom:7.5%}}
 </style>
 </head>
@@ -125,6 +125,7 @@ footer a{color:#c9cdd3}
 Your browser does not support the audio player.
 </audio>
 </div>
+<div class="radioNowPlaying" id="dca-now-playing">Now Playing: <span>Loading...</span></div>
 <div class="radioBannerStatus">Press play to join the live broadcast.</div>
 </div>
 </section>
@@ -141,6 +142,25 @@ var current=0,player;
 window.onYouTubeIframeAPIReady=function(){player=new YT.Player("dca-youtube-player",{videoId:queue[0].id,playerVars:{rel:0},events:{onStateChange:function(e){if(e.data===YT.PlayerState.ENDED&&current<queue.length-1){current++;player.loadVideoById(queue[current].id);updateQueue();}}}});updateQueue();};
 function updateQueue(){document.querySelectorAll("#dca-queue button").forEach(function(b,i){b.style.fontWeight=i===current?"800":"normal";b.style.borderColor=i===current?"#d71920":"#343a44";});}
 document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue button");if(!b||!window.YT||!player)return;var id=b.getAttribute("data-dca-video"),i=queue.findIndex(function(x){return x.id===id;});if(i>-1){current=i;player.loadVideoById(id);updateQueue();}});
+})();
+</script>
+<script>
+(function(){
+var npEl=document.getElementById("dca-now-playing");
+var npUrl="https://radio.darkcaseaudio.com/api/nowplaying/dark_case_radio";
+function updateNowPlaying(){
+fetch(npUrl+"?t="+Date.now(),{cache:"no-store"})
+.then(function(r){if(!r.ok)throw new Error("Now playing unavailable");return r.json();})
+.then(function(data){
+var song=data.now_playing&&data.now_playing.song;
+var title=song&&song.title?((song.artist?song.artist+" - ":"")+song.title):"Dark Case Radio";
+npEl.innerHTML="Now Playing: <span>"+escapeHtml(title)+"</span>";
+})
+.catch(function(){npEl.innerHTML="Now Playing: <span>Dark Case Radio</span>";});
+}
+function escapeHtml(str){return String(str).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
+updateNowPlaying();
+setInterval(updateNowPlaying,15000);
 })();
 </script>
 </body>
