@@ -49,11 +49,11 @@ if(!r.data.length){forum.innerHTML='<div class="category"><div class="empty">No 
 var html="";
 for(var i=0;i<r.data.length;i++){
 var c=r.data[i];
-var tr=await client.from("forum_threads").select("id,title,created_at,updated_at").eq("category_id",c.id).order("updated_at",{ascending:false}).limit(20);
+var tr=await client.from("forum_threads").select("id,title,created_at,updated_at,user_id").eq("category_id",c.id).order("updated_at",{ascending:false}).limit(20);
 html+='<section class="category"><div class="cathead"><div><h2>'+esc(c.name)+'</h2><p>'+esc(c.description)+'</p></div><button class="topicButton" data-cat="'+c.id+'">+ New Topic</button></div><div class="formCard" id="form-'+c.id+'"><h3>Start a new topic</h3><label>Title</label><input class="newTitle" maxlength="160" placeholder="Topic title"><label>Message</label><textarea class="newContent" maxlength="10000" placeholder="Write your opening post..."></textarea><div class="actions"><button class="primary createTopic" data-cat="'+c.id+'">Post Topic</button><button class="secondary cancelTopic" data-cat="'+c.id+'">Cancel</button></div></div><div class="topics">';
 if(tr.error){html+='<div class="empty">Unable to load topics in this category.</div>'}
 else if(!tr.data.length){html+='<div class="empty">No topics yet. Start the first discussion.</div>'}
-else{tr.data.forEach(function(t){html+='<a class="topic" href="crime-thread.html?id='+encodeURIComponent(t.id)+'"><div class="topicTitle">'+esc(t.title)+'</div><div class="topicMeta">Member discussion · Updated '+new Date(t.updated_at||t.created_at).toLocaleString("en-GB")+'</div></a>'})}
+else{var ids=tr.data.map(function(t){return t.user_id}).filter(Boolean);var profiles=ids.length?await client.from("profiles").select("id,username").in("id",ids):{data:[]};var names={};(profiles.data||[]).forEach(function(p){names[p.id]=p.username||"Member"});tr.data.forEach(function(t){html+='<a class="topic" href="crime-thread.html?id='+encodeURIComponent(t.id)+'"><div class="topicTitle">'+esc(t.title)+'</div><div class="topicMeta">'+esc(names[t.user_id]||"Member")+' · Updated '+new Date(t.updated_at||t.created_at).toLocaleString("en-GB")+'</div></a>'})}
 html+='</div></section>';
 }
 forum.innerHTML=html;
