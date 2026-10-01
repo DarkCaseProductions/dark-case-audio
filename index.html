@@ -17,6 +17,18 @@ nav{position:sticky;top:0;z-index:20;margin:8px auto 34px;background:rgba(10,11,
 nav .navinner{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:8px}
 nav a{color:#e8e8e8;text-decoration:none;padding:10px 15px;border-radius:9px;font-weight:700;font-size:.92rem}
 nav a:hover{background:var(--red);color:#fff}
+.navExtra{display:contents}
+.navMore{display:none;font:inherit;color:#e8e8e8;background:transparent;border:0;padding:9px 10px;border-radius:9px;font-weight:800;font-size:.84rem;cursor:pointer}
+.navMore:hover{background:var(--red);color:#fff}
+@media(max-width:650px){
+  nav .navinner{align-items:center;gap:4px}
+  nav .navinner>a:nth-child(-n+3){flex:0 0 auto}
+  nav .navMore{display:block;flex:0 0 auto}
+  nav .navExtra{display:none;width:100%;flex-wrap:wrap;justify-content:center;gap:4px}
+  nav.expanded .navExtra{display:flex}
+  nav.expanded .navMore{background:var(--red);color:#fff}
+  nav.expanded .navinner>a:nth-child(-n+3){margin-bottom:2px}
+}
 .hero{position:relative;overflow:hidden;border:1px solid #303640;border-radius:20px;padding:42px 34px;margin-bottom:30px;background:linear-gradient(135deg,rgba(215,25,32,.15),rgba(12,15,20,.94) 48%,rgba(15,31,47,.55));box-shadow:0 20px 55px rgba(0,0,0,.42)}
 .hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-90px;background:rgba(215,25,32,.12);filter:blur(8px);border-radius:50%}
 .hero h1{font-family:Georgia,serif;font-size:clamp(2rem,5vw,3.7rem);line-height:1.05;margin:0 0 12px;max-width:850px}
@@ -117,8 +129,8 @@ footer a{color:#c9cdd3}
 <img class="logo" src="banner%20size%20logo.png" alt="Dark Case Audio">
 <p class="tagline">True Crime · Real Cases · Paranormal · Stories From Around The World</p>
 </header>
-<nav><div class="navinner">
-<a href="#audiobooks">Audiobooks</a><a href="#ebooks">Ebooks</a><a href="#free-case-files">Free Crime Case Files</a><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="#crime-forum">Crime Forum</a><a href="#paranormal-forum">Paranormal Forum</a>
+<nav id="site-nav"><div class="navinner">
+<a href="#audiobooks">Audiobooks</a><a href="#ebooks">Ebooks</a><a href="#free-case-files">Free Crime Case Files</a><button class="navMore" type="button" aria-expanded="false" aria-controls="mobile-nav-options">+ MORE</button><span id="mobile-nav-options" class="navExtra"><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="#crime-forum">Crime Forum</a><a href="#paranormal-forum">Paranormal Forum</a></span>
 </div></nav>
 <section class="hero"><h1>Dark stories. Real cases. Audio that gets you closer to the truth.</h1><p>Explore Dark Case Audio — a growing collection of true crime, real crime cases, investigative case files, paranormal investigations, audiobooks, ebooks and free listening from the UK and around the world.</p></section>
 <section id="audiobooks" class="section">
@@ -195,6 +207,25 @@ npEl.innerHTML="Now Playing: <span>"+escapeHtml(title)+"</span>";
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
 updateNowPlaying();
 setInterval(updateNowPlaying,15000);
+})();
+</script>
+<script>
+(function(){
+  var nav=document.getElementById("site-nav");
+  var more=document.querySelector(".navMore");
+  if(!nav||!more)return;
+  more.addEventListener("click",function(){
+    var expanded=nav.classList.toggle("expanded");
+    more.setAttribute("aria-expanded",expanded?"true":"false");
+    more.textContent=expanded?"− LESS":"+ MORE";
+  });
+  nav.addEventListener("click",function(e){
+    if(e.target.closest(".navExtra a") && window.innerWidth<=650){
+      nav.classList.remove("expanded");
+      more.setAttribute("aria-expanded","false");
+      more.textContent="+ MORE";
+    }
+  });
 })();
 </script>
 </body>
