@@ -22,16 +22,22 @@
 var client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
 var id=new URLSearchParams(location.search).get("id"),area=document.getElementById("area"),title=document.getElementById("title"),session=null;
 function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function usernameMap(rows){var map={};(rows||[]).forEach(function(x){if(x&&x.id)map[x.id]=x.username||"Member"});return map}
 async function load(){
 var sr=await client.auth.getSession();session=sr.data.session;
 if(!session){area.innerHTML='<div class="notice">You need a free Dark Case Membership to view this discussion. <a href="membership.html">Sign in or create your free membership</a>.</div>';return}
 if(!id){area.innerHTML='<div class="notice">No discussion was selected.</div>';return}
-var t=await client.from("forum_threads").select("id,title,content,created_at").eq("id",id).single();
+var t=await client.from("forum_threads").select("id,title,content,created_at,user_id").eq("id",id).single();
 if(t.error){area.innerHTML='<div class="notice">This discussion could not be found.</div>';return}
 title.textContent=t.data.title;
-var p=await client.from("forum_posts").select("id,content,created_at").eq("thread_id",id).order("created_at",{ascending:true});
-var html='<article class="post"><div class="postHead"><span class="author">Member</span><span class="date">'+new Date(t.data.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(t.data.content)+'</div></article>';
-if(p.data&&p.data.length){p.data.forEach(function(x){html+='<article class="post"><div class="postHead"><span class="author">Member</span><span class="date">'+new Date(x.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(x.content)+'</div></article>'})}
+var p=await client.from("forum_posts").select("id,content,created_at,user_id").eq("thread_id",id).order("created_at",{ascending:true});
+var ids=[t.data.user_id].concat((p.data||[]).map(function(x){return x.user_id})).filter(Boolean);
+var uniqueIds=ids.filter(function(v,i,a){return a.indexOf(v)===i});
+var profiles=await client.from("profiles").select("id,username").in("id",uniqueIds);
+var names=usernameMap(profiles.data);
+var threadAuthor=names[t.data.user_id]||"Member";
+var html='<article class="post"><div class="postHead"><span class="author">'+esc(threadAuthor)+'</span><span class="date">'+new Date(t.data.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(t.data.content)+'</div></article>';
+if(p.data&&p.data.length){p.data.forEach(function(x){html+='<article class="post"><div class="postHead"><span class="author">'+esc(names[x.user_id]||"Member")+'</span><span class="date">'+new Date(x.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(x.content)+'</div></article>'})}
 html+='<section class="replyBox"><h2>Reply to this discussion</h2><textarea id="reply" maxlength="10000" placeholder="Write your reply..."></textarea><button id="replyBtn" class="primary">Post Reply</button></section>';
 area.innerHTML=html;
 document.getElementById("replyBtn").onclick=async function(){var b=this,c=document.getElementById("reply").value.trim();if(!c){alert("Please enter a reply.");return}b.disabled=true;b.textContent="Posting...";var r=await client.from("forum_posts").insert({thread_id:id,user_id:session.user.id,content:c});if(r.error){alert(r.error.message);b.disabled=false;b.textContent="Post Reply";return}location.reload()};
