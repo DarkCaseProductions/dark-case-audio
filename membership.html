@@ -116,8 +116,7 @@ button:hover{filter:brightness(1.12)}
     var result=await client.auth.signUp({email:email,password:password});
     if(result.error){showMessage(signupMessage,result.error.message);return}
     if(result.data.session){
-      showMessage(signupMessage,"Your membership has been created.");
-      renderSession(result.data.session);
+      window.location.href="index.html";
     }else{
       showMessage(signupMessage,"Your account has been created. Please check your email to confirm your membership, then log in.");
     }
@@ -130,8 +129,7 @@ button:hover{filter:brightness(1.12)}
     var password=document.getElementById("loginPassword").value;
     var result=await client.auth.signInWithPassword({email:email,password:password});
     if(result.error){showMessage(loginMessage,result.error.message);return}
-    showMessage(loginMessage,"");
-    renderSession(result.data.session);
+    window.location.href="index.html";
   });
 
   document.getElementById("logoutButton").addEventListener("click",async function(){
