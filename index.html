@@ -183,6 +183,31 @@ Your browser does not support the audio player.
 
 <script>
 (function(){
+  var SUPABASE_URL="https://inhiiamepxwjtfyqlqir.supabase.co";
+  var SUPABASE_KEY="sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5";
+  var s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+  s.onload=function(){
+    var client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    document.querySelectorAll('a[href*="/storage/v1/object/public/free-case-files/"]').forEach(function(link){
+      link.addEventListener("click",async function(e){
+        e.preventDefault();
+        var href=link.getAttribute("href");
+        var sessionResult=await client.auth.getSession();
+        var session=sessionResult&&sessionResult.data&&sessionResult.data.session;
+        if(!session){
+          window.location.href="membership.html";
+          return;
+        }
+        window.location.href=href;
+      });
+    });
+  };
+  document.head.appendChild(s);
+})();
+</script>
+<script>
+(function(){
 var queue=[{id:"wKSv00Kos7o",title:"Can Women Really Be Serial Killers?"},{id:"mXwpcNeVHGA",title:"What Really Happened in the Amityville House?"},{id:"A6bGFZqZM1M",title:"The Killer Who Inspired Jeepers Creepers"},{id:"qrRCr8jCuYM",title:"The True Crime That Inspired A Horror Classic!"},{id:"LhxmCmY43Po",title:"Are You Missing These Hidden Signs of a Psychopath?"},{id:"xulvFkkzdLY",title:"5 Creepy TRUE CRIME Cases You WON'T Believe Are Real"},{id:"VwE_qOZiYTc",title:"The Scary Truth Behind Famous Movies!"},{id:"IYF6XH4x-A4",title:"A Killer's Playbook - Inside Their Mind"},{id:"Bm9k0OnLf9o",title:"The Real Story Behind Horror’s Scariest Villains!"},{id:"UZ39MFKUUyg",title:"The Secret Rule That Makes UK Cops Assume You're Guilty"},{id:"9D9Pr584Rv0",title:"Woman Admits to Perverting Justice After Accusing 10 Innocent Men"},{id:"TL-5AN3cyfg",title:"The final days of Ian Huntley"},{id:"GTps3noiGdw",title:"The Secret Motive Behind Brianna's Murder Was Far Worse Than Hate"},{id:"u39GPPRb504",title:"If Women Can Murder, Why Do We Think They Can't Lie ?"},{id:"C1sehCckqiQ",title:"The Slender Man Case No One Can Forget"},{id:"5YG0J6U4MRY",title:"Jack the Ripper Clues That Still Shock Experts"},{id:"2fNycqXG-RM",title:"Did Amy Fitzpatrick Just Vanish Into Thin Air?"},{id:"E7V9VbM-JV0",title:"How a Safe Place Became a Nightmare for One Girl"},{id:"WdZwMpbj4O4",title:"The Unsolved Mystery of The Clocaenog Forest Man"}];
 var current=0,player;
 window.onYouTubeIframeAPIReady=function(){player=new YT.Player("dca-youtube-player",{videoId:queue[0].id,playerVars:{rel:0},events:{onStateChange:function(e){if(e.data===YT.PlayerState.ENDED&&current<queue.length-1){current++;player.loadVideoById(queue[current].id);updateQueue();}}}});updateQueue();};
