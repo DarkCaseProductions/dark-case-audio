@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crime Forum Topic | Dark Case Audio</title>
+<meta name="description" content="Dark Case Audio Crime Forum discussion.">
+<style>
+:root{--bg:#08090c;--panel:#12151b;--panel2:#181c23;--red:#d71920;--red2:#ff3038;--text:#f2f2f2;--muted:#aeb3bd;--line:#292e37}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top,#1a1d24 0,#08090c 42%,#050609 100%);color:var(--text);line-height:1.65}.container{width:min(1000px,92%);margin:auto;padding:24px 0 55px}.back{color:#ddd;text-decoration:none;font-weight:700}header{margin:30px 0 20px}h1,h2{font-family:Georgia,serif}.crumb{color:#8f96a1;font-size:.9rem}.post{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:22px;margin:18px 0;box-shadow:0 12px 30px rgba(0,0,0,.25)}.postHead{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:15px}.author{font-weight:800}.date{color:#8f96a1;font-size:.82rem}.content{white-space:pre-wrap;color:#ddd}.replyBox{background:#0d1015;border:1px solid #343a44;border-radius:12px;padding:20px;margin-top:25px}textarea{width:100%;min-height:150px;padding:12px;border-radius:8px;border:1px solid #424a58;background:#080b10;color:#fff;font:inherit;resize:vertical}.primary{margin-top:12px;background:linear-gradient(180deg,var(--red2),#b80f16);color:#fff;padding:11px 15px;border-radius:8px;border:1px solid #ff4b52;font-weight:800;cursor:pointer;width:100%}.notice{padding:14px 16px;border-radius:10px;background:#211114;border:1px solid #5b252b;color:#f1c8ca}.notice a{color:#fff;font-weight:800}footer{text-align:center;color:#8f96a1;border-top:1px solid var(--line);margin-top:40px;padding-top:25px}footer a{color:#c9cdd3}
+</style>
+</head>
+<body><div class="container">
+<a class="back" href="crime-forum.html">← Back to Crime Forum</a>
+<header><div class="crumb">Dark Case Audio · Crime Forum</div><h1 id="title">Loading topic…</h1></header>
+<div id="area"></div>
+<footer><p><a href="index.html">Dark Case Audio</a> · <a href="membership.html">Member Sign In</a> · <a href="terms.html">Terms &amp; Conditions</a> · <a href="privacy.html">Privacy Policy</a></p><p>© Dark Case Audio / Dark Case Productions</p></footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+var client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
+var id=new URLSearchParams(location.search).get("id"),area=document.getElementById("area"),title=document.getElementById("title"),session=null;
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+async function load(){
+var sr=await client.auth.getSession();session=sr.data.session;
+if(!session){area.innerHTML='<div class="notice">You need a free Dark Case Membership to view this discussion. <a href="membership.html">Sign in or create your free membership</a>.</div>';return}
+if(!id){area.innerHTML='<div class="notice">No discussion was selected.</div>';return}
+var t=await client.from("forum_threads").select("id,title,content,created_at").eq("id",id).single();
+if(t.error){area.innerHTML='<div class="notice">This discussion could not be found.</div>';return}
+title.textContent=t.data.title;
+var p=await client.from("forum_posts").select("id,content,created_at").eq("thread_id",id).order("created_at",{ascending:true});
+var html='<article class="post"><div class="postHead"><span class="author">Member</span><span class="date">'+new Date(t.data.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(t.data.content)+'</div></article>';
+if(p.data&&p.data.length){p.data.forEach(function(x){html+='<article class="post"><div class="postHead"><span class="author">Member</span><span class="date">'+new Date(x.created_at).toLocaleString("en-GB")+'</span></div><div class="content">'+esc(x.content)+'</div></article>'})}
+html+='<section class="replyBox"><h2>Reply to this discussion</h2><textarea id="reply" maxlength="10000" placeholder="Write your reply..."></textarea><button id="replyBtn" class="primary">Post Reply</button></section>';
+area.innerHTML=html;
+document.getElementById("replyBtn").onclick=async function(){var b=this,c=document.getElementById("reply").value.trim();if(!c){alert("Please enter a reply.");return}b.disabled=true;b.textContent="Posting...";var r=await client.from("forum_posts").insert({thread_id:id,user_id:session.user.id,content:c});if(r.error){alert(r.error.message);b.disabled=false;b.textContent="Post Reply";return}location.reload()};
+}
+load();
+})();
+</script>
+</body></html>
