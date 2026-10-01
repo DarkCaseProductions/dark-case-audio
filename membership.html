@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dark Case Membership | Dark Case Audio</title>
+<meta name="description" content="Free Dark Case Audio membership for free crime and paranormal case files and access to the Dark Case forums.">
+<link rel="canonical" href="https://darkcaseaudio.com/membership.html">
+<style>
+:root{--bg:#090b10;--panel:#121722;--panel2:#0d1017;--text:#f1f1f1;--muted:#aeb4c0;--red:#9d2630;--line:#303744}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#08090d,#121722);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:28px 18px 60px}
+.back{display:inline-block;color:#ddd;text-decoration:none;margin-bottom:25px;font-weight:700}
+.back:hover{color:#fff}
+header{text-align:center;margin-bottom:28px}
+h1{font-family:Georgia,serif;font-size:2.5rem;margin:0 0 10px}
+header p{color:var(--muted);font-size:1.05rem;line-height:1.6}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:rgba(18,23,34,.95);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+h2{margin:0 0 18px;font-family:Georgia,serif}
+label{display:block;margin:12px 0 6px;font-weight:700}
+input{width:100%;padding:13px;border-radius:9px;border:1px solid #424a58;background:#080b10;color:#fff;font-size:1rem}
+button{width:100%;margin-top:16px;padding:13px;border:0;border-radius:9px;background:var(--red);color:#fff;font-weight:800;font-size:1rem;cursor:pointer}
+button:hover{filter:brightness(1.12)}
+.message{margin-top:14px;padding:11px;border-radius:8px;background:var(--panel2);color:var(--muted);line-height:1.45;min-height:20px}
+.benefits{margin:25px 0 0;padding:20px;background:rgba(157,38,48,.12);border:1px solid #4b252a;border-radius:14px}
+.benefits h3{margin:0 0 12px}
+.benefits ul{margin:0;padding-left:22px;color:#ddd;line-height:1.9}
+.account{display:none;text-align:center}
+.account p{color:var(--muted)}
+@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:2rem}.wrap{padding:20px 14px 45px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">← Back to Dark Case Audio</a>
+<header>
+<h1>Dark Case Membership</h1>
+<p>One free membership for Dark Case Audio. Join once and use the same account for free crime case files, free paranormal case files, the Crime Forum and the Paranormal Forum.</p>
+</header>
+
+<div id="authArea" class="grid">
+<section class="card">
+<h2>Create your free account</h2>
+<form id="signupForm">
+<label for="signupEmail">Email address</label>
+<input id="signupEmail" type="email" autocomplete="email" required>
+<label for="signupPassword">Password</label>
+<input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required>
+<button type="submit">Create Free Membership</button>
+</form>
+<div id="signupMessage" class="message"></div>
+</section>
+
+<section class="card">
+<h2>Member login</h2>
+<form id="loginForm">
+<label for="loginEmail">Email address</label>
+<input id="loginEmail" type="email" autocomplete="email" required>
+<label for="loginPassword">Password</label>
+<input id="loginPassword" type="password" autocomplete="current-password" required>
+<button type="submit">Log In</button>
+</form>
+<div id="loginMessage" class="message"></div>
+</section>
+</div>
+
+<section class="benefits">
+<h3>Free membership gives access to</h3>
+<ul>
+<li>Free Crime Case Files</li>
+<li>Free Paranormal Case Files</li>
+<li>Dark Case Crime Forum</li>
+<li>Dark Case Paranormal Forum</li>
+</ul>
+</section>
+
+<section id="accountArea" class="card account">
+<h2>You're logged in</h2>
+<p id="accountEmail"></p>
+<button id="logoutButton" type="button">Log Out</button>
+</section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var SUPABASE_URL="https://inhiiamepxwjtfyqlqir.supabase.co";
+  var SUPABASE_KEY="sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5";
+  var client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+  var authArea=document.getElementById("authArea");
+  var accountArea=document.getElementById("accountArea");
+  var accountEmail=document.getElementById("accountEmail");
+  var signupMessage=document.getElementById("signupMessage");
+  var loginMessage=document.getElementById("loginMessage");
+
+  function showMessage(el,msg){el.textContent=msg}
+  function renderSession(session){
+    if(session&&session.user){
+      authArea.style.display="none";
+      accountArea.style.display="block";
+      accountEmail.textContent="Signed in as "+session.user.email;
+    }else{
+      authArea.style.display="";
+      accountArea.style.display="none";
+    }
+  }
+
+  document.getElementById("signupForm").addEventListener("submit",async function(e){
+    e.preventDefault();
+    showMessage(signupMessage,"Creating your free membership...");
+    var email=document.getElementById("signupEmail").value.trim();
+    var password=document.getElementById("signupPassword").value;
+    var result=await client.auth.signUp({email:email,password:password});
+    if(result.error){showMessage(signupMessage,result.error.message);return}
+    if(result.data.session){
+      showMessage(signupMessage,"Your membership has been created.");
+      renderSession(result.data.session);
+    }else{
+      showMessage(signupMessage,"Your account has been created. Please check your email to confirm your membership, then log in.");
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit",async function(e){
+    e.preventDefault();
+    showMessage(loginMessage,"Logging in...");
+    var email=document.getElementById("loginEmail").value.trim();
+    var password=document.getElementById("loginPassword").value;
+    var result=await client.auth.signInWithPassword({email:email,password:password});
+    if(result.error){showMessage(loginMessage,result.error.message);return}
+    showMessage(loginMessage,"");
+    renderSession(result.data.session);
+  });
+
+  document.getElementById("logoutButton").addEventListener("click",async function(){
+    await client.auth.signOut();
+    renderSession(null);
+  });
+
+  client.auth.getSession().then(function(result){renderSession(result.data.session)});
+  client.auth.onAuthStateChange(function(event,session){renderSession(session)});
+})();
+</script>
+</body>
+</html>
