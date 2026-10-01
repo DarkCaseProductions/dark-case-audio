@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crime Forum | Dark Case Audio</title>
+<meta name="description" content="Dark Case Audio Crime Forum — discuss true crime cases, investigations, evidence, UK crime, international crime and case files with Dark Case members.">
+<link rel="canonical" href="https://darkcaseaudio.com/crime-forum.html">
+<style>
+:root{--bg:#08090c;--panel:#12151b;--panel2:#181c23;--red:#d71920;--red2:#ff3038;--text:#f2f2f2;--muted:#aeb3bd;--line:#292e37}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top,#1a1d24 0,#08090c 42%,#050609 100%);color:var(--text);line-height:1.6}
+.container{width:min(1100px,92%);margin:auto;padding:24px 0 55px}.back{color:#ddd;text-decoration:none;font-weight:700}.back:hover{color:#fff}
+header{margin:30px 0 25px;padding:32px;border:1px solid #303640;border-radius:18px;background:linear-gradient(135deg,rgba(215,25,32,.15),rgba(12,15,20,.94) 48%,rgba(15,31,47,.55));box-shadow:0 20px 55px rgba(0,0,0,.42)}
+h1,h2,h3{font-family:Georgia,serif}h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 8px}header p{margin:0;color:#c5c9d0;max-width:760px}
+.notice{display:none;padding:14px 16px;border-radius:10px;background:#211114;border:1px solid #5b252b;color:#f1c8ca;margin-bottom:20px}.notice a{color:#fff;font-weight:800}
+.category{margin:25px 0;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.28)}
+.cathead{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;align-items:center}.cathead h2{margin:0;font-size:1.45rem}.cathead p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.topicButton,.primary{display:inline-block;background:linear-gradient(180deg,var(--red2),#b80f16);color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:800;border:1px solid #ff4b52;cursor:pointer}
+.topicButton{white-space:nowrap}.topics{padding:8px 22px 14px}.topic{display:block;color:#eee;text-decoration:none;padding:14px 4px;border-bottom:1px solid #252a32}.topic:last-child{border-bottom:0}.topic:hover{color:#ff6970}.topicTitle{font-weight:800}.topicMeta{font-size:.82rem;color:#8f96a1;margin-top:3px}.empty{padding:18px 4px;color:#8f96a1}
+.formCard{display:none;margin:0 22px 22px;padding:20px;background:#0d1015;border:1px solid #343a44;border-radius:12px}.formCard h3{margin:0 0 15px}label{display:block;font-weight:700;margin:11px 0 6px}input,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #424a58;background:#080b10;color:#fff;font:inherit}textarea{min-height:140px;resize:vertical}.actions{display:flex;gap:10px;margin-top:14px}.actions button{flex:1}.secondary{background:#242830;color:#fff;border:1px solid #3a404a;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer}
+footer{text-align:center;color:#8f96a1;border-top:1px solid var(--line);margin-top:40px;padding-top:25px}footer a{color:#c9cdd3}
+@media(max-width:650px){.container{width:94%}.cathead{display:block}.topicButton{display:block;text-align:center;margin-top:12px}.actions{display:block}.actions button{width:100%;margin-top:8px}}
+</style>
+</head>
+<body>
+<div class="container">
+<a class="back" href="index.html">← Back to Dark Case Audio</a>
+<header>
+<h1>🕵️ Crime Forum</h1>
+<p>Discuss true crime cases, investigations, evidence and case files with other Dark Case Audio members. Membership is free.</p>
+</header>
+<div id="loginNotice" class="notice">You need a free Dark Case Membership to view and participate in the forum. <a href="membership.html">Sign in or create your free membership</a>.</div>
+<div id="forum"></div>
+<footer><p><a href="index.html">Dark Case Audio</a> · <a href="membership.html">Member Sign In</a> · <a href="terms.html">Terms &amp; Conditions</a> · <a href="privacy.html">Privacy Policy</a></p><p>© Dark Case Audio / Dark Case Productions</p></footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+var client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
+var forum=document.getElementById("forum"),notice=document.getElementById("loginNotice"),session=null;
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function showMessage(msg){notice.innerHTML=msg;notice.style.display="block"}
+async function load(){
+var sr=await client.auth.getSession();session=sr.data.session;
+if(!session){showMessage('You need a free Dark Case Membership to view and participate in the forum. <a href="membership.html">Sign in or create your free membership</a>.');return}
+var r=await client.from("forum_categories").select("id,forum_type,name,description,display_order").eq("forum_type","crime").order("display_order");
+if(r.error){forum.innerHTML='<div class="category"><div class="empty">The forum could not be loaded. Please try again shortly.</div></div>';return}
+if(!r.data.length){forum.innerHTML='<div class="category"><div class="empty">No forum categories are available yet.</div></div>';return}
+var html="";
+for(var i=0;i<r.data.length;i++){
+var c=r.data[i];
+var tr=await client.from("forum_threads").select("id,title,created_at,updated_at").eq("category_id",c.id).order("updated_at",{ascending:false}).limit(20);
+html+='<section class="category"><div class="cathead"><div><h2>'+esc(c.name)+'</h2><p>'+esc(c.description)+'</p></div><button class="topicButton" data-cat="'+c.id+'">+ New Topic</button></div><div class="formCard" id="form-'+c.id+'"><h3>Start a new topic</h3><label>Title</label><input class="newTitle" maxlength="160" placeholder="Topic title"><label>Message</label><textarea class="newContent" maxlength="10000" placeholder="Write your opening post..."></textarea><div class="actions"><button class="primary createTopic" data-cat="'+c.id+'">Post Topic</button><button class="secondary cancelTopic" data-cat="'+c.id+'">Cancel</button></div></div><div class="topics">';
+if(tr.error){html+='<div class="empty">Unable to load topics in this category.</div>'}
+else if(!tr.data.length){html+='<div class="empty">No topics yet. Start the first discussion.</div>'}
+else{tr.data.forEach(function(t){html+='<a class="topic" href="crime-thread.html?id='+encodeURIComponent(t.id)+'"><div class="topicTitle">'+esc(t.title)+'</div><div class="topicMeta">Member discussion · Updated '+new Date(t.updated_at||t.created_at).toLocaleString("en-GB")+'</div></a>'})}
+html+='</div></section>';
+}
+forum.innerHTML=html;
+document.querySelectorAll(".topicButton").forEach(function(b){b.onclick=function(){var f=document.getElementById("form-"+b.dataset.cat);f.style.display=f.style.display==="block"?"none":"block";}});
+document.querySelectorAll(".cancelTopic").forEach(function(b){b.onclick=function(){document.getElementById("form-"+b.dataset.cat).style.display="none"}});
+document.querySelectorAll(".createTopic").forEach(function(b){b.onclick=function(){createTopic(b.dataset.cat,b)}});
+}
+async function createTopic(cat,b){
+var f=document.getElementById("form-"+cat),title=f.querySelector(".newTitle").value.trim(),content=f.querySelector(".newContent").value.trim();
+if(!title||!content){alert("Please enter a title and message.");return}
+b.disabled=true;b.textContent="Posting...";
+var r=await client.from("forum_threads").insert({category_id:cat,user_id:session.user.id,title:title,content:content}).select("id").single();
+if(r.error){alert(r.error.message);b.disabled=false;b.textContent="Post Topic";return}
+window.location.href="crime-thread.html?id="+encodeURIComponent(r.data.id);
+}
+load();
+})();
+</script>
+</body>
+</html>
