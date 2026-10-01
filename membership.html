@@ -21,6 +21,7 @@ header p{color:var(--muted);font-size:1.05rem;line-height:1.6}
 h2{margin:0 0 18px;font-family:Georgia,serif}
 label{display:block;margin:12px 0 6px;font-weight:700}
 input{width:100%;padding:13px;border-radius:9px;border:1px solid #424a58;background:#080b10;color:#fff;font-size:1rem}
+.hint{margin:5px 0 0;color:var(--muted);font-size:.82rem;line-height:1.4}
 button{width:100%;margin-top:16px;padding:13px;border:0;border-radius:9px;background:var(--red);color:#fff;font-weight:800;font-size:1rem;cursor:pointer}
 button:hover{filter:brightness(1.12)}
 .message{margin-top:14px;padding:11px;border-radius:8px;background:var(--panel2);color:var(--muted);line-height:1.45;min-height:20px}
@@ -29,6 +30,7 @@ button:hover{filter:brightness(1.12)}
 .benefits ul{margin:0;padding-left:22px;color:#ddd;line-height:1.9}
 .account{display:none;text-align:center}
 .account p{color:var(--muted)}
+.account .username{color:#fff;font-weight:700}
 @media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:2rem}.wrap{padding:20px 14px 45px}}
 </style>
 </head>
@@ -44,6 +46,9 @@ button:hover{filter:brightness(1.12)}
 <section class="card">
 <h2>Create your free account</h2>
 <form id="signupForm">
+<label for="signupUsername">Choose your username</label>
+<input id="signupUsername" type="text" autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]+" required>
+<p class="hint">This is the name other members will see on forum posts. Use 3–20 letters, numbers, underscores or hyphens. Your email address stays private.</p>
 <label for="signupEmail">Email address</label>
 <input id="signupEmail" type="email" autocomplete="email" required>
 <label for="signupPassword">Password</label>
@@ -78,7 +83,8 @@ button:hover{filter:brightness(1.12)}
 
 <section id="accountArea" class="card account">
 <h2>You're logged in</h2>
-<p id="accountEmail"></p>
+<p id="accountUsername" class="username"></p>
+<p>Your email address is private and is not displayed to other members.</p>
 <button id="logoutButton" type="button">Log Out</button>
 </section>
 </div>
@@ -92,16 +98,30 @@ button:hover{filter:brightness(1.12)}
 
   var authArea=document.getElementById("authArea");
   var accountArea=document.getElementById("accountArea");
-  var accountEmail=document.getElementById("accountEmail");
+  var accountUsername=document.getElementById("accountUsername");
   var signupMessage=document.getElementById("signupMessage");
   var loginMessage=document.getElementById("loginMessage");
 
   function showMessage(el,msg){el.textContent=msg}
+
+  async function loadProfile(user){
+    if(!user){
+      accountUsername.textContent="";
+      return;
+    }
+    var result=await client.from("profiles").select("username").eq("id",user.id).maybeSingle();
+    if(result.data&&result.data.username){
+      accountUsername.textContent="Username: "+result.data.username;
+    }else{
+      accountUsername.textContent="Username: Not set";
+    }
+  }
+
   function renderSession(session){
     if(session&&session.user){
       authArea.style.display="none";
       accountArea.style.display="block";
-      accountEmail.textContent="Signed in as "+session.user.email;
+      loadProfile(session.user);
     }else{
       authArea.style.display="";
       accountArea.style.display="none";
@@ -111,10 +131,30 @@ button:hover{filter:brightness(1.12)}
   document.getElementById("signupForm").addEventListener("submit",async function(e){
     e.preventDefault();
     showMessage(signupMessage,"Creating your free membership...");
+    var username=document.getElementById("signupUsername").value.trim().toLowerCase();
     var email=document.getElementById("signupEmail").value.trim();
     var password=document.getElementById("signupPassword").value;
-    var result=await client.auth.signUp({email:email,password:password});
-    if(result.error){showMessage(signupMessage,result.error.message);return}
+
+    if(!/^[a-z0-9_-]{3,20}$/.test(username)){
+      showMessage(signupMessage,"Please choose a username using 3–20 letters, numbers, underscores or hyphens.");
+      return;
+    }
+
+    var result=await client.auth.signUp({
+      email:email,
+      password:password,
+      options:{data:{username:username}}
+    });
+
+    if(result.error){
+      if(result.error.message&&result.error.message.toLowerCase().indexOf("profiles_username_key")!==-1){
+        showMessage(signupMessage,"That username is already in use. Please choose another.");
+      }else{
+        showMessage(signupMessage,result.error.message);
+      }
+      return;
+    }
+
     if(result.data.session){
       window.location.href="index.html";
     }else{
