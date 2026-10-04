@@ -86,7 +86,7 @@ footer a{color:#c9cdd3}
 .radioBanner img{display:block;width:100%;height:100%;object-fit:cover}
 .radioBannerPlayer{position:absolute;left:17.2%;top:69%;width:70.8%;height:10%;display:flex;align-items:center}
 .radioBannerPlayer audio{width:100%;height:48px;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.55))}
-.radioNowPlaying{position:absolute;left:17.2%;top:80.5%;width:70.8%;text-align:center;color:#f2f2f2;font-size:.82rem;font-weight:700;letter-spacing:.3px;text-shadow:0 2px 6px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.radioNowPlaying span{color:#ff6970}@media(max-width:650px){.radioNowPlaying{left:17.2%;top:80.5%;width:70.8%;font-size:.55rem}}.radioBannerStatus{position:absolute;left:17.2%;bottom:7.5%;color:#d7d9de;font-size:.78rem;letter-spacing:.3px;text-shadow:0 2px 5px #000}
+.radioNowPlaying{position:absolute;left:17.2%;top:79.5%;width:70.8%;height:14.5%;display:flex;align-items:center;justify-content:center;gap:28px;padding:7px 14px;background:rgba(242,242,242,.97);border:1px solid #c9cdd2;border-radius:8px;color:#16181c;font-size:.78rem;font-weight:800;letter-spacing:.2px;box-shadow:0 3px 12px rgba(0,0,0,.35);text-align:center;overflow:hidden}.radioNowPlaying .nowBlock,.radioNowPlaying .nextBlock{min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.radioNowPlaying .label{display:block;color:#555b63;font-size:.62rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:1px}.radioNowPlaying .title{display:block;color:#111318;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.radioNowPlaying span{color:#111318}@media(max-width:650px){.radioNowPlaying{left:17.2%;top:79.5%;width:70.8%;height:14.5%;gap:8px;padding:4px 7px;font-size:.5rem;border-radius:5px}.radioNowPlaying .label{font-size:.42rem;letter-spacing:.6px}}.radioBannerStatus{position:absolute;left:17.2%;bottom:1.5%;color:#d7d9de;font-size:.55rem;letter-spacing:.2px;text-shadow:0 2px 5px #000}@media(max-width:650px){.radioBannerStatus{font-size:.42rem;bottom:1.2%}}
 @media(max-width:650px){header{padding-top:18px}.logo{width:100%;height:auto}.hero{padding:30px 22px}.sectionhead{display:block}.sectionhead p{margin-top:5px}nav a{padding:9px 10px;font-size:.84rem}.card{padding:16px}.radioBanner{border-radius:12px}.radioBannerPlayer{left:17.2%;top:69%;width:70.8%;height:10%}.radioBannerPlayer audio{height:36px}.radioBannerStatus{font-size:.55rem;bottom:7.5%}}
 </style>
 <meta name="description" content="Dark Case Audio brings together true crime, real crime cases, investigative case files, audiobooks, ebooks and paranormal investigations from the UK and around the world.">
@@ -171,7 +171,7 @@ footer a{color:#c9cdd3}
 Your browser does not support the audio player.
 </audio>
 </div>
-<div class="radioNowPlaying" id="dca-now-playing">Now Playing: <span>Loading...</span></div>
+<div class="radioNowPlaying" id="dca-now-playing"><div class="nowBlock"><span class="label">Now Playing</span><span class="title">Loading...</span></div><div class="nextBlock"><span class="label">Coming Next</span><span class="title">Loading...</span></div></div>
 <div class="radioBannerStatus">Press play to join the live broadcast.</div>
 </div>
 </section>
@@ -219,15 +219,27 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 (function(){
 var npEl=document.getElementById("dca-now-playing");
 var npUrl="https://radio.darkcaseaudio.com/api/nowplaying/dark_case_radio";
+function formatSong(song,fallback){
+var title=song&&song.title?((song.artist?song.artist+" - ":"")+song.title):fallback;
+return escapeHtml(title);
+}
 function updateNowPlaying(){
 fetch(npUrl+"?t="+Date.now(),{cache:"no-store"})
 .then(function(r){if(!r.ok)throw new Error("Now playing unavailable");return r.json();})
 .then(function(data){
-var song=data.now_playing&&data.now_playing.song;
-var title=song&&song.title?((song.artist?song.artist+" - ":"")+song.title):"Dark Case Radio";
-npEl.innerHTML="Now Playing: <span>"+escapeHtml(title)+"</span>";
+var nowTitle=formatSong(data.now_playing&&data.now_playing.song,"Dark Case Radio");
+var nextTitle=formatSong(data.playing_next&&data.playing_next.song,"Next programme");
+var nowTitleEl=npEl.querySelector(".nowBlock .title");
+var nextTitleEl=npEl.querySelector(".nextBlock .title");
+if(nowTitleEl)nowTitleEl.innerHTML=nowTitle;
+if(nextTitleEl)nextTitleEl.innerHTML=nextTitle;
 })
-.catch(function(){npEl.innerHTML="Now Playing: <span>Dark Case Radio</span>";});
+.catch(function(){
+var nowTitleEl=npEl.querySelector(".nowBlock .title");
+var nextTitleEl=npEl.querySelector(".nextBlock .title");
+if(nowTitleEl)nowTitleEl.textContent="Dark Case Radio";
+if(nextTitleEl)nextTitleEl.textContent="Coming next";
+});
 }
 function escapeHtml(str){return String(str).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
 updateNowPlaying();
