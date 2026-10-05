@@ -243,42 +243,15 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   var npEl=document.getElementById("dca-now-playing");
   if(!npEl)return;
 
-  var nowEl=npEl.querySelector(".nowBlock .title");
-  var nextEl=npEl.querySelector(".nextBlock .title");
-  var worker="https://dark-case-nowplaying.darkcaseaudios.workers.dev/";
-  var timer=null;
-
-  function songText(song){
-    if(!song)return "";
-    if(song.text)return song.text;
-    if(song.artist&&song.title)return song.artist+" - "+song.title;
-    return song.title||song.artist||"";
-  }
-
-  window.dcaNowPlayingCallback=function(data){
-    if(!data)return;
-    var nowTitle=songText(data.now_playing&&data.now_playing.song);
-    var nextTitle=songText(data.playing_next&&data.playing_next.song);
-    if(nowTitle&&nowEl)nowEl.textContent=nowTitle;
-    if(nextTitle&&nextEl)nextEl.textContent=nextTitle;
-  };
-
   function loadNowPlaying(){
-    var old=document.getElementById("dca-nowplaying-jsonp");
+    var old=document.getElementById("dca-nowplaying-script");
     if(old)old.remove();
-
     var script=document.createElement("script");
-    script.id="dca-nowplaying-jsonp";
-    script.src=worker+"?callback=dcaNowPlayingCallback&t="+Date.now();
+    script.id="dca-nowplaying-script";
+    script.src="https://dark-case-nowplaying.darkcaseaudios.workers.dev/?script=1&t="+Date.now();
     script.async=true;
-    script.onload=function(){
-      if(timer)clearTimeout(timer);
-      timer=setTimeout(loadNowPlaying,10000);
-    };
-    script.onerror=function(){
-      if(timer)clearTimeout(timer);
-      timer=setTimeout(loadNowPlaying,10000);
-    };
+    script.onload=function(){setTimeout(loadNowPlaying,10000);};
+    script.onerror=function(){setTimeout(loadNowPlaying,10000);};
     document.head.appendChild(script);
   }
 
