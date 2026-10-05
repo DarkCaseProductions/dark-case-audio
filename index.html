@@ -264,7 +264,7 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   }
 
   function loadNowPlaying(){
-    fetch("https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.json?t="+Date.now(),{
+    fetch("https://dark-case-nowplaying.darkcaseaudios.workers.dev/?t="+Date.now(),{
       method:"GET",
       mode:"cors",
       credentials:"omit",
