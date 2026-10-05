@@ -245,9 +245,6 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 
   var nowEl=npEl.querySelector(".nowBlock .title");
   var nextEl=npEl.querySelector(".nextBlock .title");
-  var websocketConnected=false;
-  var websocketHasData=false;
-  var fallbackTimer=null;
 
   function songText(song){
     if(!song)return "";
@@ -256,19 +253,17 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
     return song.title||song.artist||"";
   }
 
-  function setTitles(np){
-    if(!np)return;
+  function updateNowPlaying(data){
+    if(!data)return;
 
-    var nowTitle=songText(np.now_playing&&np.now_playing.song);
-    var nextTitle=songText(np.playing_next&&np.playing_next.song);
+    var nowTitle=songText(data.now_playing&&data.now_playing.song);
+    var nextTitle=songText(data.playing_next&&data.playing_next.song);
 
     if(nowTitle&&nowEl)nowEl.textContent=nowTitle;
     if(nextTitle&&nextEl)nextEl.textContent=nextTitle;
   }
 
-  function loadApiFallback(){
-    if(websocketHasData)return;
-
+  function loadNowPlaying(){
     fetch("https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.json?t="+Date.now(),{
       method:"GET",
       mode:"cors",
@@ -276,99 +271,20 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
       cache:"no-store",
       headers:{Accept:"application/json"}
     })
-    .then(function(r){
-      if(!r.ok)throw new Error("Now playing unavailable");
-      return r.json();
+    .then(function(response){
+      if(!response.ok)throw new Error("Now Playing request failed");
+      return response.json();
     })
     .then(function(data){
-      if(!websocketHasData)setTitles(data);
+      updateNowPlaying(data);
     })
-    .catch(function(){});
+    .catch(function(){})
+    .finally(function(){
+      setTimeout(loadNowPlaying,10000);
+    });
   }
 
-  function connect(){
-    var socket;
-
-    try{
-      socket=new WebSocket(
-        "wss://radio.darkcaseaudio.com/api/live/nowplaying/websocket"
-      );
-    }catch(e){
-      loadApiFallback();
-      setTimeout(connect,10000);
-      return;
-    }
-
-    socket.onopen=function(){
-      websocketConnected=true;
-      socket.send(JSON.stringify({
-        "subs":{
-          "station:dark_case_radio":{
-            "recover":true
-          }
-        }
-      }));
-
-      clearTimeout(fallbackTimer);
-      fallbackTimer=setTimeout(function(){
-        if(!websocketHasData)loadApiFallback();
-      },5000);
-    };
-
-    socket.onmessage=function(e){
-      try{
-        var data=JSON.parse(e.data);
-
-        if(data.connect){
-          var connectData=data.connect;
-
-          if(connectData.data){
-            connectData.data.forEach(function(item){
-              if(item&&item.data&&item.data.np){
-                websocketHasData=true;
-                setTitles(item.data.np);
-              }
-            });
-          }
-
-          if(connectData.subs){
-            Object.keys(connectData.subs).forEach(function(key){
-              var sub=connectData.subs[key];
-
-              if(sub.publications){
-                sub.publications.forEach(function(item){
-                  if(item&&item.data&&item.data.np){
-                    websocketHasData=true;
-                    setTitles(item.data.np);
-                  }
-                });
-              }
-            });
-          }
-        }
-
-        if(data.pub&&data.pub.data&&data.pub.data.np){
-          websocketHasData=true;
-          setTitles(data.pub.data.np);
-        }
-
-      }catch(e){}
-    };
-
-    socket.onclose=function(){
-      websocketConnected=false;
-      clearTimeout(fallbackTimer);
-      if(!websocketHasData)loadApiFallback();
-      setTimeout(connect,5000);
-    };
-
-    socket.onerror=function(){
-      try{socket.close();}catch(e){}
-    };
-  }
-
-  loadApiFallback();
-  connect();
+  loadNowPlaying();
 })();
 </script>
 <script>
