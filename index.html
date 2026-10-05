@@ -239,32 +239,63 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 <script>
 (function(){
 var npEl=document.getElementById("dca-now-playing");
-var npUrl="https://radio.darkcaseaudio.com/api/nowplaying/dark_case_radio";
-function formatSong(song,fallback){
-var title=song&&song.title?((song.artist?song.artist+" - ":"")+song.title):fallback;
-return escapeHtml(title);
+var npJsonUrls=[
+  "https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.json",
+  "https://radio.darkcaseaudio.com/api/nowplaying/dark_case_radio"
+];
+var npTextUrl="https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.txt";
+
+function setTitles(nowTitle,nextTitle){
+  var nowTitleEl=npEl.querySelector(".nowBlock .title");
+  var nextTitleEl=npEl.querySelector(".nextBlock .title");
+  if(nowTitleEl)nowTitleEl.textContent=nowTitle||"Dark Case Radio";
+  if(nextTitleEl)nextTitleEl.textContent=nextTitle||"Coming next";
 }
-function updateNowPlaying(){
-fetch(npUrl+"?t="+Date.now(),{cache:"no-store"})
-.then(function(r){if(!r.ok)throw new Error("Now playing unavailable");return r.json();})
-.then(function(data){
-var nowTitle=formatSong(data.now_playing&&data.now_playing.song,"Dark Case Radio");
-var nextTitle=formatSong(data.playing_next&&data.playing_next.song,"Next programme");
-var nowTitleEl=npEl.querySelector(".nowBlock .title");
-var nextTitleEl=npEl.querySelector(".nextBlock .title");
-if(nowTitleEl)nowTitleEl.innerHTML=nowTitle;
-if(nextTitleEl)nextTitleEl.innerHTML=nextTitle;
-})
-.catch(function(){
-var nowTitleEl=npEl.querySelector(".nowBlock .title");
-var nextTitleEl=npEl.querySelector(".nextBlock .title");
-if(nowTitleEl)nowTitleEl.textContent="Dark Case Radio";
-if(nextTitleEl)nextTitleEl.textContent="Coming next";
-});
+function songText(song,fallback){
+  if(!song)return fallback;
+  var artist=song.artist||"";
+  var title=song.title||"";
+  return artist&&title?artist+" - "+title:(title||artist||fallback);
 }
-function escapeHtml(str){return String(str).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];});}
-updateNowPlaying();
-setInterval(updateNowPlaying,15000);
+function loadJson(index){
+  if(index>=npJsonUrls.length){
+    loadCurrentText();
+    return;
+  }
+  fetch(npJsonUrls[index]+"?t="+Date.now(),{
+    method:"GET",
+    mode:"cors",
+    credentials:"omit",
+    cache:"no-store",
+    headers:{Accept:"application/json"}
+  })
+  .then(function(r){if(!r.ok)throw new Error("Now playing unavailable");return r.json();})
+  .then(function(data){
+    var nowTitle=songText(data.now_playing&&data.now_playing.song,"Dark Case Radio");
+    var nextTitle=songText(data.playing_next&&data.playing_next.song,"Coming next");
+    setTitles(nowTitle,nextTitle);
+  })
+  .catch(function(){loadJson(index+1);});
+}
+function loadCurrentText(){
+  fetch(npTextUrl+"?t="+Date.now(),{
+    method:"GET",
+    mode:"cors",
+    credentials:"omit",
+    cache:"no-store",
+    headers:{Accept:"text/plain"}
+  })
+  .then(function(r){if(!r.ok)throw new Error("Current title unavailable");return r.text();})
+  .then(function(text){
+    text=text.trim();
+    if(text)setTitles(text,npEl.querySelector(".nextBlock .title").textContent||"Coming next");
+  })
+  .catch(function(){
+    setTitles("Dark Case Radio","Coming next");
+  });
+}
+loadJson(0);
+setInterval(function(){loadJson(0);},15000);
 })();
 </script>
 <script>
