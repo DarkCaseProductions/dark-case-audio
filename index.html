@@ -299,6 +299,104 @@ function loadCurrentText(){
 loadJson(0);
 setInterval(function(){loadJson(0);},15000);
 })();
+</script><script>
+(function(){
+  var npEl=document.getElementById("dca-now-playing");
+  if(!npEl)return;
+
+  var nowEl=npEl.querySelector(".nowBlock .title");
+  var nextEl=npEl.querySelector(".nextBlock .title");
+
+  function songText(song,fallback){
+    if(!song)return fallback;
+    if(song.text)return song.text;
+    if(song.artist&&song.title)return song.artist+" - "+song.title;
+    return song.title||song.artist||fallback;
+  }
+
+  function updateTitles(np){
+    if(!np)return;
+
+    var nowTitle=songText(
+      np.now_playing&&np.now_playing.song,
+      null
+    );
+
+    var nextTitle=songText(
+      np.playing_next&&np.playing_next.song,
+      null
+    );
+
+    if(nowTitle&&nowEl)nowEl.textContent=nowTitle;
+    if(nextTitle&&nextEl)nextEl.textContent=nextTitle;
+  }
+
+  function connect(){
+    var socket;
+
+    try{
+      socket=new WebSocket(
+        "wss://radio.darkcaseaudio.com/api/live/nowplaying/websocket"
+      );
+    }catch(e){
+      setTimeout(connect,5000);
+      return;
+    }
+
+    socket.onopen=function(){
+      socket.send(JSON.stringify({
+        "subs":{
+          "station:dark_case_radio":{
+            "recover":true
+          }
+        }
+      }));
+    };
+
+    socket.onmessage=function(e){
+      try{
+        var data=JSON.parse(e.data);
+
+        if(data.pub&&data.pub.data&&data.pub.data.np){
+          updateTitles(data.pub.data.np);
+        }
+
+        if(data.connect&&data.connect.subs){
+          Object.keys(data.connect.subs).forEach(function(key){
+            var sub=data.connect.subs[key];
+
+            if(sub.publications){
+              sub.publications.forEach(function(item){
+                if(item.data&&item.data.np){
+                  updateTitles(item.data.np);
+                }
+              });
+            }
+          });
+        }
+
+        if(data.connect&&data.connect.data){
+          data.connect.data.forEach(function(item){
+            if(item.data&&item.data.np){
+              updateTitles(item.data.np);
+            }
+          });
+        }
+
+      }catch(e){}
+    };
+
+    socket.onclose=function(){
+      setTimeout(connect,5000);
+    };
+
+    socket.onerror=function(){
+      try{socket.close();}catch(e){}
+    };
+  }
+
+  connect();
+})();
 </script>
 <script>
 (function(){
