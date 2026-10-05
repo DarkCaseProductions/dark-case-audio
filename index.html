@@ -256,7 +256,7 @@ function songText(song,fallback){
   if(!song)return fallback;
   var artist=song.artist||"";
   var title=song.title||"";
-  return artist&&title?artist+" - "+title:(title||artist||fallback);
+  return song.text||song.title||song.artist||fallback;
 }
 function loadJson(index){
   if(index>=npJsonUrls.length){
