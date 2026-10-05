@@ -240,95 +240,50 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 </script>
 <script>
 (function(){
-var npEl=document.getElementById("dca-now-playing");
-var npJsonUrls=[
-  "https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.json",
-  "https://radio.darkcaseaudio.com/api/nowplaying/dark_case_radio"
-];
-var npTextUrl="https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.txt";
-
-function setTitles(nowTitle,nextTitle){
-  var nowTitleEl=npEl.querySelector(".nowBlock .title");
-  var nextTitleEl=npEl.querySelector(".nextBlock .title");
-  if(nowTitleEl)nowTitleEl.textContent=nowTitle||"Dark Case Radio";
-  if(nextTitleEl)nextTitleEl.textContent=nextTitle||"Coming next";
-}
-function songText(song,fallback){
-  if(!song)return fallback;
-  var artist=song.artist||"";
-  var title=song.title||"";
-  return song.text||song.title||song.artist||fallback;
-}
-function loadJson(index){
-  if(index>=npJsonUrls.length){
-    loadCurrentText();
-    return;
-  }
-  fetch(npJsonUrls[index]+"?t="+Date.now(),{
-    method:"GET",
-    mode:"cors",
-    credentials:"omit",
-    cache:"no-store",
-    headers:{Accept:"application/json"}
-  })
-  .then(function(r){if(!r.ok)throw new Error("Now playing unavailable");return r.json();})
-  .then(function(data){
-    var nowTitle=songText(data.now_playing&&data.now_playing.song,"Dark Case Radio");
-    var nextTitle=songText(data.playing_next&&data.playing_next.song,"Coming next");
-    setTitles(nowTitle,nextTitle);
-  })
-  .catch(function(){loadJson(index+1);});
-}
-function loadCurrentText(){
-  fetch(npTextUrl+"?t="+Date.now(),{
-    method:"GET",
-    mode:"cors",
-    credentials:"omit",
-    cache:"no-store",
-    headers:{Accept:"text/plain"}
-  })
-  .then(function(r){if(!r.ok)throw new Error("Current title unavailable");return r.text();})
-  .then(function(text){
-    text=text.trim();
-    if(text)setTitles(text,npEl.querySelector(".nextBlock .title").textContent||"Coming next");
-  })
-  .catch(function(){
-    setTitles("Dark Case Radio","Coming next");
-  });
-}
-loadJson(0);
-setInterval(function(){loadJson(0);},15000);
-})();
-</script><script>
-(function(){
   var npEl=document.getElementById("dca-now-playing");
   if(!npEl)return;
 
   var nowEl=npEl.querySelector(".nowBlock .title");
   var nextEl=npEl.querySelector(".nextBlock .title");
+  var websocketConnected=false;
+  var websocketHasData=false;
+  var fallbackTimer=null;
 
-  function songText(song,fallback){
-    if(!song)return fallback;
+  function songText(song){
+    if(!song)return "";
     if(song.text)return song.text;
     if(song.artist&&song.title)return song.artist+" - "+song.title;
-    return song.title||song.artist||fallback;
+    return song.title||song.artist||"";
   }
 
-  function updateTitles(np){
+  function setTitles(np){
     if(!np)return;
 
-    var nowTitle=songText(
-      np.now_playing&&np.now_playing.song,
-      null
-    );
-
-    var nextTitle=songText(
-      np.playing_next&&np.playing_next.song,
-      null
-    );
+    var nowTitle=songText(np.now_playing&&np.now_playing.song);
+    var nextTitle=songText(np.playing_next&&np.playing_next.song);
 
     if(nowTitle&&nowEl)nowEl.textContent=nowTitle;
     if(nextTitle&&nextEl)nextEl.textContent=nextTitle;
+  }
+
+  function loadApiFallback(){
+    if(websocketHasData)return;
+
+    fetch("https://radio.darkcaseaudio.com/api/nowplaying_static/dark_case_radio.json?t="+Date.now(),{
+      method:"GET",
+      mode:"cors",
+      credentials:"omit",
+      cache:"no-store",
+      headers:{Accept:"application/json"}
+    })
+    .then(function(r){
+      if(!r.ok)throw new Error("Now playing unavailable");
+      return r.json();
+    })
+    .then(function(data){
+      if(!websocketHasData)setTitles(data);
+    })
+    .catch(function(){});
   }
 
   function connect(){
@@ -339,11 +294,13 @@ setInterval(function(){loadJson(0);},15000);
         "wss://radio.darkcaseaudio.com/api/live/nowplaying/websocket"
       );
     }catch(e){
-      setTimeout(connect,5000);
+      loadApiFallback();
+      setTimeout(connect,10000);
       return;
     }
 
     socket.onopen=function(){
+      websocketConnected=true;
       socket.send(JSON.stringify({
         "subs":{
           "station:dark_case_radio":{
@@ -351,42 +308,57 @@ setInterval(function(){loadJson(0);},15000);
           }
         }
       }));
+
+      clearTimeout(fallbackTimer);
+      fallbackTimer=setTimeout(function(){
+        if(!websocketHasData)loadApiFallback();
+      },5000);
     };
 
     socket.onmessage=function(e){
       try{
         var data=JSON.parse(e.data);
 
+        if(data.connect){
+          var connectData=data.connect;
+
+          if(connectData.data){
+            connectData.data.forEach(function(item){
+              if(item&&item.data&&item.data.np){
+                websocketHasData=true;
+                setTitles(item.data.np);
+              }
+            });
+          }
+
+          if(connectData.subs){
+            Object.keys(connectData.subs).forEach(function(key){
+              var sub=connectData.subs[key];
+
+              if(sub.publications){
+                sub.publications.forEach(function(item){
+                  if(item&&item.data&&item.data.np){
+                    websocketHasData=true;
+                    setTitles(item.data.np);
+                  }
+                });
+              }
+            });
+          }
+        }
+
         if(data.pub&&data.pub.data&&data.pub.data.np){
-          updateTitles(data.pub.data.np);
-        }
-
-        if(data.connect&&data.connect.subs){
-          Object.keys(data.connect.subs).forEach(function(key){
-            var sub=data.connect.subs[key];
-
-            if(sub.publications){
-              sub.publications.forEach(function(item){
-                if(item.data&&item.data.np){
-                  updateTitles(item.data.np);
-                }
-              });
-            }
-          });
-        }
-
-        if(data.connect&&data.connect.data){
-          data.connect.data.forEach(function(item){
-            if(item.data&&item.data.np){
-              updateTitles(item.data.np);
-            }
-          });
+          websocketHasData=true;
+          setTitles(data.pub.data.np);
         }
 
       }catch(e){}
     };
 
     socket.onclose=function(){
+      websocketConnected=false;
+      clearTimeout(fallbackTimer);
+      if(!websocketHasData)loadApiFallback();
       setTimeout(connect,5000);
     };
 
@@ -395,6 +367,7 @@ setInterval(function(){loadJson(0);},15000);
     };
   }
 
+  loadApiFallback();
   connect();
 })();
 </script>
