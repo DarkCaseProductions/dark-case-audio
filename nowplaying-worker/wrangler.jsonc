@@ -1,11 +1,5 @@
 {
   "name": "dark-case-nowplaying",
   "main": "worker.js",
-  "compatibility_date": "2026-10-05",
-  "routes": [
-    {
-      "pattern": "darkcaseaudio.com/api/nowplaying*",
-      "zone_name": "darkcaseaudio.com"
-    }
-  ]
+  "compatibility_date": "2026-10-05"
 }
