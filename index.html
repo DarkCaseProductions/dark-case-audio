@@ -22,13 +22,29 @@ nav a:hover{background:var(--red);color:#fff}
 .navMore{display:none;font:inherit;color:#e8e8e8;background:transparent;border:0;padding:9px 10px;border-radius:9px;font-weight:800;font-size:.84rem;cursor:pointer}
 .navMore:hover{background:var(--red);color:#fff}
 @media(max-width:650px){
-  nav .navinner{align-items:center;gap:3px;padding:6px}
+  nav{position:sticky;top:0}
+  nav .navinner{position:relative;align-items:center;gap:3px;padding:6px}
   nav .navinner>a:nth-child(-n+3){flex:0 0 auto;padding:7px 7px;font-size:.72rem}
   nav .navMore{display:block;flex:0 0 auto;padding:7px 7px;font-size:.72rem}
-  nav .navExtra{display:none;width:100%;flex-wrap:wrap;justify-content:center;gap:4px}
-  nav.expanded .navExtra{display:flex}
+  nav .navExtra{
+    display:none!important;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    right:0;
+    width:100%;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:4px;
+    padding:8px;
+    background:rgba(10,11,15,.98);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:0 12px 28px rgba(0,0,0,.5);
+    z-index:30;
+  }
+  nav.expanded .navExtra{display:flex!important}
   nav.expanded .navMore{background:var(--red);color:#fff}
-  nav.expanded .navinner>a:nth-child(-n+3){margin-bottom:2px}
 }
 .hero{position:relative;overflow:hidden;border:1px solid #303640;border-radius:20px;padding:42px 34px;margin-bottom:30px;background:linear-gradient(135deg,rgba(215,25,32,.15),rgba(12,15,20,.94) 48%,rgba(15,31,47,.55));box-shadow:0 20px 55px rgba(0,0,0,.42)}
 .hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-90px;background:rgba(215,25,32,.12);filter:blur(8px);border-radius:50%}
