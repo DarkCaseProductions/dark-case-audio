@@ -276,14 +276,16 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
     font-weight:800!important;
   }
 
-  /* Move the Now Playing / Coming Next box down away from the red line */
+  /* MOBILE ONLY: visibly lower the title box */
   .radioNowPlaying{
     top:79%!important;
+    transform:translateY(10px)!important;
   }
 
-  /* Move the "Press play..." message lower so it clears the title box */
+  /* MOBILE ONLY: visibly lower the status message */
   .radioBannerStatus{
     bottom:.4%!important;
+    transform:translateY(14px)!important;
   }
 }
 </style>
