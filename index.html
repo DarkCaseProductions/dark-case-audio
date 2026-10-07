@@ -260,7 +260,7 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 })();
 </script></script>
 <style>
-/* MOBILE ONLY — make the existing title line explicitly visible */
+/* MOBILE ONLY — title display and spacing adjustments; desktop untouched */
 @media (max-width:650px){
   #dca-now-playing .nowBlock .title,
   #dca-now-playing .nextBlock .title{
@@ -274,6 +274,16 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
     font-size:10px!important;
     line-height:12px!important;
     font-weight:800!important;
+  }
+
+  /* Move the Now Playing / Coming Next box down away from the red line */
+  .radioNowPlaying{
+    top:79%!important;
+  }
+
+  /* Move the "Press play..." message lower so it clears the title box */
+  .radioBannerStatus{
+    bottom:.4%!important;
   }
 }
 </style>
