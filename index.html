@@ -259,7 +259,7 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   }
 
   function loadNowPlaying(){
-    fetch("https://dark-case-nowplaying.darkcaseaudios.workers.dev?t="+Date.now(),{cache:"no-store"})
+    fetch("/api/nowplaying?t="+Date.now(),{cache:"no-store"})
       .then(function(response){
         if(!response.ok)throw new Error("Now Playing request failed: "+response.status);
         return response.json();
