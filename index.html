@@ -260,6 +260,43 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
 })();
 </script></script>
 <script>
+/* MOBILE-ONLY FALLBACK — does not run on desktop */
+(function(){
+  if(window.innerWidth>650)return;
+  var npEl=document.getElementById("dca-now-playing");
+  if(!npEl)return;
+
+  function updateMobile(data){
+    var n=data&&data.now_playing&&data.now_playing.song;
+    var x=data&&data.playing_next&&data.playing_next.song;
+    var nowText=n&&(n.text||(n.artist&&n.title?n.artist+" - "+n.title:n.title||n.artist))||"";
+    var nextText=x&&(x.text||(x.artist&&x.title?x.artist+" - "+x.title:x.title||x.artist))||"";
+    var a=npEl.querySelector(".nowBlock .title");
+    var b=npEl.querySelector(".nextBlock .title");
+    if(a&&nowText)a.textContent=nowText;
+    if(b&&nextText)b.textContent=nextText;
+  }
+
+  function mobilePoll(){
+    fetch("https://dark-case-nowplaying."+"darkcaseaudios.workers.dev/?t="+Date.now(),{
+      cache:"no-store",
+      mode:"cors"
+    })
+    .then(function(r){
+      if(!r.ok)throw new Error("Mobile Now Playing request failed: "+r.status);
+      return r.json();
+    })
+    .then(updateMobile)
+    .catch(function(){})
+    .finally(function(){
+      setTimeout(mobilePoll,10000);
+    });
+  }
+
+  mobilePoll();
+})();
+</script>
+<script>
 (function(){
   var nav=document.getElementById("site-nav");
   var more=document.querySelector(".navMore");
