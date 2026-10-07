@@ -244,21 +244,38 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   var npEl=document.getElementById("dca-now-playing");
   if(!npEl)return;
 
+  function updateNowPlaying(data){
+    var n=data&&data.now_playing&&data.now_playing.song;
+    var x=data&&data.playing_next&&data.playing_next.song;
+
+    var nowText=n&&(n.text||(n.artist&&n.title?n.artist+" - "+n.title:n.title||n.artist))||"";
+    var nextText=x&&(x.text||(x.artist&&x.title?x.artist+" - "+x.title:x.title||x.artist))||"";
+
+    var nowTitle=npEl.querySelector(".nowBlock .title");
+    var nextTitle=npEl.querySelector(".nextBlock .title");
+
+    if(nowTitle)nowTitle.textContent=nowText||"Dark Case Radio";
+    if(nextTitle)nextTitle.textContent=nextText||"Coming next";
+  }
+
   function loadNowPlaying(){
-    var old=document.getElementById("dca-nowplaying-script");
-    if(old)old.remove();
-    var script=document.createElement("script");
-    script.id="dca-nowplaying-script";
-    script.src="https://dark-case-nowplaying.darkcaseaudios.workers.dev/?script=1&t="+Date.now();
-    script.async=true;
-    script.onload=function(){setTimeout(loadNowPlaying,10000);};
-    script.onerror=function(){setTimeout(loadNowPlaying,10000);};
-    document.head.appendChild(script);
+    fetch("/api/nowplaying?t="+Date.now(),{cache:"no-store"})
+      .then(function(response){
+        if(!response.ok)throw new Error("Now Playing request failed: "+response.status);
+        return response.json();
+      })
+      .then(updateNowPlaying)
+      .catch(function(error){
+        console.error("Dark Case Now Playing:",error);
+      })
+      .finally(function(){
+        setTimeout(loadNowPlaying,10000);
+      });
   }
 
   loadNowPlaying();
 })();
-</script>
+</script></script>
 <script>
 (function(){
   var nav=document.getElementById("site-nav");
