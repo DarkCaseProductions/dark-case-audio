@@ -259,6 +259,24 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   loadNowPlaying();
 })();
 </script></script>
+<style>
+/* MOBILE ONLY — make the existing title line explicitly visible */
+@media (max-width:650px){
+  #dca-now-playing .nowBlock .title,
+  #dca-now-playing .nextBlock .title{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:relative!important;
+    z-index:5!important;
+    min-height:12px!important;
+    color:#fff!important;
+    font-size:10px!important;
+    line-height:12px!important;
+    font-weight:800!important;
+  }
+}
+</style>
 <script>
 /* MOBILE-ONLY FALLBACK — desktop code is untouched */
 (function(){
