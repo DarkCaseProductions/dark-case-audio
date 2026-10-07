@@ -147,6 +147,28 @@ footer a{color:#c9cdd3}
 <a href="#audiobooks">Audiobooks</a><a href="#ebooks">Ebooks</a><a href="#free-case-files">Free Crime Case Files</a><button class="navMore" type="button" aria-expanded="false" aria-controls="mobile-nav-options">+ MORE</button><span id="mobile-nav-options" class="navExtra"><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="crime-forum.html">Crime Forum</a><a href="paranormal-forum.html">Paranormal Forum</a><a href="membership.html" title="Dark Case Membership — Sign In or Create Account">Member Sign In</a></span>
 </div></nav>
 <section class="hero"><h1>Dark stories. Real cases. Audio that gets you closer to the truth.</h1><p>Explore Dark Case Audio — a growing collection of true crime, real crime cases, investigative case files, paranormal investigations, audiobooks, ebooks and free listening from the UK and around the world.</p></section>
+<section id="free-audio" class="section">
+<div class="sectionhead"><h2>📻 Dark Case Radio</h2><p>Live 24/7 Dark Case Radio - True Crime Cases - Real Paranormal Stories</p></div>
+<div class="radioBanner">
+<img src="radio%20box%20picture.png" alt="Dark Case Radio — Live 24/7">
+<div class="radioBannerPlayer">
+<div class="radioConsole" aria-label="Dark Case Radio player">
+<button class="radioPlayButton" id="dca-play" type="button" aria-label="Play Dark Case Radio">▶</button>
+<div class="radioConsoleCenter">
+<div class="radioConsoleTop"><span class="radioLiveMini">LIVE 24/7</span><span>Dark Case Radio</span></div>
+<div class="radioProgress" id="dca-progress" aria-label="Live stream progress"><div class="radioProgressFill" id="dca-progress-fill"></div></div>
+</div>
+<div class="radioConsoleRight"><button class="radioMute" id="dca-mute" type="button" aria-label="Mute">🔊</button><input class="radioVolume" id="dca-volume" type="range" min="0" max="1" step=".01" value=".9" aria-label="Volume"><span class="radioTime" id="dca-time">LIVE</span></div>
+<audio id="dark-case-radio-player" preload="none">
+<source src="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" type="audio/mpeg">
+Your browser does not support the audio player.
+</audio>
+</div>
+</div>
+<div class="radioNowPlaying" id="dca-now-playing"><div class="nowBlock"><span class="label">NOW PLAYING</span><span class="title">Loading...</span></div><div class="nextBlock"><span class="label">COMING NEXT</span><span class="title">Loading...</span></div></div>
+</div>
+</section>
+
 <section id="audiobooks" class="section">
 <div class="sectionhead"><h2>🎧 Audiobooks</h2><p>Download Full AudioBooks</p></div>
 <div class="grid">
@@ -177,28 +199,7 @@ footer a{color:#c9cdd3}
 <article class="card product"><div class="free-case-cover"><img src="cover%20Madeleine%20McCann%20Case%20File.png" alt="The Madeleine McCann Case File"></div><span class="badge">Free Case File</span><h3>The Madeleine McCann Case File</h3><p class="desc">A complete investigative case record covering the disappearance, investigation, forensic record, witness evidence, searches, investigative theories and current procedural position.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/Madeleine%20McCann%20Case%20File.zip?download=Madeleine%20McCann%20Case%20File.zip">Download Free Case File</a></article>
 <article class="card product"><div class="free-case-cover"><img src="The%20False%20Accusation_%20UK%20Case%20Files.png" alt="The False Accusation — UK Case Files"></div><span class="badge">Free Case File</span><h3>The False Accusation — UK Case Files</h3><p class="desc">A Dark Case Productions UK crime case file examining women who have been charged with making false accusations, the allegations involved, the investigations that followed and the impact on those involved.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/The%20False%20Accusation_%20UK%20Case%20Files.zip?download=The%20False%20Accusation_%20UK%20Case%20Files.zip">Download Free Case File</a></article></div></section>
 <section id="free-paranormal-case-files" class="section"><div class="sectionhead"><h2>👻 Free Paranormal Case Files</h2><p>Free with a FREE Dark Case Membership</p></div><div class="grid free-case-grid"><article class="card product"><div class="free-case-cover"><img src="cover%20with%20logo.png" alt="The Poltergeist of South Shields"></div><span class="badge">Free Paranormal Case File</span><h3>The Poltergeist of South Shields</h3><p class="meta"><b>Written by Robert D Jones</b></p><p class="desc">Inside the South Shields Poltergeist Case — the family, the house and the unexplained.</p><a class="button" href="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/free-case-files/The_Poltergeist_of_South_Shields_FREE.zip?download=The_Poltergeist_of_South_Shields_FREE.zip">Download Free Case File</a></article></div></section>
-<section id="free-audio" class="section">
-<div class="sectionhead"><h2>📻 Dark Case Radio</h2><p>Live 24/7 Dark Case Radio - True Crime Cases - Real Paranormal Stories</p></div>
-<div class="radioBanner">
-<img src="radio%20box%20picture.png" alt="Dark Case Radio — Live 24/7">
-<div class="radioBannerPlayer">
-<div class="radioConsole" aria-label="Dark Case Radio player">
-<button class="radioPlayButton" id="dca-play" type="button" aria-label="Play Dark Case Radio">▶</button>
-<div class="radioConsoleCenter">
-<div class="radioConsoleTop"><span class="radioLiveMini">LIVE 24/7</span><span>Dark Case Radio</span></div>
-<div class="radioProgress" id="dca-progress" aria-label="Live stream progress"><div class="radioProgressFill" id="dca-progress-fill"></div></div>
-</div>
-<div class="radioConsoleRight"><button class="radioMute" id="dca-mute" type="button" aria-label="Mute">🔊</button><input class="radioVolume" id="dca-volume" type="range" min="0" max="1" step=".01" value=".9" aria-label="Volume"><span class="radioTime" id="dca-time">LIVE</span></div>
-<audio id="dark-case-radio-player" preload="none">
-<source src="https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3" type="audio/mpeg">
-Your browser does not support the audio player.
-</audio>
-</div>
-</div>
-<div class="radioNowPlaying" id="dca-now-playing"><div class="nowBlock"><span class="label">NOW PLAYING</span><span class="title">Loading...</span></div><div class="nextBlock"><span class="label">COMING NEXT</span><span class="title">Loading...</span></div></div>
-<div class="radioBannerStatus">Press play to join the live broadcast.</div>
-</div>
-</section>
+
 <section id="crime-forum" class="section"><div class="card"><span class="badge">Member Forum</span><h2>🕵️ Crime Forum</h2><p>A dedicated place for discussions about crime, cases, investigations and related subjects.</p><a class="button" href="crime-forum.html">Enter Crime Forum</a></div></section>
 <section id="paranormal-forum" class="section"><div class="card"><span class="badge">Member Forum</span><h2>👻 Paranormal Forum</h2><p>A separate discussion area for paranormal experiences, investigations, haunted locations and related subjects.</p><a class="button" href="paranormal-forum.html">Enter Paranormal Forum</a></div></section>
 <section class="section"><div class="card"><h2>Customer Information</h2><p>Digital audiobooks are supplied electronically; no physical goods are shipped.</p><p>Customer service: <a href="mailto:darkcaseaudios@gmail.com" style="color:#ddd">darkcaseaudios@gmail.com</a></p><p>Refund requests are considered in accordance with applicable UK consumer law and the circumstances of the purchase.</p><p>Where cancellation rights apply, they will be handled in accordance with applicable consumer law and the rules applying to digital content.</p></div></section>
