@@ -283,13 +283,9 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
     transform:none!important;
   }
 
-  /* MOBILE ONLY: keep the broadcast message below the title box */
+  /* MOBILE ONLY: remove the extra broadcast message so it cannot clash with the radio titles */
   .radioBannerStatus{
-    bottom:.35%!important;
-    transform:none!important;
-    z-index:6!important;
-    font-size:.48rem!important;
-    padding:2px 5px!important;
+    display:none!important;
   }
 }
 </style>
