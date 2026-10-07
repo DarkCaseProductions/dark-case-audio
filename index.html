@@ -276,16 +276,18 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
     font-weight:800!important;
   }
 
-  /* MOBILE ONLY: visibly lower the title box */
+  /* MOBILE ONLY: lower the title box while giving the message its own space */
   .radioNowPlaying{
-    top:79%!important;
-    transform:translateY(10px)!important;
+    top:77%!important;
+    height:12%!important;
+    transform:none!important;
   }
 
-  /* MOBILE ONLY: visibly lower the status message */
+  /* MOBILE ONLY: place the status at the very bottom, clear of the title box */
   .radioBannerStatus{
-    bottom:.4%!important;
-    transform:translateY(14px)!important;
+    bottom:.2%!important;
+    transform:none!important;
+    z-index:6!important;
   }
 }
 </style>
