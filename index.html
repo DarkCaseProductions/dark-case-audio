@@ -297,6 +297,9 @@ document.addEventListener("click",function(e){var b=e.target.closest("#dca-queue
   var npEl=document.getElementById("dca-now-playing");
   if(!npEl)return;
 
+  var mobileStatus=document.querySelector(".radioBannerStatus");
+  if(mobileStatus)mobileStatus.style.display="none";
+
   function loadMobileTitles(){
     var old=document.getElementById("dca-mobile-nowplaying-script");
     if(old)old.remove();
