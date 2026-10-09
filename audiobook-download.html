@@ -4,161 +4,76 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Audiobook | Dark Case Audio</title>
-
 <style>
-body {
-    margin: 0;
-    background: #111;
-    color: #eee;
-    font-family: Arial, sans-serif;
-}
-
-.container {
-    max-width: 760px;
-    margin: 50px auto;
-    padding: 25px;
-}
-
-h1 {
-    font-size: 30px;
-}
-
-h2 {
-    margin-top: 30px;
-}
-
-.note {
-    color: #aaa;
-    line-height: 1.6;
-}
-
-.download {
-    display: block;
-    margin: 25px 0;
-    padding: 18px;
-    background: #222;
-    border-radius: 8px;
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
-    text-align: center;
-}
-
-.download:hover {
-    background: #333;
-}
-
-.error {
-    color: #ffb3b3;
-}
-
-.loading {
-    color: #aaa;
-}
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:#f4f4f4;font-family:Arial,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
+.container{width:min(760px,100%);margin:48px 16px;padding:32px;background:#191919;border:1px solid #343434;border-radius:16px}
+.brand{color:#d71920;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+h1{font-size:clamp(27px,5vw,38px);margin:10px 0 8px}
+.intro{color:#bbb;line-height:1.65}
+.status{margin-top:24px;padding:16px;border-radius:10px;background:#222;color:#ddd;line-height:1.6}
+.status.error{color:#ffb8b8;border:1px solid #713535}
+#content{margin-top:24px}
+.book{padding:22px;background:#111;border:1px solid #383838;border-radius:12px}
+.book h2{margin:0 0 10px;font-size:22px}
+.book p{color:#bbb;line-height:1.6}
+.download{display:block;margin-top:20px;padding:16px;background:#c81720;border-radius:8px;color:white;text-decoration:none;font-weight:800;text-align:center}
+.download:hover{background:#e1262f}
+.small{font-size:13px;color:#999;line-height:1.6;margin-top:16px}
 </style>
 </head>
-
 <body>
-
-<div class="container">
-
-<h1>Dark Case Audio</h1>
-
-<div id="message" class="loading">
-Preparing your audiobook...
-</div>
-
-<div id="content"></div>
-
-</div>
-
+<main class="container">
+  <div class="brand">Dark Case Audio</div>
+  <h1>Your audiobook</h1>
+  <p class="intro">Thank you for your purchase. Once your payment is verified, your secure audiobook download will be available here.</p>
+  <div id="message" class="status">Verifying your payment securely…</div>
+  <div id="content"></div>
+  <p class="small">Keep your downloaded ZIP file intact until you are ready to extract the audiobook files. The secure download link expires after one hour.</p>
+</main>
 <script>
-
-const FUNCTION_URL =
-"https://inhiiamepxwjtfyqlqir.supabase.co/functions/v1/audiobook-access";
-
-const params = new URLSearchParams(window.location.search);
-const sessionId = params.get("session_id");
-
+const FUNCTION_URL = "https://inhiiamepxwjtfyqlqir.supabase.co/functions/v1/audiobook-access";
+const sessionId = new URLSearchParams(window.location.search).get("session_id");
 const message = document.getElementById("message");
 const content = document.getElementById("content");
 
 if (!sessionId) {
-
-    message.className = "error";
-
-    message.textContent =
-        "No payment session was supplied. Please return to Dark Case Audio and contact support if you need help.";
-
+  message.className = "status error";
+  message.textContent = "No payment session was supplied. If you have completed your purchase, please contact Dark Case Audio support.";
 } else {
-
-    fetch(
-        FUNCTION_URL +
-        "?session_id=" +
-        encodeURIComponent(sessionId)
-    )
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        if (!data.ok) {
-
-            message.className = "error";
-
-            message.textContent =
-                data.error ||
-                "We could not verify your payment.";
-
-            return;
-        }
-
-        message.className = "note";
-
-        message.textContent =
-            "Your payment has been verified. Your audiobook is ready below.";
-
-        const title = document.createElement("h2");
-
-        title.textContent = data.title;
-
-        content.appendChild(title);
-
-        const downloadLink = document.createElement("a");
-
-        downloadLink.className = "download";
-
-        downloadLink.href = data.download.url;
-
-        downloadLink.textContent =
-            "Download Complete Audiobook";
-
-        content.appendChild(downloadLink);
-
-        const note = document.createElement("p");
-
-        note.className = "note";
-
-        note.textContent =
-            "This secure download link expires after 1 hour.";
-
-        content.appendChild(note);
-
+  fetch(FUNCTION_URL + "?session_id=" + encodeURIComponent(sessionId))
+    .then(async response => {
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || "We could not verify your payment.");
+      return data;
     })
-
+    .then(data => {
+      message.className = "status";
+      message.textContent = "Payment verified successfully. Your audiobook is ready to download.";
+      const card = document.createElement("section");
+      card.className = "book";
+      const title = document.createElement("h2");
+      title.textContent = data.title;
+      const description = document.createElement("p");
+      description.textContent = "Your complete audiobook is packaged in a ZIP file. Click the button below to download it.";
+      const link = document.createElement("a");
+      link.className = "download";
+      const downloadUrl = new URL(data.download.url);
+      // Explicitly request the real ZIP filename instead of a blank download name.
+      downloadUrl.searchParams.set("download", data.download.name || "audiobook.zip");
+      link.href = downloadUrl.toString();
+      link.textContent = "Download " + (data.download.name || "audiobook.zip");
+      link.setAttribute("download", data.download.name || "audiobook.zip");
+      card.append(title, description, link);
+      content.appendChild(card);
+    })
     .catch(error => {
-
-        console.error(error);
-
-        message.className = "error";
-
-        message.textContent =
-            "Something went wrong while preparing your audiobook. Please contact Dark Case Audio support.";
-
+      console.error("Audiobook page error:", error);
+      message.className = "status error";
+      message.textContent = error.message || "Something went wrong while preparing your audiobook. Please contact Dark Case Audio support.";
     });
 }
-
 </script>
-
 </body>
 </html>
