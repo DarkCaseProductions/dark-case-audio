@@ -528,7 +528,7 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
       var box=document.createElement("div");box.className="dca-share-box";
       var label=document.createElement("label");label.textContent="Direct link to this item";
       var field=document.createElement("input");field.className="dca-share-url";field.type="text";field.readOnly=true;
-      field.value=window.location.origin+window.location.pathname+"#"+card.id;
+      field.value="https://darkcaseaudio.com/share/"+card.id+".html";
       field.setAttribute("aria-label","Direct link to "+heading.textContent.trim());
       field.addEventListener("click",function(){field.select();});
       var button=document.createElement("button");button.type="button";button.className="dca-share-copy";button.textContent="Copy link";
