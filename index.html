@@ -495,10 +495,12 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
 
 
 <style>
-.dca-share-link{display:block;width:100%;margin-top:9px;padding:10px 12px;border-radius:9px;border:1px solid #4a515e;background:#191d25;color:#f2f2f2;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}
-.dca-share-link:hover,.dca-share-link:focus{background:#252b35;border-color:var(--red);color:#fff}
+.dca-share-box{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;padding:9px;border:1px solid #414956;border-radius:9px;background:#141820}
+.dca-share-box label{display:block;width:100%;color:#e5e7eb;font-size:.82rem;font-weight:700}
+.dca-share-url{box-sizing:border-box;flex:1 1 220px;min-width:0;width:100%;padding:9px;border:1px solid #596273;border-radius:6px;background:#090b10;color:#fff;font:12px/1.4 monospace}
+.dca-share-copy{flex:0 0 auto;padding:9px 12px;border:1px solid var(--red);border-radius:6px;background:var(--red);color:#fff;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
+.dca-share-copy:hover,.dca-share-copy:focus{filter:brightness(1.15)}
 </style>
-
 
 <script>
 (function(){
@@ -509,16 +511,7 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
     {id:"free-paranormal-case-files",prefix:"paranormal-file"}
   ];
   function slugify(value){
-    return (value||"item").toLowerCase()
-      .replace(/&amp;/g," and ").replace(/&/g," and ")
-      .replace(/<[^>]*>/g," ")
-      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "item";
-  }
-  function copyText(text){
-    if(navigator.clipboard && window.isSecureContext){
-      return navigator.clipboard.writeText(text).then(function(){return true;}).catch(function(){return false;});
-    }
-    return Promise.resolve(false);
+    return (value||"item").toLowerCase().replace(/&amp;/g," and ").replace(/&/g," and ").replace(/<[^>]*>/g," ").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"item";
   }
   groups.forEach(function(group){
     var section=document.getElementById(group.id);
@@ -527,37 +520,38 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
       var heading=card.querySelector("h3");
       if(!heading)return;
       if(!card.id){
-        var base=group.prefix+"-"+slugify(heading.textContent);
-        var candidate=base, n=2;
-        while(document.getElementById(candidate) && document.getElementById(candidate)!==card){candidate=base+"-"+n++;}
+        var base=group.prefix+"-"+slugify(heading.textContent),candidate=base,n=2;
+        while(document.getElementById(candidate)&&document.getElementById(candidate)!==card)candidate=base+"-"+n++;
         card.id=candidate;
       }
-      if(card.querySelector(".dca-share-link"))return;
-      var share=document.createElement("button");
-      share.type="button";
-      share.className="dca-share-link";
-      share.textContent="Copy link to this item";
-      share.setAttribute("aria-label","Copy direct link to "+heading.textContent.trim());
-      share.addEventListener("click",function(){
-        var url=window.location.origin+window.location.pathname+"#"+card.id;
-        copyText(url).then(function(copied){
-          if(copied){
-            share.textContent="Link copied!";
-            setTimeout(function(){share.textContent="Copy link to this item";},1800);
-          }else{
-            window.prompt("Copy this direct link:",url);
-          }
-        });
+      if(card.querySelector(".dca-share-box"))return;
+      var box=document.createElement("div");box.className="dca-share-box";
+      var label=document.createElement("label");label.textContent="Direct link to this item";
+      var field=document.createElement("input");field.className="dca-share-url";field.type="text";field.readOnly=true;
+      field.value=window.location.origin+window.location.pathname+"#"+card.id;
+      field.setAttribute("aria-label","Direct link to "+heading.textContent.trim());
+      field.addEventListener("click",function(){field.select();});
+      var button=document.createElement("button");button.type="button";button.className="dca-share-copy";button.textContent="Copy link";
+      button.addEventListener("click",function(){
+        field.focus();field.select();field.setSelectionRange(0,field.value.length);
+        if(navigator.clipboard&&window.isSecureContext){
+          navigator.clipboard.writeText(field.value).then(function(){button.textContent="Copied!";setTimeout(function(){button.textContent="Copy link";},1800);}).catch(function(){button.textContent="Select link above";field.select();});
+        }else{
+          var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+          button.textContent=ok?"Copied!":"Select link above";
+          if(ok)setTimeout(function(){button.textContent="Copy link";},1800);
+        }
       });
-      card.appendChild(share);
+      box.append(label,field,button);card.appendChild(box);
     });
   });
-  if(window.location.hash){
-    window.addEventListener("load",function(){
-      var target=document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
-      if(target)setTimeout(function(){target.scrollIntoView({behavior:"smooth",block:"center"});},250);
-    });
+  function scrollToHash(){
+    if(!window.location.hash)return;
+    var target=document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+    if(target)setTimeout(function(){target.scrollIntoView({behavior:"smooth",block:"center"});},350);
   }
+  window.addEventListener("load",scrollToHash);
+  if(document.readyState==="complete")scrollToHash();
 })();
 </script>
 
