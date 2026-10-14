@@ -214,7 +214,7 @@ Your browser does not support the audio player.
 </div>
 <div class="radioNowPlaying" id="dca-now-playing"><div class="nowBlock"><span class="label">NOW PLAYING</span><span class="title">Loading...</span></div><div class="nextBlock"><span class="label">COMING NEXT</span><span class="title">Loading...</span></div></div>
 </div>
-<div class="radioShareRow"><a class="button radioShareButton" href="https://darkcaseaudio.com/share/dca-radio.html" aria-label="Share Dark Case Radio">↗ Share Dark Case Radio</a></div>
+<div class="dca-share-box radioShareBox"><label for="radio-share-url">Direct link to this item</label><input id="radio-share-url" class="dca-share-url" type="text" value="https://darkcaseaudio.com/share/dca-radio.html" readonly aria-label="Direct link to Dark Case Radio"><button id="radio-share-copy" class="dca-share-copy" type="button">Copy link</button></div>
 </section>
 
 <section id="audiobooks" class="section">
@@ -547,6 +547,20 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
       box.append(label,field,button);card.appendChild(box);
     });
   });
+  var radioShareField=document.getElementById("radio-share-url"),radioShareButton=document.getElementById("radio-share-copy");
+  if(radioShareField&&radioShareButton){
+    radioShareField.addEventListener("click",function(){radioShareField.select();});
+    radioShareButton.addEventListener("click",function(){
+      radioShareField.focus();radioShareField.select();radioShareField.setSelectionRange(0,radioShareField.value.length);
+      if(navigator.clipboard&&window.isSecureContext){
+        navigator.clipboard.writeText(radioShareField.value).then(function(){radioShareButton.textContent="Copied!";setTimeout(function(){radioShareButton.textContent="Copy link";},1800);}).catch(function(){radioShareButton.textContent="Select link above";radioShareField.select();});
+      }else{
+        var copied=false;try{copied=document.execCommand("copy");}catch(e){}
+        radioShareButton.textContent=copied?"Copied!":"Select link above";
+        if(copied)setTimeout(function(){radioShareButton.textContent="Copy link";},1800);
+      }
+    });
+  }
   function scrollToHash(){
     if(!window.location.hash)return;
     var target=document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
