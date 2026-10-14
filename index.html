@@ -161,6 +161,37 @@ footer a{color:#c9cdd3}
 <nav id="site-nav"><div class="navinner">
 <a href="#audiobooks">Audiobooks</a><a href="#ebooks">Ebooks</a><a href="#free-case-files">Free Crime Case Files</a><button class="navMore" type="button" aria-expanded="false" aria-controls="mobile-nav-options">+ MORE</button><span id="mobile-nav-options" class="navExtra"><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="crime-forum.html">Crime Forum</a><a href="paranormal-forum.html">Paranormal Forum</a><a href="membership.html" title="Dark Case Membership — Sign In or Create Account">Member Sign In</a></span>
 </div></nav>
+
+<section id="dca-catalog-search" class="section" aria-label="Search the Dark Case Audio catalogue" style="margin:18px 0 30px">
+  <div style="background:linear-gradient(135deg,rgba(215,25,32,.13),rgba(18,21,27,.98) 55%);border:1px solid var(--line);border-radius:16px;padding:clamp(16px,3vw,26px)">
+    <h2 style="font-family:Georgia,serif;margin:0 0 6px;font-size:clamp(1.35rem,3vw,1.8rem)">Search Dark Case Audio</h2>
+    <p style="color:var(--muted);margin:0 0 14px">Find audiobooks, ebooks, free crime case files and paranormal case files by title, person or subject.</p>
+    <label for="dca-search-input" style="display:block;font-weight:700;margin-bottom:6px">What are you looking for?</label>
+    <input id="dca-search-input" type="search" autocomplete="off" placeholder="Try Lucy Letby, poltergeist, forensics…" style="display:block;width:100%;min-height:48px;padding:12px 14px;border-radius:10px;border:1px solid #424854;background:#08090c;color:#f2f2f2;font:inherit;outline-color:var(--red)">
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px" id="dca-search-filters" aria-label="Filter search results">
+      <button type="button" class="dca-search-filter active" data-filter="all">All content</button>
+      <button type="button" class="dca-search-filter" data-filter="audiobooks">Audiobooks</button>
+      <button type="button" class="dca-search-filter" data-filter="ebooks">Ebooks</button>
+      <button type="button" class="dca-search-filter" data-filter="crime">Crime case files</button>
+      <button type="button" class="dca-search-filter" data-filter="paranormal">Paranormal case files</button>
+    </div>
+    <p id="dca-search-summary" aria-live="polite" style="color:var(--muted);margin:14px 0 0;font-size:.9rem">Enter a title, person's name or subject to search the catalogue.</p>
+    <div id="dca-search-results" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;margin-top:12px"></div>
+  </div>
+</section>
+<style>
+#dca-search-filters .dca-search-filter{font:inherit;font-size:.84rem;font-weight:700;color:#e8e8e8;background:#20242c;border:1px solid #3a404b;border-radius:999px;padding:8px 12px;cursor:pointer}
+#dca-search-filters .dca-search-filter:hover,#dca-search-filters .dca-search-filter.active{background:var(--red);border-color:#ff4b52;color:#fff}
+.dca-search-result{display:flex;gap:12px;align-items:center;text-align:left;width:100%;min-width:0;padding:12px;background:#0b0d12;border:1px solid #343a44;border-radius:12px;color:var(--text);cursor:pointer;font:inherit}
+.dca-search-result:hover,.dca-search-result:focus{border-color:var(--red);background:#151922}
+.dca-search-result img{width:58px;height:76px;object-fit:contain;background:#08090c;border-radius:6px;flex:0 0 auto}
+.dca-search-result .dca-result-copy{min-width:0}
+.dca-search-result strong{display:block;line-height:1.3}
+.dca-search-result small{display:block;color:var(--muted);margin-top:5px}
+.dca-search-result .dca-result-desc{font-size:.82rem;color:#b9bec8;margin-top:5px}
+@media(max-width:650px){#dca-catalog-search{margin-top:12px!important}#dca-search-filters .dca-search-filter{font-size:.78rem;padding:7px 10px}}
+</style>
+
 <section class="hero"><h1>Dark stories. Real cases. Audio that gets you closer to the truth.</h1><p>Explore Dark Case Audio — a growing collection of true crime, real crime cases, investigative case files, paranormal investigations, audiobooks, ebooks and free listening from the UK and around the world.</p></section>
 <section id="free-audio" class="section">
 <div class="sectionhead"><h2>📻 Dark Case Radio</h2><p>Live 24/7 Dark Case Radio - True Crime Cases - Real Paranormal Stories</p></div>
@@ -404,5 +435,63 @@ mute&&mute.addEventListener("click",function(){audio.muted=!audio.muted;mute.tex
 audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audio.duration>0){fill.style.width=(audio.currentTime/audio.duration*100)+"%";time.textContent=Math.floor(audio.currentTime/60)+":"+String(Math.floor(audio.currentTime%60)).padStart(2,"0");}else{fill.style.width="100%";time.textContent="LIVE";}});
 })();
 </script>
+
+<script>
+(function(){
+  var root=document.getElementById("dca-catalog-search");
+  if(!root)return;
+  var input=document.getElementById("dca-search-input");
+  var results=document.getElementById("dca-search-results");
+  var summary=document.getElementById("dca-search-summary");
+  var filters=document.getElementById("dca-search-filters");
+  var activeFilter="all";
+  var items=[];
+  var sections=[
+    {id:"audiobooks",type:"audiobooks",label:"Audiobook"},
+    {id:"ebooks",type:"ebooks",label:"Ebook"},
+    {id:"free-case-files",type:"crime",label:"Free crime case file"},
+    {id:"free-paranormal-case-files",type:"paranormal",label:"Free paranormal case file"}
+  ];
+  sections.forEach(function(section){
+    var parent=document.getElementById(section.id);
+    if(!parent)return;
+    parent.querySelectorAll("article.card").forEach(function(card,index){
+      if(!card.id)card.id="dca-item-"+section.type+"-"+(index+1);
+      var heading=card.querySelector("h3");
+      if(!heading)return;
+      var image=card.querySelector("img");
+      var desc=card.querySelector(".desc");
+      var searchable=[heading.textContent,desc?desc.textContent:"",image?(image.alt||""):"",card.textContent,card.getAttribute("data-search")||""].join(" ").toLowerCase();
+      items.push({card:card,title:heading.textContent.trim(),desc:desc?desc.textContent.trim():"",image:image?image.src:"",type:section.type,label:section.label,searchable:searchable});
+    });
+  });
+  function draw(){
+    var query=input.value.trim().toLowerCase();
+    results.replaceChildren();
+    if(!query){summary.textContent="Enter a title, person's name or subject to search "+items.length+" catalogue items.";return;}
+    var terms=query.split(/\s+/).filter(Boolean);
+    var matches=items.filter(function(item){
+      return (activeFilter==="all"||item.type===activeFilter)&&terms.every(function(term){return item.searchable.includes(term);});
+    }).slice(0,40);
+    summary.textContent=matches.length?("Showing "+matches.length+(matches.length===40?"+":"")+" result"+(matches.length===1?"":"s")+" for “"+input.value.trim()+"”."):"No matches found. Try another spelling or search term.";
+    matches.forEach(function(item){
+      var button=document.createElement("button");button.type="button";button.className="dca-search-result";
+      var image=document.createElement("img");image.alt="";image.loading="lazy";if(item.image)image.src=item.image;
+      var copy=document.createElement("span");copy.className="dca-result-copy";
+      var title=document.createElement("strong");title.textContent=item.title;
+      var meta=document.createElement("small");meta.textContent=item.label+(item.card.querySelector(".price")?" · "+item.card.querySelector(".price").textContent.trim():"");
+      copy.append(title,meta);
+      if(item.desc){var desc=document.createElement("span");desc.className="dca-result-desc";desc.textContent=item.desc.length>125?item.desc.slice(0,122)+"…":item.desc;copy.appendChild(desc);}
+      button.append(image,copy);
+      button.addEventListener("click",function(){item.card.scrollIntoView({behavior:"smooth",block:"center"});item.card.style.outline="2px solid var(--red)";item.card.style.outlineOffset="4px";setTimeout(function(){item.card.style.outline="";item.card.style.outlineOffset="";},2200);});
+      results.appendChild(button);
+    });
+  }
+  input.addEventListener("input",draw);
+  filters.querySelectorAll("button[data-filter]").forEach(function(button){button.addEventListener("click",function(){activeFilter=button.dataset.filter;filters.querySelectorAll("button").forEach(function(b){b.classList.toggle("active",b===button);});draw();});});
+  draw();
+})();
+</script>
+
 </body>
 </html>
