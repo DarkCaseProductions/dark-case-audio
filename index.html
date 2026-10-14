@@ -493,5 +493,73 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
 })();
 </script>
 
+
+<style>
+.dca-share-link{display:block;width:100%;margin-top:9px;padding:10px 12px;border-radius:9px;border:1px solid #4a515e;background:#191d25;color:#f2f2f2;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}
+.dca-share-link:hover,.dca-share-link:focus{background:#252b35;border-color:var(--red);color:#fff}
+</style>
+
+
+<script>
+(function(){
+  var groups=[
+    {id:"audiobooks",prefix:"audio"},
+    {id:"ebooks",prefix:"ebook"},
+    {id:"free-case-files",prefix:"crime-file"},
+    {id:"free-paranormal-case-files",prefix:"paranormal-file"}
+  ];
+  function slugify(value){
+    return (value||"item").toLowerCase()
+      .replace(/&amp;/g," and ").replace(/&/g," and ")
+      .replace(/<[^>]*>/g," ")
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "item";
+  }
+  function copyText(text){
+    if(navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text).then(function(){return true;}).catch(function(){return false;});
+    }
+    return Promise.resolve(false);
+  }
+  groups.forEach(function(group){
+    var section=document.getElementById(group.id);
+    if(!section)return;
+    section.querySelectorAll("article.card").forEach(function(card,index){
+      var heading=card.querySelector("h3");
+      if(!heading)return;
+      if(!card.id){
+        var base=group.prefix+"-"+slugify(heading.textContent);
+        var candidate=base, n=2;
+        while(document.getElementById(candidate) && document.getElementById(candidate)!==card){candidate=base+"-"+n++;}
+        card.id=candidate;
+      }
+      if(card.querySelector(".dca-share-link"))return;
+      var share=document.createElement("button");
+      share.type="button";
+      share.className="dca-share-link";
+      share.textContent="Copy link to this item";
+      share.setAttribute("aria-label","Copy direct link to "+heading.textContent.trim());
+      share.addEventListener("click",function(){
+        var url=window.location.origin+window.location.pathname+"#"+card.id;
+        copyText(url).then(function(copied){
+          if(copied){
+            share.textContent="Link copied!";
+            setTimeout(function(){share.textContent="Copy link to this item";},1800);
+          }else{
+            window.prompt("Copy this direct link:",url);
+          }
+        });
+      });
+      card.appendChild(share);
+    });
+  });
+  if(window.location.hash){
+    window.addEventListener("load",function(){
+      var target=document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+      if(target)setTimeout(function(){target.scrollIntoView({behavior:"smooth",block:"center"});},250);
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
