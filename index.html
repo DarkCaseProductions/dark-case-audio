@@ -468,7 +468,7 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
   function draw(){
     var query=input.value.trim().toLowerCase();
     results.replaceChildren();
-    if(!query){summary.textContent="Enter a title, person's name or subject to search "+items.length+" catalogue items.";return;}
+    if(!query){summary.textContent="Enter a title, person's name or subject to search the catalogue.";return;}
     var terms=query.split(/\s+/).filter(Boolean);
     var matches=items.filter(function(item){
       return (activeFilter==="all"||item.type===activeFilter)&&terms.every(function(term){return item.searchable.includes(term);});
