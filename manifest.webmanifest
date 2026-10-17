@@ -10,15 +10,15 @@
   "theme_color": "#b5121b",
   "icons": [
     {
-      "src": "./pwa-icon.svg",
+      "src": "https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./pwa-icon.svg",
+      "src": "https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
