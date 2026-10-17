@@ -1,0 +1,13 @@
+# This configuration is only on the pwa-foundation test branch.
+# It does not change the GitHub Pages production website.
+
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"
