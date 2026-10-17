@@ -1,9 +1,9 @@
 {
-  "id": "./",
+  "id": "./pwa-preview.html",
   "name": "Dark Case Audio",
   "short_name": "Dark Case Audio",
   "description": "True crime, paranormal case files, audiobooks and Dark Case Radio.",
-  "start_url": "./index.html",
+  "start_url": "./pwa-preview.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b0d11",
