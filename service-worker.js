@@ -46,7 +46,9 @@ self.addEventListener("fetch", (event) => {
 
   // Only cache the explicitly listed public shell assets. Navigation is
   // network-first so visitors receive current website content when online.
-  const isShellAsset = APP_SHELL.some((path) => new URL(path, self.location.href).pathname === url.pathname);
+  const shellPaths = APP_SHELL.map((path) => new URL(path, self.location.href).pathname);
+  const isHomeNavigation = request.mode === "navigate" && (url.pathname === new URL("./", self.location.href).pathname || url.pathname === new URL("./index.html", self.location.href).pathname);
+  const isShellAsset = isHomeNavigation || shellPaths.includes(url.pathname);
 
   if (!isShellAsset) return;
 
