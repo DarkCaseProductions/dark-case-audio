@@ -3,8 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#b5121b">
 <link rel="icon" type="image/png" sizes="1254x1254" href="https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png">
 <meta name="google-site-verification" content="VzxYMFj-U759wwEJyJ6VF0l9elabggbbK56aHv467XU" />
 <title>Dark Case Audio | True Crime, Real Cases & Paranormal Stories</title>
@@ -165,17 +163,6 @@ footer a{color:#c9cdd3}
 <img class="logo" src="banner%20size%20logo.png" alt="Dark Case Audio">
 <p class="tagline">True Crime · Real Cases · Paranormal · Stories From Around The World</p>
 </header>
-<section id="dca-install-app" class="container" aria-label="Install Dark Case Audio" style="margin:0 auto 22px;padding:0 0 0">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(181,18,27,.22),rgba(18,21,27,.98) 60%);border:1px solid #3b3037;border-radius:14px;padding:16px 20px">
-    <div style="display:flex;align-items:center;gap:13px;min-width:0">
-      <img src="https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png" alt="" width="48" height="48" style="object-fit:contain;border-radius:8px;flex:0 0 auto">
-      <div><strong style="display:block;color:#fff;font-size:1.05rem">Get Dark Case Audio on your desktop</strong><span style="display:block;color:#c5c9d0;font-size:.92rem">Install the app for quick access to audiobooks, case files and live radio.</span></div>
-    </div>
-    <button id="dca-install-button" type="button" style="background:#b5121b;color:#fff;border:1px solid #ff3038;border-radius:9px;padding:11px 17px;font-weight:800;cursor:pointer;font:inherit">Install / Add to Desktop</button>
-    <span id="dca-install-help" role="status" aria-live="polite" style="color:#c5c9d0;font-size:.88rem">Click the button for installation options.</span>
-  </div>
-</section>
-
 <nav id="site-nav"><div class="navinner">
 <a href="#audiobooks">Audiobooks</a><a href="#free-case-files">Free Crime Case Files</a><button class="navMore" type="button" aria-expanded="false" aria-controls="mobile-nav-options">+ MORE</button><span id="mobile-nav-options" class="navExtra"><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="crime-forum.html">Crime Forum</a><a href="paranormal-forum.html">Paranormal Forum</a><a href="membership.html" title="Dark Case Membership — Sign In or Create Account">Member Sign In</a></span>
 </div></nav>
@@ -586,46 +573,6 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
 })();
 </script>
 
-<script>
-(function(){
-  var installButton=document.getElementById("dca-install-button");
-  var help=document.getElementById("dca-install-help");
-  if(!installButton)return;
-  var deferredPrompt=null;
-  window.addEventListener("beforeinstallprompt",function(event){
-    event.preventDefault();deferredPrompt=event;installButton.hidden=false;
-    if(help)help.textContent="Install Dark Case Audio on this device.";
-  });
-  installButton.addEventListener("click",async function(){
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt=null;
-      installButton.hidden=true;
-      return;
-    }
-    if(window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone){
-      if(help)help.textContent="Dark Case Audio is already running as an installed app.";
-      installButton.textContent="App already installed";
-      installButton.disabled=true;
-      return;
-    }
-    if(help){
-      help.textContent="To install in Chrome on Windows: open the three-dot menu (top right), choose Cast, save and share, then Install page as app (or look for Install Dark Case Audio). If that option is missing, this browser has not offered installation yet. On iPhone, open this site in Safari, tap Share, then Add to Home Screen.";
-    }
-  });
-  window.addEventListener("appinstalled",function(){
-    installButton.hidden=true;
-    if(help)help.textContent="Dark Case Audio is installed on this device.";
-  });
-  if("serviceWorker" in navigator && location.protocol==="https:"){
-    window.addEventListener("load",function(){
-      navigator.serviceWorker.register("./service-worker.js").catch(function(error){
-        console.error("Dark Case Audio app setup failed.",error);
-      });
-    });
-  }
-})();
-</script>
+
 </body>
 </html>
