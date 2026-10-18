@@ -171,8 +171,8 @@ footer a{color:#c9cdd3}
       <img src="https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png" alt="" width="48" height="48" style="object-fit:contain;border-radius:8px;flex:0 0 auto">
       <div><strong style="display:block;color:#fff;font-size:1.05rem">Get Dark Case Audio on your desktop</strong><span style="display:block;color:#c5c9d0;font-size:.92rem">Install the app for quick access to audiobooks, case files and live radio.</span></div>
     </div>
-    <button id="dca-install-button" type="button" hidden style="background:#b5121b;color:#fff;border:1px solid #ff3038;border-radius:9px;padding:11px 17px;font-weight:800;cursor:pointer;font:inherit">Install Dark Case Audio</button>
-    <span id="dca-install-help" style="color:#c5c9d0;font-size:.88rem">On supported browsers, use the install icon in your address bar or your browser menu.</span>
+    <button id="dca-install-button" type="button" style="background:#b5121b;color:#fff;border:1px solid #ff3038;border-radius:9px;padding:11px 17px;font-weight:800;cursor:pointer;font:inherit">Install / Add to Desktop</button>
+    <span id="dca-install-help" role="status" aria-live="polite" style="color:#c5c9d0;font-size:.88rem">Click the button for installation options.</span>
   </div>
 </section>
 
@@ -597,10 +597,22 @@ audio.addEventListener("timeupdate",function(){if(isFinite(audio.duration)&&audi
     if(help)help.textContent="Install Dark Case Audio on this device.";
   });
   installButton.addEventListener("click",async function(){
-    if(!deferredPrompt)return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt=null;installButton.hidden=true;
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt=null;
+      installButton.hidden=true;
+      return;
+    }
+    if(window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone){
+      if(help)help.textContent="Dark Case Audio is already running as an installed app.";
+      installButton.textContent="App already installed";
+      installButton.disabled=true;
+      return;
+    }
+    if(help){
+      help.textContent="To install in Chrome on Windows: open the three-dot menu (top right), choose Cast, save and share, then Install page as app (or look for Install Dark Case Audio). If that option is missing, this browser has not offered installation yet. On iPhone, open this site in Safari, tap Share, then Add to Home Screen.";
+    }
   });
   window.addEventListener("appinstalled",function(){
     installButton.hidden=true;
