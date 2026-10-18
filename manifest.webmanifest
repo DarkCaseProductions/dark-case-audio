@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "Dark Case Audio",
+  "short_name": "Dark Case Audio",
+  "description": "True crime, paranormal case files, audiobooks and Dark Case Radio.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0d11",
+  "theme_color": "#b5121b",
+  "icons": [
+    {
+      "src": "https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
