@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dark Case Audio">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png">
+<title>Dark Case Audio</title>
+<style>
+:root{color-scheme:dark;--bg:#08090c;--panel:#14171d;--line:#292e37;--muted:#aeb3bd;--red:#d71920;--bright:#ff3038}
+*{box-sizing:border-box}html{background:#08090c;scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at top,#1b1e26 0,#08090c 45%);color:#f5f5f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;padding:17px 20px 14px;border-bottom:1px solid var(--line);background:rgba(8,9,12,.96);backdrop-filter:blur(14px)}.brand{font-size:19px;font-weight:900;letter-spacing:1px}.brand em{font-style:normal;color:var(--bright)}.tag{font-size:9px;letter-spacing:2px;color:#aeb3bd;margin-top:5px}
+main{max-width:560px;margin:auto;padding:17px}.hero{padding:23px 19px;border-radius:19px;border:1px solid #493039;background:linear-gradient(145deg,#251116,#12141b 70%);margin:4px 0 22px}.eyebrow{font-size:10px;letter-spacing:2.5px;color:var(--bright);font-weight:900}.hero h1{font-family:Georgia,serif;font-size:34px;line-height:1.08;margin:13px 0 10px}.hero p{font-size:14px;line-height:1.6;color:#c5c9d0;margin:0}.listen{display:block;text-align:center;margin-top:18px;background:linear-gradient(#f22b33,#b80f16);color:white;text-decoration:none;padding:14px 12px;border-radius:10px;font-size:13px;font-weight:900;box-shadow:0 8px 20px #d7192033}
+h2{font-size:16px;letter-spacing:.6px;margin:0 0 13px}.tile{display:flex;align-items:center;gap:12px;padding:13px;margin-bottom:9px;background:linear-gradient(115deg,#181b22,#111319);border:1px solid var(--line);border-radius:13px;color:inherit;text-decoration:none;transition:border-color .15s}.tile:active{border-color:#7c343a;background:#21151a}.ico{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;background:#321317;border-radius:12px;color:var(--bright);font-size:22px;font-weight:bold}.tile strong{display:block;font-size:14px}.tile small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:4px}.arrow{margin-left:auto;color:var(--bright);font-size:25px}.foot{text-align:center;color:#727985;font-size:10px;padding:16px 0 24px}.install{display:none;margin:0 0 18px;padding:12px 14px;background:#171a21;border:1px solid #493039;border-radius:12px;color:#ddd;font-size:12px;line-height:1.5}.install b{color:#fff}.back{display:none;color:#ff777d;border:0;background:none;font-weight:800;padding:0 0 14px;font-size:13px}.webview{display:none;width:100%;height:calc(100dvh - 75px);border:0;background:#08090c}.home.hidden{display:none}.webtop{display:none;position:sticky;top:0;z-index:6;padding:12px 16px;background:#08090c;border-bottom:1px solid var(--line);align-items:center;justify-content:space-between}.webtop button{border:0;background:#21151a;color:#ff777d;padding:10px 12px;border-radius:8px;font-weight:800}
+@media(min-width:600px){main{padding-top:24px}.hero{padding:28px}}
+</style>
+</head>
+<body>
+<header><div class="brand">DARK CASE <em>AUDIO</em></div><div class="tag">TRUE CRIME • PARANORMAL • AUDIO</div></header>
+<div class="webtop" id="webtop"><button id="back">‹ HOME</button><span id="webtitle" style="font-size:13px;font-weight:800">DARK CASE AUDIO</span><button id="external">OPEN ↗</button></div>
+<main class="home" id="home">
+<section class="hero"><div class="eyebrow">DARK CASE PRODUCTIONS</div><h1>Real cases.<br>Dark stories.</h1><p>Your home for true crime, paranormal investigations, audiobooks and Dark Case Radio — all in one place.</p><a class="listen" href="https://darkcaseaudio.com/">▶ &nbsp; LISTEN TO DCA LIVE RADIO</a></section>
+<div class="install" id="install"><b>Add Dark Case Audio to your iPhone:</b> tap the Share button in Safari, then choose <b>Add to Home Screen</b>.</div>
+<h2>EXPLORE DARK CASE AUDIO</h2>
+<a class="tile" href="https://darkcaseaudio.com/" data-title="DCA Live Radio"><span class="ico">♫</span><span><strong>DCA Live Radio</strong><small>Listen live, day and night</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/#audiobooks" data-title="Audiobooks"><span class="ico">▣</span><span><strong>Audiobooks</strong><small>Explore the latest audio releases</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/#ebooks" data-title="Ebooks"><span class="ico">▤</span><span><strong>Ebooks</strong><small>Browse digital books</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/crime-case-files.html" data-title="Free Crime Case Files"><span class="ico">⌕</span><span><strong>Free Crime Case Files</strong><small>Explore the crime archive</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/paranormal-case-files.html" data-title="Free Paranormal Case Files"><span class="ico">☾</span><span><strong>Free Paranormal Case Files</strong><small>Hauntings and unexplained cases</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/membership.html" data-title="Membership"><span class="ico">♙</span><span><strong>Membership</strong><small>Sign in and manage your account</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/crime-forum.html" data-title="Crime Forum"><span class="ico">◉</span><span><strong>Crime Forum</strong><small>Discuss cases with the community</small></span><span class="arrow">›</span></a>
+<a class="tile" href="https://darkcaseaudio.com/paranormal-forum.html" data-title="Paranormal Forum"><span class="ico">✧</span><span><strong>Paranormal Forum</strong><small>Share experiences and theories</small></span><span class="arrow">›</span></a>
+<div class="foot">DARK CASE AUDIO • darkcaseaudio.com</div>
+</main>
+<iframe class="webview" id="webview" title="Dark Case Audio section" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+<script>
+const home=document.getElementById('home'), frame=document.getElementById('webview'), topbar=document.getElementById('webtop');
+let current='https://darkcaseaudio.com/';
+function openPage(url,title){current=url;home.classList.add('hidden');frame.style.display='block';topbar.style.display='flex';frame.src=url;document.getElementById('webtitle').textContent=title||'DARK CASE AUDIO';window.scrollTo(0,0)}
+function goHome(){frame.src='about:blank';frame.style.display='none';topbar.style.display='none';home.classList.remove('hidden');window.scrollTo(0,0)}
+document.querySelectorAll('a.tile, a.listen').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openPage(a.href,a.dataset.title||'DCA Live Radio')}));
+document.getElementById('back').addEventListener('click',goHome);
+document.getElementById('external').addEventListener('click',()=>window.open(current,'_blank','noopener'));
+if(/iPhone|iPad|iPod/.test(navigator.userAgent)&&!window.navigator.standalone)document.getElementById('install').style.display='block';
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body></html>
