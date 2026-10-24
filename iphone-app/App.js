@@ -33,6 +33,16 @@ export default function App() {
         <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 34 }}>
+          <View style={{ borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#343a46", marginBottom: 20, backgroundColor: "#08090c" }}>
+            <View style={{ paddingHorizontal: 14, paddingVertical: 12, backgroundColor: "#151017", borderBottomWidth: 1, borderBottomColor: "#292e37" }}>
+              <Text style={{ color: "#fff", fontSize: 18, fontWeight: "900" }}>📻 DARK CASE RADIO</Text>
+              <Text style={{ color: "#aeb3bd", fontSize: 11, marginTop: 3 }}>LIVE 24/7 • True Crime & Paranormal</Text>
+            </View>
+            <WebView source={{ uri: SITE + "#free-audio" }} style={{ height: 390, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction setSupportMultipleWindows={false} />
+            <Pressable onPress={() => open(SECTIONS[0])} style={{ backgroundColor: "#d71920", padding: 13, alignItems: "center" }}>
+              <Text style={{ color: "#fff", fontWeight: "900", fontSize: 14 }}>OPEN FULL RADIO PAGE ↗</Text>
+            </Pressable>
+          </View>
           <View style={{ padding: 22, borderRadius: 18, borderWidth: 1, borderColor: "#493039", backgroundColor: "#151017", marginBottom: 22 }}>
             <Text style={{ color: "#ff3038", fontSize: 11, fontWeight: "900", letterSpacing: 3, marginBottom: 10 }}>DARK CASE PRODUCTIONS</Text>
             <Text style={{ color: "#fff", fontSize: 31, fontWeight: "900", lineHeight: 36 }}>Real cases.{ "\n" }Dark stories.</Text>
