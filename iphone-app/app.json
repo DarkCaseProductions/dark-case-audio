@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Dark Case Audio",
+    "slug": "dark-case-audio",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "darkcaseaudio",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.darkcaseproductions.darkcaseaudio"
+    },
+    "android": {
+      "package": "com.darkcaseproductions.darkcaseaudio"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "splash": {
+      "backgroundColor": "#08090c"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
