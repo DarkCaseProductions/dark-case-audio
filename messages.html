@@ -41,7 +41,7 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 </main>
 <script>
 (function(){
-const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5",{auth:{lock:async(_name,_acquireTimeout,fn)=>await fn()}});
+const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
 const $=id=>document.getElementById(id);
 let user=null,profiles=[],blockedByMe=[],blockedMe=[],active=null,conversationRows=[],hiddenMessageIds=[];
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
