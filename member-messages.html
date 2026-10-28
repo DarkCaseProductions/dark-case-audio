@@ -41,7 +41,7 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 </main>
 <script>
 (function(){
-const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
+const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5",{auth:{lock:async(_name,_timeout,fn)=>await fn()}});
 const $=id=>document.getElementById(id);
 let user=null,profiles=[],blockedByMe=[],blockedMe=[],active=null,conversationRows=[],hiddenMessageIds=[];
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -49,11 +49,22 @@ function note(s){$("notice").textContent=s}
 function nameFor(id){const p=profiles.find(x=>x.id===id);return p?(p.display_name||p.username||"Member"):"Member"}
 function isBlocked(id){return blockedByMe.includes(id)||blockedMe.includes(id)}
 async function start(){
- const sr=await client.auth.getSession(); user=sr.data.session&&sr.data.session.user;
+ note("Checking your membership…");
+ let session=null;
+ try{
+  const result=await Promise.race([client.auth.getSession(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("session_timeout")),8000))]);
+  if(result.error)throw result.error;
+  session=result.data&&result.data.session;
+ }catch(err){
+  note("Your membership session could not be loaded. Please sign in again from the membership page.");
+  const a=document.createElement("a");a.href="membership.html";a.textContent="Open membership sign-in";a.className="btn";$("notice").appendChild(a);
+  return;
+ }
+ user=session&&session.user;
  if(!user){note("Please sign in with your free Dark Case Audio membership to use private messages.");const a=document.createElement("a");a.href="membership.html";a.textContent=" Sign in or create an account";a.className="btn";$("notice").appendChild(a);return}
  $("messaging").classList.remove("hidden");
  const pr=await client.from("profiles").select("id,username,display_name").order("username");
- if(pr.error){note("Couldn't load the member directory. Please refresh and try again.");return}
+ if(pr.error){note("Couldn't load the member directory: "+pr.error.message);return}
  profiles=(pr.data||[]).filter(p=>p.id!==user.id);
  await loadBlocks(); await loadConversations(); renderMembers(); renderBlocks();
  note("Signed in. Select a member to message them.");
