@@ -105,7 +105,7 @@ async function deleteForMe(ids){
  const promptText=ids.length===1?"Delete this message from your view only? The other member may still see their copy.":"Delete this chat from your view only? The other member may still see their copies.";
  if(!confirm(promptText))return;
  const rows=ids.map(message_id=>({message_id,user_id:user.id}));
- const r=await client.from("private_message_deletions").upsert(rows,{onConflict:"message_id,user_id",ignoreDuplicates:true});
+ const r=await client.from("private_message_deletions").insert(rows);
  if(r.error){alert("Could not delete this from your view. Please try again.");return}
  await loadConversations();
  if(active)await openThread(active);
