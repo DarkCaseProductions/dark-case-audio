@@ -16,7 +16,7 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 .status{color:var(--muted);background:#0d1017;border-radius:8px;padding:10px;margin:10px 0;overflow-wrap:anywhere}.list{display:grid;gap:8px}.person,.conversation{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);padding:11px;border-radius:9px;color:var(--text);cursor:pointer}.person.active,.conversation.active{border-color:var(--red)}.muted{color:var(--muted);font-size:.88rem}.messages{display:flex;flex-direction:column;gap:10px;max-height:440px;overflow:auto;padding:8px 0}.bubble{max-width:85%;padding:11px 13px;border-radius:12px;background:#222833;white-space:pre-wrap;overflow-wrap:anywhere}.bubble.mine{align-self:flex-end;background:#512027}.bubble .muted{display:block;margin-top:5px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.hidden{display:none!important}
 @media(max-width:720px){.layout{grid-template-columns:1fr}h1{font-size:1.9rem}.messages{max-height:50vh}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body><main class="wrap">
 <a class="back" href="index.html">← Back to Dark Case Audio</a>
@@ -41,7 +41,8 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 </main>
 <script>
 (function(){
-const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5",{auth:{lock:async(_name,_timeout,fn)=>await fn()}});
+if(typeof window.supabase==="undefined"){document.getElementById("notice").textContent="The messaging sign-in library did not load. Please try again shortly.";return;}
+const client=window.supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5",{auth:{lock:async(_name,_timeout,fn)=>await fn()}});
 const $=id=>document.getElementById(id);
 let user=null,profiles=[],blockedByMe=[],blockedMe=[],active=null,conversationRows=[],hiddenMessageIds=[];
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
