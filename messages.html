@@ -12,7 +12,7 @@
 h1,h2{font-family:Georgia,serif}h1{font-size:2.3rem;margin:25px 0 4px}.intro{color:var(--muted);margin-top:0}
 .layout{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:22px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
 input,textarea,select{width:100%;padding:12px;border-radius:8px;border:1px solid #424956;background:#080b10;color:#fff;font:inherit;margin:5px 0 12px}
-textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;padding:10px 14px;border:0;border-radius:8px;background:var(--red);color:white;font-weight:bold;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.secondary{background:#303641}.danger{background:#6f2026}.small{font-size:.88rem;padding:7px 10px}
+textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;padding:10px 14px;border:0;border-radius:8px;background:var(--red);color:white;font-weight:bold;cursor:pointer;text-decoration:none}button:disabled{opacity:.5;cursor:wait}.secondary{background:#303641}.danger{background:#6f2026}.delete-message{display:block;margin-top:7px;background:#303641;font-size:.78rem;padding:5px 8px}.small{font-size:.88rem;padding:7px 10px}
 .status{color:var(--muted);background:#0d1017;border-radius:8px;padding:10px;margin:10px 0;overflow-wrap:anywhere}.list{display:grid;gap:8px}.person,.conversation{width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);padding:11px;border-radius:9px;color:var(--text);cursor:pointer}.person.active,.conversation.active{border-color:var(--red)}.muted{color:var(--muted);font-size:.88rem}.messages{display:flex;flex-direction:column;gap:10px;max-height:440px;overflow:auto;padding:8px 0}.bubble{max-width:85%;padding:11px 13px;border-radius:12px;background:#222833;white-space:pre-wrap;overflow-wrap:anywhere}.bubble.mine{align-self:flex-end;background:#512027}.bubble .muted{display:block;margin-top:5px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.hidden{display:none!important}
 @media(max-width:720px){.layout{grid-template-columns:1fr}h1{font-size:1.9rem}.messages{max-height:50vh}}
 </style>
@@ -32,7 +32,7 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 <section class="panel">
 <div id="empty"><h2>Your messages</h2><p class="muted">Choose a member to start a private conversation or open a conversation below.</p><div id="conversations" class="list"></div></div>
 <div id="thread" class="hidden">
-<div class="row" style="justify-content:space-between"><div><h2 id="threadName" style="margin:0">Member</h2><div class="muted">Private conversation</div></div><button id="blockButton" class="danger small">Block member</button></div>
+<div class="row" style="justify-content:space-between"><div><h2 id="threadName" style="margin:0">Member</h2><div class="muted">Private conversation</div></div><div class="row"><button id="deleteChatButton" class="secondary small">Delete chat</button><button id="blockButton" class="danger small">Block member</button></div></div>
 <div id="threadMessages" class="messages"></div>
 <form id="sendForm"><label for="messageBody">Message</label><textarea id="messageBody" maxlength="5000" placeholder="Write a message…" required></textarea><div class="row"><button id="sendButton" type="submit">Send message</button><span class="muted">Maximum 5,000 characters.</span></div></form>
 <div id="threadStatus" class="status hidden"></div>
@@ -43,7 +43,7 @@ textarea{min-height:105px;resize:vertical}button,.btn{display:inline-block;paddi
 (function(){
 const client=supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
 const $=id=>document.getElementById(id);
-let user=null,profiles=[],blockedByMe=[],blockedMe=[],active=null,conversationRows=[];
+let user=null,profiles=[],blockedByMe=[],blockedMe=[],active=null,conversationRows=[],hiddenMessageIds=[];
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function note(s){$("notice").textContent=s}
 function nameFor(id){const p=profiles.find(x=>x.id===id);return p?(p.display_name||p.username||"Member"):"Member"}
@@ -67,7 +67,10 @@ async function loadBlocks(){
 async function loadConversations(){
  const r=await client.from("private_messages").select("id,sender_id,recipient_id,body,created_at,read_at").or("sender_id.eq."+user.id+",recipient_id.eq."+user.id).order("created_at",{ascending:false}).limit(300);
  if(r.error){note("Could not load messages. Please refresh.");return}
- conversationRows=r.data||[];
+ const hidden=await client.from("private_message_deletions").select("message_id").eq("user_id",user.id);
+ if(hidden.error){note("Could not load your message display settings. Please refresh.");return}
+ hiddenMessageIds=(hidden.data||[]).map(x=>x.message_id);
+ conversationRows=(r.data||[]).filter(m=>!hiddenMessageIds.includes(m.id));
  const map=new Map();
  conversationRows.forEach(m=>{const other=m.sender_id===user.id?m.recipient_id:m.sender_id;if(!map.has(other))map.set(other,m)});
  const box=$("conversations");box.innerHTML="";
@@ -91,11 +94,28 @@ async function openThread(id){
  const blocked=isBlocked(id);$("blockButton").textContent=blockedByMe.includes(id)?"Unblock member":"Block member";$("blockButton").disabled=blockedMe.includes(id);
  $("sendForm").classList.toggle("hidden",blocked);$("threadStatus").classList.toggle("hidden",!blocked);$("threadStatus").textContent=blockedMe.includes(id)?"This member has blocked you. You cannot send messages.":blockedByMe.includes(id)?"You blocked this member. Unblock them to send messages again.":"";
  const rows=conversationRows.filter(m=>(m.sender_id===user.id&&m.recipient_id===id)||(m.sender_id===id&&m.recipient_id===user.id)).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
- $("threadMessages").innerHTML=rows.map(m=>'<div class="bubble '+(m.sender_id===user.id?"mine":"")+'">'+esc(m.body)+'<span class="muted">'+(m.sender_id===user.id?"You":esc(nameFor(id)))+" · "+new Date(m.created_at).toLocaleString("en-GB")+"</span></div>").join("")||'<p class="muted">No messages yet. Start the conversation below.</p>';
+ $("threadMessages").innerHTML=rows.map(m=>'<div class="bubble '+(m.sender_id===user.id?"mine":"")+'">'+esc(m.body)+'<span class="muted">'+(m.sender_id===user.id?"You":esc(nameFor(id)))+" · "+new Date(m.created_at).toLocaleString("en-GB")+"</span><button type="button" class="delete-message" data-delete-message="'+esc(m.id)+'">Delete for me</button></div>').join("")||'<p class="muted">No messages yet. Start the conversation below.</p>';
+ $("threadMessages").querySelectorAll("[data-delete-message]").forEach(b=>b.onclick=()=>deleteForMe([b.dataset.deleteMessage]));
  $("threadMessages").scrollTop=$("threadMessages").scrollHeight;
  const unread=rows.filter(m=>m.sender_id===id&&m.recipient_id===user.id&&!m.read_at).map(m=>m.id);
  if(unread.length){await client.from("private_messages").update({read_at:new Date().toISOString()}).in("id",unread);conversationRows=conversationRows.map(m=>unread.includes(m.id)?{...m,read_at:new Date().toISOString()}:m)}
 }
+async function deleteForMe(ids){
+ if(!ids.length)return;
+ const promptText=ids.length===1?"Delete this message from your view only? The other member may still see their copy.":"Delete this chat from your view only? The other member may still see their copies.";
+ if(!confirm(promptText))return;
+ const rows=ids.map(message_id=>({message_id,user_id:user.id}));
+ const r=await client.from("private_message_deletions").upsert(rows,{onConflict:"message_id,user_id",ignoreDuplicates:true});
+ if(r.error){alert("Could not delete this from your view. Please try again.");return}
+ await loadConversations();
+ if(active)await openThread(active);
+}
+$("deleteChatButton").onclick=async()=>{
+ if(!active)return;
+ const ids=conversationRows.filter(m=>(m.sender_id===user.id&&m.recipient_id===active)||(m.sender_id===active&&m.recipient_id===user.id)).map(m=>m.id);
+ if(!ids.length){alert("There are no messages in this chat to delete.");return}
+ await deleteForMe(ids);
+};
 $("memberSearch").addEventListener("input",renderMembers);
 $("blockButton").onclick=async()=>{
  if(!active)return;
