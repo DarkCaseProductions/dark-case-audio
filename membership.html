@@ -85,7 +85,7 @@ button:hover{filter:brightness(1.12)}
 <h2>You're logged in</h2>
 <p id="accountUsername" class="username"></p>
 <p>Your email address is private and is not displayed to other members.</p>
-<p><a href="messages.html" style="color:#fff;font-weight:800;">Open Private Messages →</a></p>
+<p><a href="messages.html" style="color:#fff;font-weight:800;">Open Private Messages <span id="accountUnreadMessageBadge" hidden style="display:inline-block;background:#b91c2c;color:#fff;border-radius:999px;padding:1px 7px;font-size:.75rem;margin-left:4px;">0</span> →</a></p>
 <button id="logoutButton" type="button">Log Out</button>
 </section>
 </div>
@@ -118,14 +118,34 @@ button:hover{filter:brightness(1.12)}
     }
   }
 
+  async function updateAccountUnreadBadge(user){
+    var badge=document.getElementById("accountUnreadMessageBadge");
+    if(!badge)return;
+    if(!user){badge.hidden=true;return;}
+    try{
+      var mr=await client.from("private_messages").select("id").eq("recipient_id",user.id).is("read_at",null).limit(200);
+      if(mr.error){badge.hidden=true;return;}
+      var ids=(mr.data||[]).map(function(x){return x.id;});
+      if(!ids.length){badge.hidden=true;return;}
+      var dr=await client.from("private_message_deletions").select("message_id").eq("user_id",user.id).in("message_id",ids);
+      if(dr.error){badge.hidden=true;return;}
+      var hidden=new Set((dr.data||[]).map(function(x){return x.message_id;}));
+      var count=ids.filter(function(id){return !hidden.has(id);}).length;
+      badge.textContent=count>99?"99+":String(count);
+      badge.hidden=count===0;
+    }catch(e){badge.hidden=true;}
+  }
+
   function renderSession(session){
     if(session&&session.user){
       authArea.style.display="none";
       accountArea.style.display="block";
       loadProfile(session.user);
+      updateAccountUnreadBadge(session.user);
     }else{
       authArea.style.display="";
       accountArea.style.display="none";
+      updateAccountUnreadBadge(null);
     }
   }
 
@@ -180,6 +200,7 @@ button:hover{filter:brightness(1.12)}
 
   client.auth.getSession().then(function(result){renderSession(result.data.session)});
   client.auth.onAuthStateChange(function(event,session){renderSession(session)});
+  window.setInterval(function(){client.auth.getSession().then(function(r){updateAccountUnreadBadge(r.data&&r.data.session&&r.data.session.user);});},60000);
 })();
 </script>
 </body>
