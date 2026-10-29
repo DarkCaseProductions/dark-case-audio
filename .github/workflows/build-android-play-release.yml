@@ -2,6 +2,11 @@ name: Build Dark Case Audio Google Play bundle
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-android-play-release.yml
 
 permissions:
   contents: read
@@ -52,7 +57,7 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Install JavaScript dependencies
         run: npm install --no-audit --no-fund
@@ -71,16 +76,18 @@ jobs:
           import re
           p = Path("android/app/build.gradle")
           s = p.read_text()
-          if "signingConfigs {" not in s:
-              raise SystemExit("Could not find signingConfigs block in generated Gradle file")
-          release_config = """signingConfigs {
+          if "buildTypes {" not in s:
+              raise SystemExit("Could not find buildTypes block in generated Gradle file")
+          signing = """signingConfigs {
                   release {
                       storeFile file(System.getenv("UPLOAD_KEYSTORE_PATH"))
                       storePassword System.getenv("ANDROID_UPLOAD_KEYSTORE_PASSWORD")
                       keyAlias System.getenv("ANDROID_UPLOAD_KEY_ALIAS")
                       keyPassword System.getenv("ANDROID_UPLOAD_KEY_PASSWORD")
-                  }"""
-          s = s.replace("signingConfigs {", release_config, 1)
+                  }
+              }
+          """
+          s = s.replace("buildTypes {", signing + "\\n        buildTypes {", 1)
           s, count = re.subn(
               r"(buildTypes\\s*\\{[\\s\\S]*?release\\s*\\{[\\s\\S]*?signingConfig\\s+)signingConfigs\\.debug",
               r"\\1signingConfigs.release",
