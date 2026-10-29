@@ -14,7 +14,7 @@ const SECTIONS = [
   { title: "Paranormal Forum", subtitle: "Share experiences and theories", url: SITE + "paranormal-forum.html", icon: "✧" },
 ];
 export default function App() {
-  const [page, setPage] = useState(null);
+  const [page, setPage] = useState(SECTIONS[0]);
   const [historyKey, setHistoryKey] = useState(0);
   const open = (item) => { setPage(item); setHistoryKey(v => v + 1); };
   const back = () => setPage(null);
@@ -30,7 +30,7 @@ export default function App() {
         {page ? <Pressable onPress={() => Linking.openURL(page.url)}><Text style={{ color: "#c5c9d0", fontSize: 12 }}>OPEN WEB ↗</Text></Pressable> : null}
       </View>
       {page ? (
-        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
+        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} injectedJavaScript={page.title === "DCA Live Radio" ? "(function(){var tries=0;function startRadio(){var audio=document.getElementById('dark-case-radio-player');if(audio){audio.preload='auto';audio.play().catch(function(){});return;}if(tries++<30)setTimeout(startRadio,500);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startRadio,{once:true});else startRadio();})();true;" : undefined} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 34 }}>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: "#493039", marginBottom: 20, padding: 18, backgroundColor: "#151017" }}>
