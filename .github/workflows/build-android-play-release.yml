@@ -81,21 +81,14 @@ jobs:
                       keyPassword System.getenv("ANDROID_UPLOAD_KEY_PASSWORD")
                   }"""
           s = s.replace("signingConfigs {", release_config, 1)
-          start = s.find("buildTypes {")
-          if start < 0:
-              raise SystemExit("Could not find buildTypes block in generated Gradle file")
-          end = s.find("\n}", start)
-          if end < 0:
-              end = len(s)
-          part = s[start:end]
-          rel = part.find("release {")
-          if rel < 0:
-              raise SystemExit("Could not find release build type")
-          before, tail = part[:rel], part[rel:]
-          tail, count = re.subn(r"signingConfig signingConfigs\\.debug", "signingConfig signingConfigs.release", tail, count=1)
+          s, count = re.subn(
+              r"(buildTypes\\s*\\{[\\s\\S]*?release\\s*\\{[\\s\\S]*?signingConfig\\s+)signingConfigs\\.debug",
+              r"\\1signingConfigs.release",
+              s,
+              count=1,
+          )
           if count != 1:
               raise SystemExit("Could not replace release signing configuration safely")
-          s = s[:start] + before + tail + s[end:]
           p.write_text(s)
           PY
 
