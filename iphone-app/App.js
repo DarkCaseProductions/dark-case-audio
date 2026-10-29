@@ -4,7 +4,7 @@ import { WebView } from "react-native-webview";
 
 const SITE = "https://darkcaseaudio.com/";
 const SECTIONS = [
-  { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE, icon: "▶" },
+  { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE + "#free-audio", icon: "▶" },
   { title: "Audiobooks", subtitle: "Explore the latest audio releases", url: SITE + "#audiobooks", icon: "♫" },
   { title: "Ebooks", subtitle: "Browse digital books", url: SITE + "#ebooks", icon: "▤" },
   { title: "Free Crime Case Files", subtitle: "Explore the crime archive", url: SITE + "crime-case-files.html", icon: "⌕" },
