@@ -1,0 +1,36 @@
+name: Check Android app dependencies
+
+on:
+  push:
+    branches:
+      - android-native-build
+    paths:
+      - "iphone-app/package.json"
+      - "iphone-app/app.json"
+      - "iphone-app/App.js"
+      - ".github/workflows/check-android-dependencies.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  expo-check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: iphone-app
+    steps:
+      - name: Check out Android build branch
+        uses: actions/checkout@v4
+        with:
+          ref: android-native-build
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: iphone-app/package.json
+      - name: Install app dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run Expo project diagnostics
+        run: npx expo-doctor
