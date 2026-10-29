@@ -11,7 +11,11 @@
       "bundleIdentifier": "com.darkcaseproductions.darkcaseaudio"
     },
     "android": {
-      "package": "com.darkcaseproductions.darkcaseaudio"
+      "package": "com.darkcaseproductions.darkcaseaudio",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#08090c"
+      }
     },
     "web": {
       "bundler": "metro"
@@ -21,6 +25,7 @@
     },
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "icon": "./assets/icon.png"
   }
 }
