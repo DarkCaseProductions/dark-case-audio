@@ -1,0 +1,44 @@
+name: Prepare Android app icons
+
+on:
+  push:
+    branches:
+      - android-native-build
+    paths:
+      - "iphone-app/app.json"
+      - "DCA_ Noir Evidence Room Emblem.png"
+      - ".github/workflows/prepare-android-icon.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate-icons:
+    if: "!contains(github.event.head_commit.message, 'Generate Android launcher icons')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Android build branch
+        uses: actions/checkout@v4
+        with:
+          ref: android-native-build
+      - name: Prepare square launcher PNGs from the approved emblem
+        run: |
+          python -m pip install --user Pillow
+          mkdir -p iphone-app/assets
+          python - <<'PY'
+          from PIL import Image, ImageOps
+          source = Image.open("DCA_ Noir Evidence Room Emblem.png").convert("RGB")
+          # Preserve the full square artwork and resize cleanly for Android launchers.
+          source = ImageOps.fit(source, (1024, 1024), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+          source.save("iphone-app/assets/icon.png", "PNG", optimize=True)
+          source.save("iphone-app/assets/adaptive-icon.png", "PNG", optimize=True)
+          PY
+      - name: Commit icon assets to this preparation branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add iphone-app/assets/icon.png iphone-app/assets/adaptive-icon.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate Android launcher icons"
+            git push origin HEAD:android-native-build
+          fi
