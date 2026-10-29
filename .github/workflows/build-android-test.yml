@@ -49,13 +49,21 @@ jobs:
           ./gradlew assembleRelease
       - name: Sign test APK for device installation
         run: |
-          APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          set -euo pipefail
+          RELEASE_DIR="android/app/build/outputs/apk/release"
+          echo "Release APK outputs:"
+          find "$RELEASE_DIR" -maxdepth 1 -type f -name '*.apk' -print
+          APK="$(find "$RELEASE_DIR" -maxdepth 1 -type f -name '*.apk' ! -name 'dark-case-audio-test.apk' -print -quit)"
+          if [ -z "$APK" ]; then
+            echo "::error::Gradle completed but no APK was found in $RELEASE_DIR"
+            exit 1
+          fi
           mkdir -p "$HOME/.android"
           if [ ! -f "$HOME/.android/debug.keystore" ]; then
             keytool -genkeypair -v -storetype JKS -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
           fi
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-pass pass:android --key-pass pass:android --out android/app/build/outputs/apk/release/dark-case-audio-test.apk "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify android/app/build/outputs/apk/release/dark-case-audio-test.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-pass pass:android --key-pass pass:android --out "$RELEASE_DIR/dark-case-audio-test.apk" "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$RELEASE_DIR/dark-case-audio-test.apk"
       - name: Upload test APK
         uses: actions/upload-artifact@v4
         with:
