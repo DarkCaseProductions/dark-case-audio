@@ -21,16 +21,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: android-native-build
-      - name: Prepare square launcher PNGs from the new Industrial DCA emblem
+      - name: Prepare square launcher PNGs from the approved smaller Industrial DCA metallic emblem
         run: |
           python -m pip install --user Pillow
           mkdir -p iphone-app/assets
-          curl -fL "https://raw.githubusercontent.com/DarkCaseProductions/dark-case-audio/main/Industrial%20DCA%20Audio%20Emblem.png" -o /tmp/dca-emblem.png
+          curl -fL "https://raw.githubusercontent.com/DarkCaseProductions/dark-case-audio/main/Industrial%20DCA%20Metallic%20Audio%20Emblem.png" -o /tmp/dca-emblem.png
           python - <<'PY'
-          from PIL import Image, ImageOps
+          from PIL import Image
           source = Image.open("/tmp/dca-emblem.png").convert("RGB")
-          # Use the newly approved Industrial DCA emblem and resize cleanly for Android launchers.
-          source = ImageOps.fit(source, (1024, 1024), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+          # The source image already has the emblem scaled down on a black square canvas.
+          source = source.resize((1024, 1024), Image.Resampling.LANCZOS)
           source.save("iphone-app/assets/icon.png", "PNG", optimize=True)
           source.save("iphone-app/assets/adaptive-icon.png", "PNG", optimize=True)
           PY
