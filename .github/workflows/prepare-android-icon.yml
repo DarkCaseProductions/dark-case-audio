@@ -25,9 +25,10 @@ jobs:
         run: |
           python -m pip install --user Pillow
           mkdir -p iphone-app/assets
+          curl -fL "https://raw.githubusercontent.com/DarkCaseProductions/dark-case-audio/main/DCA_%20Noir%20Evidence%20Room%20Emblem.png" -o /tmp/dca-emblem.png
           python - <<'PY'
           from PIL import Image, ImageOps
-          source = Image.open("DCA_ Noir Evidence Room Emblem.png").convert("RGB")
+          source = Image.open("/tmp/dca-emblem.png").convert("RGB")
           # Preserve the full square artwork and resize cleanly for Android launchers.
           source = ImageOps.fit(source, (1024, 1024), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
           source.save("iphone-app/assets/icon.png", "PNG", optimize=True)
