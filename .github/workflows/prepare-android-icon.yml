@@ -6,11 +6,12 @@ on:
       - android-native-build
     paths:
       - "iphone-app/app.json"
-      - "Industrial DCA Audio Emblem.png"
+      - "Industrial DCA Metallic Audio Emblem.png"
       - ".github/workflows/prepare-android-icon.yml"
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   generate-icons:
@@ -29,7 +30,7 @@ jobs:
           python - <<'PY'
           from PIL import Image
           source = Image.open("/tmp/dca-emblem.png").convert("RGB")
-          # The source image already has the emblem scaled down on a black square canvas.
+          # Preserve the black canvas and smaller emblem exactly as designed.
           source = source.resize((1024, 1024), Image.Resampling.LANCZOS)
           source.save("iphone-app/assets/icon.png", "PNG", optimize=True)
           source.save("iphone-app/assets/adaptive-icon.png", "PNG", optimize=True)
@@ -43,3 +44,8 @@ jobs:
             git commit -m "Generate Android launcher icons"
             git push origin HEAD:android-native-build
           fi
+      - name: Start Android APK build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run build-android-test.yml --ref android-native-build
