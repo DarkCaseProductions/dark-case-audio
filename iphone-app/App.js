@@ -38,7 +38,7 @@ export default function App() {
               <Text style={{ color: "#fff", fontSize: 18, fontWeight: "900" }}>📻 DARK CASE RADIO</Text>
               <Text style={{ color: "#aeb3bd", fontSize: 11, marginTop: 3 }}>LIVE 24/7 • True Crime & Paranormal</Text>
             </View>
-            <WebView source={{ uri: SITE + "#free-audio" }} style={{ height: 390, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction setSupportMultipleWindows={false} />
+            <WebView source={{ uri: SITE + "#free-audio" }} style={{ height: 390, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} />
             <Pressable onPress={() => open(SECTIONS[0])} style={{ backgroundColor: "#d71920", padding: 13, alignItems: "center" }}>
               <Text style={{ color: "#fff", fontWeight: "900", fontSize: 14 }}>OPEN FULL RADIO PAGE ↗</Text>
             </Pressable>
