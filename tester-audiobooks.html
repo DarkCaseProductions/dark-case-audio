@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tester Audiobooks | Dark Case Audio</title>
+<style>
+:root{color-scheme:dark;--bg:#090b10;--panel:#151922;--line:#343b47;--red:#c81720;--muted:#aeb4c0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#f4f4f4;font-family:Arial,sans-serif;line-height:1.55}
+main{width:min(1000px,94%);margin:36px auto;padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+a{color:#fff}.brand{color:#e52b34;font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+h1{font-family:Georgia,serif;font-size:clamp(28px,5vw,40px);margin:8px 0}
+.intro{color:var(--muted)}#status{padding:13px 15px;background:#0c0f15;border:1px solid var(--line);border-radius:9px;margin:20px 0;color:#ddd}
+#status.error{color:#ffb8b8;border-color:#713535}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px}
+.item{background:#0c0f15;border:1px solid var(--line);border-radius:11px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.item h2{font-size:17px;line-height:1.3;margin:0;flex:1}
+button{border:0;border-radius:8px;background:var(--red);color:#fff;font-weight:800;padding:12px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.small{font-size:13px;color:var(--muted);margin-top:22px}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Dark Case Audio</div>
+<h1>Tester Audiobook Access</h1>
+<p class="intro">This page gives authorised Dark Case Audio app testers access to the paid audiobooks during testing. It does not change the normal checkout or customer payment process.</p>
+<div id="status">Checking your membership sign-in…</div>
+<div id="catalogue" class="grid" hidden></div>
+<p class="small"><a href="membership.html">Membership</a> · <a href="index.html">Back to Dark Case Audio</a><br>Each secure download link expires after one hour. Sign in using the Dark Case Audio account that was approved for tester access.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  const SUPABASE_URL="https://inhiiamepxwjtfyqlqir.supabase.co";
+  const SUPABASE_KEY="sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5";
+  const FUNCTION_URL=SUPABASE_URL+"/functions/v1/tester-audiobook-access";
+  const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  const status=document.getElementById("status");
+  const catalogue=document.getElementById("catalogue");
+  const items=[
+    ["gwrych","Uncovering the Ghosts of Gwrych Castle"],
+    ["essex","The Essex Boys - Case File"],
+    ["falsely_accused","Falsely Accused - Step By Step Guide"],
+    ["women","The Women Who Crossed the Line"],
+    ["patrick_tate","Before Rettendon - Patrick Tate"],
+    ["allegation","When an Allegation Becomes a Death Sentence"],
+    ["paranormal","Paranormal Files Vol. 1"],
+    ["detective_1","THE DETECTIVE Vol. 1"],
+    ["detective_2","THE DETECTIVE Vol. 2"],
+    ["crime_paranormal","Crime & The Paranormal Vol. 1"],
+    ["crimes_children","Crimes Against Children Vol. 1"],
+    ["murder_homicide","Murder & Homicide Vol. 1"],
+    ["forensic_1","The Forensic Files Vol. 1"],
+    ["forensic_2","The Forensic Files Vol. 2"],
+    ["strangest_crimes","The Strangest Crimes"]
+  ];
+  function showError(message){status.className="error";status.textContent=message;}
+  async function prepare(){
+    const result=await client.auth.getSession();
+    const session=result.data&&result.data.session;
+    if(!session){showError("You are not signed in. Please log in to your approved Dark Case Audio membership, then return to this page.");return;}
+    status.className="";
+    status.textContent="Signed in. Choose an audiobook below to prepare its secure download.";
+    catalogue.hidden=false;
+    items.forEach(function(item){
+      const card=document.createElement("section");card.className="item";
+      const title=document.createElement("h2");title.textContent=item[1];
+      const button=document.createElement("button");button.type="button";button.textContent="Get audiobook";
+      button.addEventListener("click",async function(){
+        button.disabled=true;button.textContent="Preparing download…";
+        try{
+          const current=await client.auth.getSession();
+          const accessToken=current.data&&current.data.session&&current.data.session.access_token;
+          if(!accessToken)throw new Error("Your sign-in has expired. Please log in again.");
+          const response=await fetch(FUNCTION_URL,{method:"POST",headers:{"Authorization":"Bearer "+accessToken,"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({item:item[0]})});
+          const data=await response.json();
+          if(!response.ok||!data.ok)throw new Error(data.error||"The download could not be prepared.");
+          const link=document.createElement("a");link.href=data.download.url;link.textContent="Download "+data.download.name;link.style.color="#fff";link.style.fontWeight="800";link.style.overflowWrap="anywhere";
+          button.replaceWith(link);
+          status.className="";status.textContent=data.title+" is ready. The secure link expires after one hour.";
+        }catch(error){status.className="error";status.textContent=error.message||"Unable to prepare the download.";button.disabled=false;button.textContent="Try again";}
+      });
+      card.append(title,button);catalogue.append(card);
+    });
+  }
+  prepare().catch(function(error){showError(error.message||"Unable to check your membership sign-in.");});
+})();
+</script>
+</body>
+</html>
