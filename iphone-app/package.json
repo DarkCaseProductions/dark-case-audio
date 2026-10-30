@@ -15,7 +15,8 @@
     "react": "19.3.0",
     "react-native": "0.88.1",
     "react-native-webview": "14.0.1",
-    "expo-audio": "~58.0.9"
+    "expo-audio": "~58.0.9",
+    "expo-asset": "~58.0.18"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"
