@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, View, Text, ScrollView, Pressable, StatusBar, Platform, Linking } from "react-native";
 import { WebView } from "react-native-webview";
+import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from "expo-audio";
 
 const SITE = "https://darkcaseaudio.com/";
+const RADIO_STREAM = "https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3";
 const SECTIONS = [
   { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE + "#free-audio", icon: "▶" },
   { title: "Audiobooks", subtitle: "Explore the latest audio releases", url: SITE + "#audiobooks", icon: "♫" },
@@ -16,6 +18,31 @@ const SECTIONS = [
 export default function App() {
   const [page, setPage] = useState(SECTIONS[0]);
   const [historyKey, setHistoryKey] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const player = useAudioPlayer(RADIO_STREAM, { updateInterval: 500 });
+  const status = useAudioPlayerStatus(player);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionMode: "doNotMix"
+        });
+        if (mounted) player.play();
+      } catch (error) {
+        console.warn("DCA native radio autoplay failed:", error);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [player]);
+
+  useEffect(() => {
+    player.volume = muted ? 0 : 1;
+  }, [muted, player]);
+
   const open = (item) => { setPage(item); setHistoryKey(v => v + 1); };
   const back = () => setPage(null);
   return (
@@ -29,8 +56,20 @@ export default function App() {
         </View>
         {page ? <Pressable onPress={() => Linking.openURL(page.url)}><Text style={{ color: "#c5c9d0", fontSize: 12 }}>OPEN WEB ↗</Text></Pressable> : null}
       </View>
+      <View style={{ minHeight: 54, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 8, backgroundColor: "#171017", borderBottomWidth: 1, borderBottomColor: "#493039" }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: "#fff", fontWeight: "900", fontSize: 13 }}>DCA LIVE RADIO</Text>
+          <Text style={{ color: "#aeb3bd", fontSize: 11, marginTop: 2 }}>{status.isBuffering ? "Connecting to live radio…" : status.playing ? "LIVE • Playing" : status.error ? "Radio connection problem" : "Radio paused"}</Text>
+        </View>
+        <Pressable onPress={() => { if (status.playing) player.pause(); else player.play(); }} style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: "#321317", marginRight: 8 }}>
+          <Text style={{ color: "#fff", fontWeight: "800" }}>{status.playing ? "PAUSE" : "PLAY"}</Text>
+        </Pressable>
+        <Pressable onPress={() => setMuted(v => !v)} style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: "#d71920" }}>
+          <Text style={{ color: "#fff", fontWeight: "900" }}>{muted ? "UNMUTE" : "MUTE"}</Text>
+        </Pressable>
+      </View>
       {page ? (
-        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} injectedJavaScript={page.title === "DCA Live Radio" ? "(function(){var tries=0,stream='https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3';function startRadio(){var audio=document.getElementById('dark-case-radio-player');if(!audio){audio=document.querySelector('audio');}if(audio){audio.autoplay=true;audio.preload='auto';audio.muted=false;if(!audio.src||audio.src==='about:blank'){audio.src=stream;}if(audio.paused){audio.play().catch(function(){if(tries++<40)setTimeout(startRadio,1500);});}return;}if(tries++<40)setTimeout(startRadio,500);}startRadio();setTimeout(startRadio,1200);setTimeout(startRadio,3000);})();true;" : undefined} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
+        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 34 }}>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: "#493039", marginBottom: 20, padding: 18, backgroundColor: "#151017" }}>
@@ -42,7 +81,7 @@ export default function App() {
           </View>
           <View style={{ padding: 22, borderRadius: 18, borderWidth: 1, borderColor: "#493039", backgroundColor: "#151017", marginBottom: 22 }}>
             <Text style={{ color: "#ff3038", fontSize: 11, fontWeight: "900", letterSpacing: 3, marginBottom: 10 }}>DARK CASE PRODUCTIONS</Text>
-            <Text style={{ color: "#fff", fontSize: 31, fontWeight: "900", lineHeight: 36 }}>Real cases.{ "\n" }Dark stories.</Text>
+            <Text style={{ color: "#fff", fontSize: 31, fontWeight: "900", lineHeight: 36 }}>Real cases.{"\n"}Dark stories.</Text>
             <Text style={{ color: "#c5c9d0", fontSize: 14, lineHeight: 21, marginTop: 12 }}>Your home for true crime, paranormal investigations, audiobooks and Dark Case Radio — all in one place.</Text>
             <Pressable onPress={() => open(SECTIONS[0])} style={{ marginTop: 18, backgroundColor: "#d71920", padding: 14, borderRadius: 10, alignItems: "center" }}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 15 }}>▶  LISTEN TO DCA LIVE RADIO</Text></Pressable>
           </View>
