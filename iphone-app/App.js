@@ -12,6 +12,7 @@ const SECTIONS = [
   { title: "Free Crime Case Files", subtitle: "Explore the crime archive", url: SITE + "crime-case-files.html", icon: "⌕" },
   { title: "Free Paranormal Case Files", subtitle: "Hauntings, investigations and unexplained cases", url: SITE + "paranormal-case-files.html", icon: "☾" },
   { title: "Membership", subtitle: "Sign in and manage your account", url: SITE + "membership.html", icon: "♙" },
+  { title: "Tester Audiobooks", subtitle: "Authorised app testers only", url: SITE + "tester-audiobooks.html", icon: "⬇" },
   { title: "Crime Forum", subtitle: "Discuss cases with the community", url: SITE + "crime-forum.html", icon: "◉" },
   { title: "Paranormal Forum", subtitle: "Share experiences and theories", url: SITE + "paranormal-forum.html", icon: "✧" },
 ];
