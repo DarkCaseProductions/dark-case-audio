@@ -81,7 +81,7 @@ The current `audiobook-access` function remains the existing website delivery pa
 The immediate priority is to test the app without implementing paid in-app purchases yet.
 
 - The app home screen now routes audiobook access to `tester-audiobooks.html`, not the public paid audiobook catalogue.
-- A dedicated tester catalogue page has been added. It reuses the existing `tester-audiobook-access` Edge Function and the existing membership sign-in session.
+- A tester catalogue page already exists on the live website at `https://darkcaseaudio.com/tester-audiobooks.html`. It already uses the existing `tester-audiobook-access` Edge Function and the membership sign-in session. The new branch copy is for controlled UI changes only; do not overwrite the live page or publish it from this branch without reviewing differences.
 - The Edge Function checks the authenticated Supabase user ID against its server-side allow-list before issuing a one-hour signed download URL. The page does not grant access based on a client-side flag.
 - The current Edge Function allow-list contains two tester user IDs. Additional testers must be explicitly authorised server-side; do not make the function public or remove its user check.
 - The app WebView hides Stripe Payment Link anchors and blocks navigation to Stripe Checkout hosts in tester mode. The live website and its existing paid audiobook checkout links remain unchanged.
