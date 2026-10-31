@@ -8,7 +8,6 @@ const RADIO_STREAM = "https://radio.darkcaseaudio.com/listen/dark_case_radio/rad
 const SECTIONS = [
   { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE + "#free-audio", icon: "▶" },
   { title: "Audiobooks", subtitle: "Explore the latest audio releases", url: SITE + "#audiobooks", icon: "♫" },
-  { title: "Ebooks", subtitle: "Browse digital books", url: SITE + "#ebooks", icon: "▤" },
   { title: "Free Crime Case Files", subtitle: "Explore the crime archive", url: SITE + "crime-case-files.html", icon: "⌕" },
   { title: "Free Paranormal Case Files", subtitle: "Hauntings, investigations and unexplained cases", url: SITE + "paranormal-case-files.html", icon: "☾" },
   { title: "Membership", subtitle: "Sign in and manage your account", url: SITE + "membership.html", icon: "♙" },
