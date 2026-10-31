@@ -100,7 +100,10 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew bundleRelease
+          ./gradlew assembleRelease bundleRelease
+          APK="app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK"
+          jarsigner -verify "$APK" >/dev/null
           BUNDLE="app/build/outputs/bundle/release/app-release.aab"
           test -s "$BUNDLE"
           jarsigner -verify "$BUNDLE" >/dev/null
@@ -109,7 +112,9 @@ jobs:
       - name: Upload Google Play bundle
         uses: actions/upload-artifact@v4
         with:
-          name: dark-case-audio-google-play-aab
-          path: iphone-app/android/app/build/outputs/bundle/release/app-release.aab
+          name: dark-case-audio-tester-builds
+          path: |
+            iphone-app/android/app/build/outputs/apk/release/app-release.apk
+            iphone-app/android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
