@@ -2,6 +2,9 @@ name: Build Dark Case Audio Google Play bundle
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - android-billing-choice
 
 permissions:
   contents: read
