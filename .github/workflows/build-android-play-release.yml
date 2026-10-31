@@ -13,10 +13,10 @@ jobs:
       run:
         working-directory: iphone-app
     steps:
-      - name: Check out Android build branch
+      - name: Check out the branch selected for this run
         uses: actions/checkout@v4
         with:
-          ref: android-native-build
+          ref: ${{ github.ref }}
 
       - name: Check upload signing secrets
         env:
@@ -82,8 +82,8 @@ jobs:
                   }"""
           s = s.replace("signingConfigs {", release_config, 1)
           s, count = re.subn(
-              r"(buildTypes\\s*\\{[\\s\\S]*?release\\s*\\{[\\s\\S]*?signingConfig\\s+)signingConfigs\\.debug",
-              r"\\1signingConfigs.release",
+              r"(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?signingConfig\s+)signingConfigs\.debug",
+              r"\1signingConfigs.release",
               s,
               count=1,
           )
