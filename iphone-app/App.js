@@ -7,11 +7,10 @@ const SITE = "https://darkcaseaudio.com/";
 const RADIO_STREAM = "https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3";
 const SECTIONS = [
   { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE + "#free-audio", icon: "▶" },
-  { title: "Audiobooks", subtitle: "Explore the latest audio releases", url: SITE + "#audiobooks", icon: "♫" },
+  { title: "Free Tester Audiobooks", subtitle: "Free access for authorised app testers", url: SITE + "tester-audiobooks.html", icon: "♫" },
   { title: "Free Crime Case Files", subtitle: "Explore the crime archive", url: SITE + "crime-case-files.html", icon: "⌕" },
   { title: "Free Paranormal Case Files", subtitle: "Hauntings, investigations and unexplained cases", url: SITE + "paranormal-case-files.html", icon: "☾" },
   { title: "Membership", subtitle: "Sign in and manage your account", url: SITE + "membership.html", icon: "♙" },
-  { title: "Tester Audiobooks", subtitle: "Authorised app testers only", url: SITE + "tester-audiobooks.html", icon: "⬇" },
   { title: "Crime Forum", subtitle: "Discuss cases with the community", url: SITE + "crime-forum.html", icon: "◉" },
   { title: "Paranormal Forum", subtitle: "Share experiences and theories", url: SITE + "paranormal-forum.html", icon: "✧" },
 ];
@@ -82,7 +81,7 @@ export default function App() {
           <View style={{ padding: 22, borderRadius: 18, borderWidth: 1, borderColor: "#493039", backgroundColor: "#151017", marginBottom: 22 }}>
             <Text style={{ color: "#ff3038", fontSize: 11, fontWeight: "900", letterSpacing: 3, marginBottom: 10 }}>DARK CASE PRODUCTIONS</Text>
             <Text style={{ color: "#fff", fontSize: 31, fontWeight: "900", lineHeight: 36 }}>Real cases.{"\n"}Dark stories.</Text>
-            <Text style={{ color: "#c5c9d0", fontSize: 14, lineHeight: 21, marginTop: 12 }}>Your home for true crime, paranormal investigations, audiobooks and Dark Case Radio — all in one place.</Text>
+            <Text style={{ color: "#c5c9d0", fontSize: 14, lineHeight: 21, marginTop: 12 }}>Your home for true crime, paranormal investigations, tester audiobooks and Dark Case Radio — all in one place.</Text>
             <Pressable onPress={() => open(SECTIONS[0])} style={{ marginTop: 18, backgroundColor: "#d71920", padding: 14, borderRadius: 10, alignItems: "center" }}><Text style={{ color: "#fff", fontWeight: "900", fontSize: 15 }}>▶  LISTEN TO DCA LIVE RADIO</Text></Pressable>
           </View>
           <Text style={{ color: "#fff", fontSize: 21, fontWeight: "900", marginBottom: 12 }}>EXPLORE DARK CASE AUDIO</Text>
