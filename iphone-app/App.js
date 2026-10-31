@@ -5,32 +5,6 @@ import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from "expo-au
 
 const SITE = "https://darkcaseaudio.com/";
 const RADIO_STREAM = "https://radio.darkcaseaudio.com/listen/dark_case_radio/radio.mp3";
-const TESTER_MODE_SCRIPT = `
-(function(){
-  function hidePaidCheckoutLinks(){
-    document.querySelectorAll('a[href]').forEach(function(link){
-      var href=(link.getAttribute('href')||'').toLowerCase();
-      if(href.includes('buy.stripe.com')||href.includes('checkout.stripe.com')){
-        link.style.display='none';
-        link.setAttribute('aria-hidden','true');
-        link.removeAttribute('href');
-      }
-    });
-  }
-  hidePaidCheckoutLinks();
-  new MutationObserver(hidePaidCheckoutLinks).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['href']});
-  document.addEventListener('click',function(event){
-    var link=event.target&&event.target.closest?event.target.closest('a[href]'):null;
-    if(link){
-      var href=(link.getAttribute('href')||'').toLowerCase();
-      if(href.includes('buy.stripe.com')||href.includes('checkout.stripe.com')){
-        event.preventDefault();event.stopPropagation();
-      }
-    }
-  },true);
-  true;
-})();
-`;
 const SECTIONS = [
   { title: "DCA Live Radio", subtitle: "Listen live, day and night", url: SITE + "#free-audio", icon: "▶" },
   { title: "Free Tester Audiobooks", subtitle: "Free access for authorised app testers", url: SITE + "tester-audiobooks.html", icon: "♫" },
@@ -94,7 +68,7 @@ export default function App() {
         </Pressable>
       </View>
       {page ? (
-        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} injectedJavaScript={TESTER_MODE_SCRIPT} onShouldStartLoadWithRequest={(request) => { const lowerUrl = request.url.toLowerCase(); if (lowerUrl.includes("buy.stripe.com") || lowerUrl.includes("checkout.stripe.com")) return false; if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
+        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 34 }}>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: "#493039", marginBottom: 20, padding: 18, backgroundColor: "#151017" }}>
