@@ -10,13 +10,23 @@ Use Google's rendered billing-choice screen with the external-web-link option (G
 
 The app must not simply open existing Stripe URLs from the WebView. It must first invoke the Google Play Billing Choice flow for eligible digital products. If the user chooses Google Play Billing, continue through the standard Play purchase flow. If the user chooses the external link, obtain the external transaction token, associate it with the exact intended audiobook/order, and open the matching Dark Case Audio website checkout.
 
+## Verified Google requirements (checked 31 October 2026)
+
+- The selected route is Scenario 2A: Google renders the billing-choice screen and the user is sent to the external website when they choose the external option.
+- Google requires Billing Choice enrolment and the external-link preferences to be enabled in Play Console before the app flow is used.
+- The Android integration must use Play Billing Library 9.1 or later.
+- For Scenario 2A, obtain a reporting token using `createBillingProgramReportingDetailsAsync` with `DeveloperBillingType.EXTERNAL_LINK`, then pass it to the Billing Choice flow / external-link launch as required by the current Play Billing API.
+- After a successful external purchase, report it through Google Play Developer API `externaltransactions.createexternaltransaction`. The one-time purchase payload requires the token, a unique external transaction ID, transaction time, original pre-tax amount, original tax amount, and the user's tax region code. For this digital-content link, report `externalOfferDetails.linkType = LINK_TO_DIGITAL_CONTENT_OFFER`.
+- Google requires reporting authorized transactions within 24 hours. Refunds must also be reported through the corresponding external-transactions refund API.
+- These requirements are for audiobook purchases only. Ebooks are withdrawn from sale and are excluded from all app catalogue, checkout, reporting and refund work.
+
 ## Required implementation work
 
 1. Confirm Play Console enrolment approval and configure the app for the UK external-web-link option, including any required choice-screen and external-link preferences.
 2. Add a maintained Android native bridge compatible with the current Expo SDK / React Native project and Play Billing Library 9.1 or later. Because this is an Expo managed project, implement/configure the native module through an Expo config plugin or another reproducible native-project integration. Do not make manual edits only to generated android/ files; the release workflow runs expo prebuild --clean.
 3. Implement product discovery and the Google Play Billing purchase path. Map only the currently purchasable audiobook catalogue entries to stable product identifiers; ebooks are withdrawn from sale and must not appear in the app purchase flow.
 4. For the external-link choice, obtain and persist the Google external transaction token server-side before opening the matching Stripe checkout. Bind the token to a specific audiobook, user/session, and pending order.
-5. On verified Stripe payment success, securely report the authorized transaction to Google Play through the required Billing Choice API within 24 hours. Do not trust a client-side success redirect as proof of payment.
+5. Use a new server-created Stripe Checkout Session for app-originated purchases, carrying a server-controlled order reference. The existing static website Payment Links must remain unchanged. On verified Stripe payment success, report the authorized one-time transaction to Google Play through the External Transactions API within 24 hours, including the correct pre-tax/tax split, GBP currency, UK tax region, transaction timestamp, unique external transaction ID, token and digital-content-offer link type. Do not trust a client-side success redirect as proof of payment.
 6. Handle cancellations, abandoned checkout, refunds, duplicate callbacks, retries, and token expiry/idempotency.
 7. Test both Google Play and Stripe paths with Play license testers/internal testing, then inspect the resulting signed AAB and Play Console declarations.
 
@@ -41,3 +51,26 @@ Before coding the payment/reporting endpoints, inspect the existing Supabase aud
 - Do not add placeholder billing calls, fake tokens, guessed product IDs, or client-side Google service-account credentials.
 - Do not run a production build or upload an AAB until the native bridge, backend reporting, product mapping, and Play Console enrollment are in place.
 - A successful build alone does not prove Billing Choice compliance; complete end-to-end testing is required.
+
+## Existing checkout constraint and implementation boundary
+
+The current website checkout uses fixed Stripe Payment Links. These remain untouched. They do not provide the required server-controlled association between a Billing Choice external transaction token and a specific pending audiobook order. App-originated external-link purchases therefore need a separate server-created Stripe Checkout Session flow that:
+
+- accepts only an allow-listed audiobook identifier and a valid pending-order reference;
+- stores the Google token against that pending order before creating the Stripe session;
+- sets server-controlled Stripe metadata / client reference data to identify the pending order;
+- verifies the completed Stripe session directly with Stripe on the server;
+- calculates and reports the exact GBP pre-tax and tax amounts from the verified Stripe transaction, without guessing tax values;
+- uses an idempotent report state so webhook retries cannot create duplicate Google reports;
+- handles failed/abandoned checkouts and refunds without granting audiobook access prematurely.
+
+The current `audiobook-access` function remains the existing website delivery path and must not be changed as part of this work. A separate app purchase/reporting path should be implemented and tested before any production deployment.
+
+## Outstanding prerequisites before implementation can be completed
+
+- Google Play Billing Choice enrolment approval and external-link preferences enabled for this app.
+- Confirmation of the Play Console external-link configuration and any required declarations.
+- A Google Play Developer API service account with the required access, configured only as a Supabase Edge Function secret.
+- A secure backend order/token schema and app-specific Stripe Checkout Session endpoint.
+- A confirmed mapping of all currently-for-sale audiobooks to the existing Stripe Price IDs and verified prices/tax treatment.
+- An Expo-compatible native module/config plugin that builds reproducibly through the repository's `expo prebuild --clean` release workflow.
