@@ -85,8 +85,8 @@ jobs:
                   }"""
           s = s.replace("signingConfigs {", release_config, 1)
           s, count = re.subn(
-              r"(buildTypes\\s*\\{[\\s\\S]*?release\\s*\\{[\\s\\S]*?signingConfig\\s+)signingConfigs\\.debug",
-              r"\\1signingConfigs.release",
+              r"(buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?signingConfig\s+)signingConfigs\.debug",
+              r"\1signingConfigs.release",
               s,
               count=1,
           )
