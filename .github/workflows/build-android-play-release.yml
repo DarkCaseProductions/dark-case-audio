@@ -55,13 +55,18 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Install JavaScript dependencies
         run: npm install --no-audit --no-fund
 
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install --clean
+
+      - name: Verify generated Android SDK configuration
+        run: |
+          grep -R "compileSdkVersion 36\|compileSdk 36" android/build.gradle android/app/build.gradle
+          grep -R "targetSdkVersion 36\|targetSdk 36" android/build.gradle android/app/build.gradle
 
       - name: Configure release signing
         env:
