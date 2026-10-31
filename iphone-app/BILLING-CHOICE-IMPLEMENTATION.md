@@ -74,3 +74,27 @@ The current `audiobook-access` function remains the existing website delivery pa
 - A secure backend order/token schema and app-specific Stripe Checkout Session endpoint.
 - A confirmed mapping of all currently-for-sale audiobooks to the existing Stripe Price IDs and verified prices/tax treatment.
 - An Expo-compatible native module/config plugin that builds reproducibly through the repository's `expo prebuild --clean` release workflow.
+
+
+## Temporary app-testing mode (31 October 2026)
+
+The immediate priority is to test the app without implementing paid in-app purchases yet.
+
+- The app home screen now routes audiobook access to `tester-audiobooks.html`, not the public paid audiobook catalogue.
+- A dedicated tester catalogue page has been added. It reuses the existing `tester-audiobook-access` Edge Function and the existing membership sign-in session.
+- The Edge Function checks the authenticated Supabase user ID against its server-side allow-list before issuing a one-hour signed download URL. The page does not grant access based on a client-side flag.
+- The current Edge Function allow-list contains two tester user IDs. Additional testers must be explicitly authorised server-side; do not make the function public or remove its user check.
+- The app WebView hides Stripe Payment Link anchors and blocks navigation to Stripe Checkout hosts in tester mode. The live website and its existing paid audiobook checkout links remain unchanged.
+- Ebooks remain withdrawn and are not included.
+
+### Testing-mode verification still required
+
+1. Confirm the two currently allow-listed membership accounts are the intended testers.
+2. Test sign-in and sign-out in the app WebView, including session persistence between Membership and Tester Audiobooks.
+3. Test one authorised tester download and one non-authorised account (which must be denied).
+4. Verify that paid Stripe checkout links are hidden and blocked in the app, while the normal public website still displays its paid audiobook shop.
+5. Run the Android build workflow on this branch and install the resulting build through an internal testing track. Do not upload to production.
+
+### Paid release is deferred
+
+Billing Choice, app-originated Stripe Checkout Sessions, external transaction reporting, refunds and Google Play billing integration are deferred until after app testing and before public paid release. No production Supabase functions, live website checkout links, or public sales settings are to be changed for this temporary phase.
