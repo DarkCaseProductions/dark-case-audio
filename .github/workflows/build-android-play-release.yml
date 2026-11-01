@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/build-android-play-release.yml
       - iphone-app/App.js
+      - iphone-app/app.json
 
 permissions:
   contents: read
