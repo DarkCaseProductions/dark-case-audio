@@ -48,6 +48,15 @@ nav a:hover{background:var(--red);color:#fff}
   nav.expanded .navExtra{display:flex!important}
   nav.expanded .navMore{background:var(--red);color:#fff}
 }
+.tester-callout{margin:22px auto 30px;padding:20px;background:linear-gradient(135deg,#171b21,#0b0e12 68%,#18212a);border:1px solid #39414b;border-radius:18px;box-shadow:0 18px 42px rgba(0,0,0,.38);text-align:center}
+.tester-callout img{display:block;width:100%;max-width:820px;height:auto;margin:0 auto 22px;border:1px solid #4a4f55;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.tester-callout-copy{max-width:790px;margin:0 auto}
+.tester-callout h1{margin:0 0 10px;font-family:Georgia,serif;font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.12;color:#f1eee6}
+.tester-callout p{margin:10px auto;color:#c7ccd3;font-size:1.02rem}
+.tester-callout .tester-benefit{color:#e8dfc9;font-weight:700}
+.tester-callout .tester-contact{display:inline-block;margin-top:12px;padding:12px 22px;border-radius:8px;background:#d6c39b;color:#171717;text-decoration:none;font-weight:800;border:1px solid #eee0bd}
+.tester-callout .tester-contact:hover{background:#eee0bd}
+@media(max-width:650px){.tester-callout{padding:13px;margin:16px auto 24px}.tester-callout img{margin-bottom:16px;border-radius:9px}.tester-callout p{font-size:.94rem}.tester-callout .tester-contact{display:block;width:100%}}
 .hero{position:relative;overflow:hidden;border:1px solid #303640;border-radius:20px;padding:42px 34px;margin-bottom:30px;background:linear-gradient(135deg,rgba(215,25,32,.15),rgba(12,15,20,.94) 48%,rgba(15,31,47,.55));box-shadow:0 20px 55px rgba(0,0,0,.42)}
 .hero:after{content:"";position:absolute;width:260px;height:260px;right:-90px;top:-90px;background:rgba(215,25,32,.12);filter:blur(8px);border-radius:50%}
 .hero h1{font-family:Georgia,serif;font-size:clamp(2rem,5vw,3.7rem);line-height:1.05;margin:0 0 12px;max-width:850px}
@@ -165,6 +174,18 @@ footer a{color:#c9cdd3}
 <img class="logo" src="Dark%20Case%20Audio_%20True%20Stories%20Await.png" alt="Dark Case Audio">
 <p class="tagline">True Crime · Real Cases · Paranormal · Stories From Around The World</p>
 </header>
+
+<section id="app-tester-callout" class="tester-callout" aria-labelledby="app-tester-heading">
+  <img src="Dark%20Case%20Audio%20App%20Testers%20Wanted.png" alt="Dark Case Audio app testers wanted — true crime, paranormal, audiobooks and free access to paid content during the tester period">
+  <div class="tester-callout-copy">
+    <h1 id="app-tester-heading">Help Us Put Dark Case Audio Through Its Paces</h1>
+    <p>Are you into true crime, real investigations, audiobooks or the unexplained? We’re looking for a few people to try the new Dark Case Audio app before its full release.</p>
+    <p>Explore the 24/7 live radio, audiobooks, ebooks, crime and paranormal case files, and members’ forums. We want honest feedback from people who enjoy this kind of content, so we can spot problems, improve the experience and make the app the best it can be.</p>
+    <p class="tester-benefit">As a thank-you, approved testers get free access to paid content for the duration of the tester period.</p>
+    <p>Interested? Email us with the Google account address you use for the Play Store, and we’ll send you the details on joining the test.</p>
+    <a class="tester-contact" href="mailto:darkcaseaudios@gmail.com?subject=Dark%20Case%20Audio%20App%20Tester">I’m Interested — Contact Dark Case Audio</a>
+  </div>
+</section>
 
 <nav id="site-nav"><div class="navinner">
 <a href="#audiobooks">Audiobooks</a><a href="#free-case-files">Free Crime Case Files</a><button class="navMore" type="button" aria-expanded="false" aria-controls="mobile-nav-options">+ MORE</button><span id="mobile-nav-options" class="navExtra"><a href="#free-paranormal-case-files">Free Paranormal Case Files</a><a href="true-crime.html" title="True Crime & Real Cases">True Crime</a><a href="#free-audio">DCA.Live Radio</a><a href="crime-forum.html">Crime Forum</a><a href="paranormal-forum.html">Paranormal Forum</a><a href="messages.html">Private Messages <span id="unreadMessageBadge" hidden style="display:inline-block;background:#b91c2c;color:#fff;border-radius:999px;padding:1px 7px;font-size:.75rem;font-weight:800;margin-left:4px;">0</span></a><a href="membership.html" title="Dark Case Membership — Sign In or Create Account">Member Sign In</a></span>
