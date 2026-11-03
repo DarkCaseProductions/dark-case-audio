@@ -139,7 +139,7 @@ button:hover{filter:brightness(1.12)}
 
   function renderSession(session){
     var testerAccessRow=document.getElementById("testerAccessRow");
-    if(testerAccessRow){testerAccessRow.hidden=!(session&&session.user&&["f00d5eed-418c-4a41-bf1d-d8d35f2190b2","799f8ce2-e7e0-482b-8c58-1f4b6af7d76b","bda5cdd6-0360-4aac-aa6e-d6b31faee215","42669ae0-5316-45a4-8b50-dd915c4dda09","cb99e0fc-f5fd-4ffe-8ea3-5706bd3236c0"].includes(session.user.id));}
+    if(testerAccessRow){testerAccessRow.hidden=!(session&&session.user&&["f00d5eed-418c-4a41-bf1d-d8d35f2190b2","799f8ce2-e7e0-482b-8c58-1f4b6af7d76b","bda5cdd6-0360-4aac-aa6e-d6b31faee215","42669ae0-5316-45a4-8b50-dd915c4dda09","cb99e0fc-f5fd-4ffe-8ea3-5706bd3236c0","2646d360-1743-4a56-838d-69c8d079ec67"].includes(session.user.id));}
     if(session&&session.user){
       authArea.style.display="none";
       accountArea.style.display="block";
