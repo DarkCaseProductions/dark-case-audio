@@ -2,6 +2,13 @@ name: Build Dark Case Audio Google Play bundle
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - android-native-build
+    paths:
+      - .github/workflows/build-android-play-release.yml
+      - iphone-app/App.js
+      - iphone-app/app.json
 
 permissions:
   contents: read
