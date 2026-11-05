@@ -32,7 +32,15 @@ export default function App() {
           shouldPlayInBackground: true,
           interruptionMode: "doNotMix"
         });
-        if (mounted) player.play();
+        if (mounted) {
+          player.setActiveForLockScreen(true, {
+            title: "Dark Case Radio",
+            artist: "Dark Case Audio",
+            albumTitle: "Live 24/7",
+            artworkUrl: "https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png"
+          });
+          player.play();
+        }
       } catch (error) {
         console.warn("DCA native radio autoplay failed:", error);
       }
@@ -62,7 +70,7 @@ export default function App() {
           <Text style={{ color: "#fff", fontWeight: "900", fontSize: 13 }}>DCA LIVE RADIO</Text>
           <Text style={{ color: "#aeb3bd", fontSize: 11, marginTop: 2 }}>{status.isBuffering ? "Connecting to live radio…" : status.playing ? "LIVE • Playing" : status.error ? "Radio connection problem" : "Radio paused"}</Text>
         </View>
-        <Pressable onPress={() => { if (status.playing) player.pause(); else player.play(); }} style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: "#321317", marginRight: 8 }}>
+        <Pressable onPress={() => { if (status.playing) player.pause(); else { player.setActiveForLockScreen(true, { title: "Dark Case Radio", artist: "Dark Case Audio", albumTitle: "Live 24/7", artworkUrl: "https://darkcaseaudio.com/DCA%20Crimson%20Steel%20Audio%20Emblem.png" }); player.play(); } }} style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: "#321317", marginRight: 8 }}>
           <Text style={{ color: "#fff", fontWeight: "800" }}>{status.playing ? "PAUSE" : "PLAY"}</Text>
         </Pressable>
         <Pressable onPress={() => setMuted(v => !v)} style={{ paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: "#d71920" }}>
