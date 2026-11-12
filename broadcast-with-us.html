@@ -149,10 +149,55 @@ document.getElementById('partnerForm').addEventListener('submit',function(event)
  '',
  'The applicant has confirmed rights to submit the programme for consideration and understands that separate written permission is required before broadcast.'
  ];
- const subject=encodeURIComponent('Broadcasting partner application – '+value('podcast'));
- const body=encodeURIComponent(lines.join('\n'));
- document.getElementById('formStatus').textContent='Your email app should now open with the application prepared. Please review it and press Send.';
- window.location.href='mailto:darkcaseaudios@gmail.com?subject='+subject+'&body='+body;
+ const subject='Broadcasting partner application – '+value('podcast');
+ const body=lines.join('\n');
+ const mailto='mailto:darkcaseaudios@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+ const status=document.getElementById('formStatus');
+ status.textContent='Your application has been prepared below. Choose “Open email” to send it, or copy the application text into an email addressed to darkcaseaudios@gmail.com.';
+ let fallback=document.getElementById('applicationFallback');
+ if(!fallback){
+   fallback=document.createElement('div');
+   fallback.id='applicationFallback';
+   fallback.className='tile';
+   fallback.style.marginTop='16px';
+   status.insertAdjacentElement('afterend',fallback);
+ }
+ fallback.innerHTML='';
+ const heading=document.createElement('h3');
+ heading.textContent='Your application is ready';
+ fallback.appendChild(heading);
+ const emailLink=document.createElement('a');
+ emailLink.className='button';
+ emailLink.href=mailto;
+ emailLink.textContent='Open email to send application';
+ emailLink.style.margin='8px 0 14px';
+ emailLink.style.display='inline-block';
+ fallback.appendChild(emailLink);
+ const copyLabel=document.createElement('label');
+ copyLabel.textContent='Application text (you can copy this if your email programme does not open)';
+ copyLabel.style.marginTop='10px';
+ fallback.appendChild(copyLabel);
+ const copyArea=document.createElement('textarea');
+ copyArea.readOnly=true;
+ copyArea.value=body;
+ copyArea.style.minHeight='240px';
+ fallback.appendChild(copyArea);
+ const copyButton=document.createElement('button');
+ copyButton.type='button';
+ copyButton.textContent='Copy application text';
+ copyButton.addEventListener('click',async function(){
+   try{
+     await navigator.clipboard.writeText(body);
+     copyButton.textContent='Copied';
+   }catch(error){
+     copyArea.focus();
+     copyArea.select();
+     const copied=document.execCommand('copy');
+     copyButton.textContent=copied?'Copied':'Select the text above and copy it';
+   }
+ });
+ fallback.appendChild(copyButton);
+ fallback.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 </script>
 </body>
