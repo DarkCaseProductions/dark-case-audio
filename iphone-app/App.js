@@ -30,7 +30,7 @@ export default function App() {
         {page ? <Pressable onPress={() => Linking.openURL(page.url)}><Text style={{ color: "#c5c9d0", fontSize: 12 }}>OPEN WEB ↗</Text></Pressable> : null}
       </View>
       {page ? (
-        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { if (request.url.startsWith("https://darkcaseaudio.com") || request.url.startsWith("https://www.darkcaseaudio.com")) return true; if (request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} />
+        <WebView key={historyKey} source={{ uri: page.url }} style={{ flex: 1, backgroundColor: "#08090c" }} javaScriptEnabled domStorageEnabled allowsBackForwardNavigationGestures mediaPlaybackRequiresUserAction={false} setSupportMultipleWindows={false} onShouldStartLoadWithRequest={(request) => { const allowedOrigins = ["https://darkcaseaudio.com", "https://www.darkcaseaudio.com", "https://inhiiamepxwjtfyqlqir.supabase.co"]; if (allowedOrigins.some((origin) => request.url.startsWith(origin)) || request.url.startsWith("about:blank")) return true; Linking.openURL(request.url).catch(() => {}); return false; }} allowsInlineMediaPlayback />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 34 }}>
           <View style={{ borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#343a46", marginBottom: 20, backgroundColor: "#08090c" }}>
