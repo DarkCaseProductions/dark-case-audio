@@ -53,11 +53,11 @@ nav a:hover{background:var(--red);color:#fff}
 .dragon-premiere{margin:18px auto 30px;padding:0;background:linear-gradient(145deg,#151922,#080a0e);border:1px solid #343a46;border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.42)}
 .dragon-premiere-art{position:relative;width:100%;max-width:900px;margin:0 auto;line-height:0}
 .dragon-premiere-art img{display:block;width:100%;height:auto}
-.dragon-premiere-play{position:absolute;left:20.5%;top:77.5%;transform:translate(-50%,-50%);width:9%;aspect-ratio:1;border:0;border-radius:50%;display:grid;place-items:center;background:transparent;color:transparent;font-size:0;font-weight:900;line-height:1;cursor:pointer;text-shadow:none;box-shadow:none;padding:0}
-.dragon-premiere-play:hover{background:rgba(255,255,255,.08)}
-.dragon-premiere-play:focus-visible{outline:3px solid #fff;outline-offset:4px;background:rgba(0,0,0,.35)}
-.dragon-premiere-play.is-playing{background:rgba(0,0,0,.68);border:2px solid #fff;color:#fff;font-size:clamp(16px,2.5vw,27px);letter-spacing:-2px;text-shadow:0 1px 5px #000;box-shadow:0 0 12px rgba(0,0,0,.5)}
-@media(max-width:650px){.dragon-premiere{margin:14px auto 22px;border-radius:12px}.dragon-premiere-play.is-playing{border-width:1px;font-size:clamp(12px,4vw,22px)}}
+.dragon-premiere-sample{position:absolute;z-index:2;left:50%;top:84.4%;transform:translate(-50%,-50%);width:74%;max-width:900px;margin:0;padding:9px 11px;background:#0b0d12;border:1px solid #343a46;border-radius:11px;box-shadow:0 5px 18px rgba(0,0,0,.72);line-height:normal;text-align:left}
+.dragon-premiere-sample .sample-heading{margin:0 0 7px;color:#f2f2f2;font-size:clamp(11px,1.35vw,16px);font-weight:800;line-height:1.2}
+.dragon-premiere-sample audio{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:40px;margin:0;color-scheme:dark}
+.dragon-premiere-sample .sample-note{margin:6px 0 0;color:#aeb3bd;font-size:clamp(9px,1vw,12px);line-height:1.2}
+@media(max-width:650px){.dragon-premiere{margin:14px auto 22px;border-radius:12px}.dragon-premiere-sample{width:74%;padding:6px 8px;border-radius:8px}.dragon-premiere-sample .sample-heading{margin-bottom:4px}.dragon-premiere-sample audio{height:34px}.dragon-premiere-sample .sample-note{margin-top:4px}}
 
 
 .hero{position:relative;overflow:hidden;border:1px solid #303640;border-radius:20px;padding:42px 34px;margin-bottom:30px;background:linear-gradient(135deg,rgba(215,25,32,.15),rgba(12,15,20,.94) 48%,rgba(15,31,47,.55));box-shadow:0 20px 55px rgba(0,0,0,.42)}
@@ -251,38 +251,17 @@ footer a{color:#c9cdd3}
 <section id="dragon-family-premiere" class="dragon-premiere" aria-label="The Dragon Family premiere">
   <div class="dragon-premiere-art">
     <img src="for%20website%20Dragon%20Family_%20Premiere%20of%20Two%20Episodes.png" alt="The Dragon Family — premiere of the first two episodes, from Dark Case Audio">
-    <button class="dragon-premiere-play" id="dragon-premiere-play" type="button" aria-label="Play The Dragon Family premiere" aria-pressed="false">▶</button>
-    <audio id="dragon-premiere-audio" preload="none">
-      <source src="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/audiobook-samples/Dragon%20Family_%20Premiere%20of%20Two%20Episodes.mp3" type="audio/mpeg">
-      Your browser does not support the audio player.
-    </audio>
+    <div class="audiobook-sample dragon-premiere-sample">
+      <p class="sample-heading">Listen to the premiere</p>
+      <audio id="dragon-premiere-audio" controls preload="metadata" aria-label="Play the first two episodes of The Dragon Family">
+        <source src="https://inhiiamepxwjtfyqlqir.supabase.co/storage/v1/object/public/audiobook-samples/Dragon%20Family_%20Premiere%20of%20Two%20Episodes.mp3" type="audio/mpeg">
+        Your browser does not support the audio player.
+      </audio>
+      <p class="sample-note">The first two episodes of The Dragon Family.</p>
+    </div>
   </div>
 </section>
-<script>
-(function(){
-  var audio=document.getElementById("dragon-premiere-audio");
-  var button=document.getElementById("dragon-premiere-play");
-  if(!audio||!button)return;
-  function showPlaying(playing){
-    button.textContent=playing?"Ⅱ":"▶";
-    button.classList.toggle("is-playing",playing);
-    button.setAttribute("aria-pressed",playing?"true":"false");
-    button.setAttribute("aria-label",playing?"Pause The Dragon Family premiere":"Play The Dragon Family premiere");
-  }
-  button.addEventListener("click",function(){
-    if(audio.paused){
-      audio.play().then(function(){showPlaying(true);}).catch(function(){showPlaying(false);});
-    }else{
-      audio.pause();
-      showPlaying(false);
-    }
-  });
-  audio.addEventListener("play",function(){showPlaying(true);});
-  audio.addEventListener("pause",function(){showPlaying(false);});
-  audio.addEventListener("ended",function(){showPlaying(false);});
-  audio.addEventListener("error",function(){showPlaying(false);});
-})();
-</script>
+
 
 
 
