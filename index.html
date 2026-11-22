@@ -221,6 +221,17 @@ footer a{color:#c9cdd3}
 /* Temporarily hide the Dragon Family and Soundtrack features while they are being updated. */
 #dragon-family-premiere,
 #the-soundtrack-premiere{display:none!important;}
+
+
+/* Google Play app download feature */
+.app-download{margin:22px auto 30px;padding:22px 24px;display:flex;align-items:center;justify-content:center;gap:24px;background:linear-gradient(115deg,#171b23,#0b0d12 70%);border:1px solid #343b48;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.38);text-align:left}
+.app-download-copy{max-width:620px}
+.app-download h2{margin:0 0 5px;color:#fff;font-size:clamp(1.25rem,2.4vw,1.8rem);line-height:1.2}
+.app-download p{margin:0;color:#c3c8d1;font-size:.98rem;line-height:1.5}
+.app-download-badge{display:block;flex:0 0 auto;width:190px;max-width:42%;height:auto}
+.app-download-badge img{display:block;width:100%;height:auto}
+.app-download a:focus-visible{outline:3px solid #fff;outline-offset:5px;border-radius:8px}
+@media(max-width:650px){.app-download{margin:16px auto 22px;padding:17px 14px;flex-direction:column;gap:12px;text-align:center}.app-download-copy{max-width:100%}.app-download p{font-size:.9rem}.app-download-badge{width:172px;max-width:70%}}
 </style>
 <meta name="description" content="Dark Case Audio brings together true crime, real crime cases, investigative case files, audiobooks, ebooks and paranormal investigations from the UK and around the world.">
 <link rel="canonical" href="https://darkcaseaudio.com/">
@@ -261,6 +272,16 @@ footer a{color:#c9cdd3}
 <img class="logo" src="Dark%20Case%20Audio_%20True%20Stories%20Await.png" alt="Dark Case Audio">
 <p class="tagline">True Crime · Real Cases · Paranormal · Stories From Around The World</p>
 </header>
+
+<section class="app-download container" aria-label="Download the Dark Case Audio app">
+  <div class="app-download-copy">
+    <h2>Take Dark Case Audio with you</h2>
+    <p>Download the app for Android and enjoy Dark Case Audio wherever you go — with live radio, audiobooks and more.</p>
+  </div>
+  <a class="app-download-badge" href="https://play.google.com/store/apps/details?id=com.darkcaseproductions.darkcaseaudio" target="_blank" rel="noopener" aria-label="Get Dark Case Audio on Google Play">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play">
+  </a>
+</section>
 
 
 <section id="dragon-family-premiere" class="dragon-premiere" aria-label="The Dragon Family premiere">
