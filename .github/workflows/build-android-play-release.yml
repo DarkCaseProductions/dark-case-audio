@@ -1,5 +1,5 @@
 name: Build Dark Case Audio Google Play bundle
-# Android app version is read from the android-native-build branch.
+# Android app version is read from the android-native-build branch (release bundle versionCode 5).
 
 on:
   workflow_dispatch:
