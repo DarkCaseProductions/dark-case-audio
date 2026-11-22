@@ -90,6 +90,37 @@ button:hover{filter:brightness(1.12)}
   <p style="color:#ddd;line-height:1.6;">£3 per month. Get three audiobook download credits every paid month. Unused credits expire when your billing month ends.</p>
   <div id="plusStatus" class="message">Loading your Dark Case Plus status...</div>
   <button id="plusSubscribeButton" type="button">Join Dark Case Plus — £3/month</button>
+  <button id="plusManageButton" type="button" hidden>Manage or cancel subscription</button>
+  <div id="plusDownloadArea" hidden style="margin-top:20px;padding-top:18px;border-top:1px solid #343744;">
+    <h3 style="margin:0 0 8px;color:#f3d28b;">Use an audiobook credit</h3>
+    <p style="color:#c8cbd1;line-height:1.5;">Choose an eligible audiobook. Each title can be claimed once per billing month. A download uses one of your three monthly credits.</p>
+    <label for="plusAudiobookSelect">Choose an audiobook</label>
+    <select id="plusAudiobookSelect" style="width:100%;padding:13px;border-radius:9px;border:1px solid #424a58;background:#080b10;color:#fff;font-size:1rem;">
+      <option value="">Select an audiobook</option>
+      <option>Uncovering the Ghosts of Gwrych Castle</option>
+      <option>The Essex Boys - The Case File</option>
+      <option>Falsely Accused - Step By Step Guide</option>
+      <option>The Women Who Crossed The Line</option>
+      <option>Before Rettendon - Patrick Tate</option>
+      <option>When An Allegation Becomes a Death Sentence</option>
+      <option>Paranormal Files Vol.1</option>
+      <option>THE DETECTIVE Vol. 1</option>
+      <option>THE DETECTIVE Vol. 2</option>
+      <option>Crime &amp; The Paranormal Vol. 1</option>
+      <option>Crimes Against Children Vol. 1</option>
+      <option>Murder &amp; Homicide Vol. 1</option>
+      <option>The Forensic Files Vol. 1</option>
+      <option>The Forensic Files Vol. 2</option>
+      <option>The Strangest Crimes UK</option>
+      <option>The Paranormal Investigator’s Toolkit</option>
+      <option>The Art of Deception</option>
+      <option>Consumed by Fire — The Human Combustion Mystery</option>
+      <option>Russell Brand: The Fall From Fame</option>
+      <option>A Story of Lies: The Eleanor Williams Case</option>
+    </select>
+    <button id="plusDownloadButton" type="button">Download using 1 credit</button>
+    <p class="hint">Your remaining credits are shown above. Download links are temporary and expire after one hour.</p>
+  </div>
   <div id="plusHistory" style="margin-top:18px;color:#ddd;"></div>
 </div>
 <p><a href="messages.html" style="color:#fff;font-weight:800;">Open Private Messages <span id="accountUnreadMessageBadge" hidden style="display:inline-block;background:#b91c2c;color:#fff;border-radius:999px;padding:1px 7px;font-size:.75rem;margin-left:4px;">0</span> →</a></p>
@@ -159,13 +190,17 @@ button:hover{filter:brightness(1.12)}
       if(!response.ok)throw new Error(data.error||"Unable to load membership.");
       if(data.active){
         var expiry=data.creditsExpireAt?new Date(data.creditsExpireAt).toLocaleDateString():"the end of your billing period";
-        status.textContent="Subscription: "+data.subscription.status+". Credits remaining: "+data.creditsRemaining+" of 3. Unused credits expire "+expiry+".";
+        status.textContent="Subscription: "+data.subscription.status+(data.subscription.cancelAtPeriodEnd?" (cancels at the end of this paid period)":"")+". Credits remaining: "+data.creditsRemaining+" of 3. Unused credits expire "+expiry+".";
         button.textContent="Dark Case Plus active";
         button.disabled=true;
+        document.getElementById("plusManageButton").hidden=false;
+        document.getElementById("plusDownloadArea").hidden=false;
       }else{
         status.textContent=data.subscription?"Subscription status: "+data.subscription.status+". You can join again when your previous subscription has ended.":"You do not currently have a Dark Case Plus subscription.";
         button.textContent="Join Dark Case Plus — £3/month";
         button.disabled=false;
+        document.getElementById("plusManageButton").hidden=true;
+        document.getElementById("plusDownloadArea").hidden=true;
       }
       if(data.downloads&&data.downloads.length){
         history.innerHTML="<h3>Dark Case Plus download history</h3><ul style='line-height:1.8;padding-left:22px'>"+data.downloads.map(function(item){return "<li>"+escapeHtml(item.audiobook_title)+" — "+new Date(item.redeemed_at).toLocaleDateString()+"</li>";}).join("")+"</ul>";
@@ -246,6 +281,34 @@ button:hover{filter:brightness(1.12)}
       var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to start checkout.");
       window.location.href=data.url;
     }catch(e){status.textContent=e.message||"Unable to start checkout.";button.disabled=false;}
+  });
+
+  document.getElementById("plusManageButton").addEventListener("click",async function(){
+    var button=this;var status=document.getElementById("plusStatus");
+    var sr=await client.auth.getSession();var session=sr.data&&sr.data.session;
+    if(!session){status.textContent="Please log in first.";return;}
+    button.disabled=true;status.textContent="Opening secure billing management...";
+    try{
+      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-create-portal",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({})});
+      var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to open billing management.");
+      window.location.href=data.url;
+    }catch(e){status.textContent=e.message||"Unable to open billing management.";button.disabled=false;}
+  });
+
+  document.getElementById("plusDownloadButton").addEventListener("click",async function(){
+    var button=this;var status=document.getElementById("plusStatus");
+    var title=document.getElementById("plusAudiobookSelect").value;
+    if(!title){status.textContent="Please choose an audiobook first.";return;}
+    var sr=await client.auth.getSession();var session=sr.data&&sr.data.session;
+    if(!session){status.textContent="Please log in first.";return;}
+    button.disabled=true;status.textContent="Preparing your secure audiobook download...";
+    try{
+      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-plus-download",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({title:title})});
+      var data=await response.json();if(!response.ok||!data.downloadUrl)throw new Error(data.error||"Unable to prepare this download.");
+      status.textContent="Your download is ready. Opening "+title+". Credits remaining: "+data.creditsRemaining+".";
+      await loadDarkCasePlus(session);
+      window.location.href=data.downloadUrl;
+    }catch(e){status.textContent=e.message||"Unable to prepare this download.";button.disabled=false;}
   });
 
   document.getElementById("logoutButton").addEventListener("click",async function(){
