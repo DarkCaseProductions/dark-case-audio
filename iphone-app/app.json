@@ -2,7 +2,7 @@
   "expo": {
     "name": "Dark Case Audio",
     "slug": "dark-case-audio",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "scheme": "darkcaseaudio",
@@ -16,7 +16,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#08090c"
       },
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "bundler": "metro"
@@ -31,7 +31,8 @@
         {
           "enableBackgroundPlayback": true
         }
-      ]
+      ],
+      "./withOptionalPortraitFeature"
     ]
   }
 }
