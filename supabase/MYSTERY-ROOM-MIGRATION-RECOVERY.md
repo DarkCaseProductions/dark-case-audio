@@ -77,7 +77,7 @@ Do not change these publication settings as part of migration recovery without a
 
 - `supabase/recovery/20261123153000_mystery_room_schema_candidate.sql` — reconstructed baseline candidate for the eight Mystery Room tables, constraints, indexes, RLS policies, admin helper functions and role grants. This is deliberately outside `supabase/migrations/` so it cannot be accidentally pushed to the connected production project.
 - `supabase/recovery/seed_mystery_room_public_content.sql` — development seed for the two published cases, their case backgrounds/questions and 11 evidence entries. It excludes member notes, submissions, discussion posts, editorial reviews and admin IDs.
-- Both files were executed together in isolated temporary schemas inside a transaction on the connected database on 23 November 2026. The transaction rolled back successfully. This was a SQL replay/syntax check, not a disposable-project integration test.
+- Both files were executed together in isolated temporary schemas inside a transaction on the connected database on 23 November 2026. The transaction rolled back successfully. Anonymous-role simulation returned two published catalogue cards and six Enfield evidence items, with no SELECT privilege on notes, submissions, discussions or reviews. An ordinary authenticated free-member simulation returned two catalogue cards, one case background, six evidence items and no visible notes, submissions, discussions or reviews for that simulated account. These checks used temporary schemas and retained no changes. This was a role/policy replay check, not a disposable-project integration test.
 
 ## Recovery work still required
 
