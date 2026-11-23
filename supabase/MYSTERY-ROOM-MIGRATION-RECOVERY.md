@@ -8,9 +8,9 @@
 
 The production Supabase project already contains the Mystery Room schema, policies, functions and case content. The migration history below was read directly from Supabase's migration ledger.
 
-The original SQL bodies for these historical migrations were **not present in the GitHub repository and are not returned by the migration-ledger listing**. This file is therefore an inventory and recovery record, **not a replayable migration set**. Do not copy these version names into a fresh project as empty migrations, and do not mark them as applied on another database. Doing so would create a false impression that the schema had been installed.
+The original SQL bodies for these historical migrations were **not present in the GitHub repository and are not returned by the migration-ledger listing**. This file is therefore an inventory and recovery record, not a verbatim copy of the historical migration set. Do not copy these version names into a fresh project as empty migrations, and do not mark them as applied on another database.
 
-A proper portable migration set still needs to be reconstructed and tested against a separate empty Supabase project or disposable database before it can be treated as authoritative. The live database has not been changed as part of writing this document.
+A reconstructed baseline candidate and a development seed now live under `supabase/recovery/`. They were executed together against isolated temporary schemas inside a transaction on 23 November 2026; the transaction was rolled back. This confirms that the candidate SQL parses and its tables, constraints, indexes, functions, policies, grants and public case seed can be created together without colliding with the live Mystery Room objects. It is **not** a full clean-project replay: the candidate depends on the existing application tables `auth.users` and `public.dark_case_subscriptions`, and it has not yet been tested in a separate Supabase project. The live database has not been changed by this validation.
 
 ## Recorded migration history
 
@@ -73,13 +73,18 @@ Do not change these publication settings as part of migration recovery without a
 - The membership-status Edge Function `dark-case-plus-status` is active and performs its own bearer-token validation. Its deployed configuration currently has JWT gateway verification disabled; do not change that setting without reviewing the function's manual authentication logic.
 - No Supabase development branches were present at the time of review.
 
+## Recovery files and verification
+
+- `supabase/recovery/20261123153000_mystery_room_schema_candidate.sql` — reconstructed baseline candidate for the eight Mystery Room tables, constraints, indexes, RLS policies, admin helper functions and role grants. This is deliberately outside `supabase/migrations/` so it cannot be accidentally pushed to the connected production project.
+- `supabase/recovery/seed_mystery_room_public_content.sql` — development seed for the two published cases, their case backgrounds/questions and 11 evidence entries. It excludes member notes, submissions, discussion posts, editorial reviews and admin IDs.
+- Both files were executed together in isolated temporary schemas inside a transaction on the connected database on 23 November 2026. The transaction rolled back successfully. This was a SQL replay/syntax check, not a disposable-project integration test.
+
 ## Recovery work still required
 
-1. Reconstruct the original schema, constraints, indexes, functions, grants and RLS policies as versioned SQL migrations. The three new hardening migrations are now stored as applied SQL files in `supabase/migrations/`; the original foundational migration bodies are still missing.
-2. Separate the case seed content from schema migrations where practical, and avoid embedding live member IDs or private member data.
-3. Include an explicit, safe administrator bootstrap step that maps the approved account by email only when that account already exists; never hard-code a production auth UUID into a reusable migration.
-4. Recreate the feature in a disposable Supabase project and verify all policies and access paths before calling the migrations portable.
-5. Keep production and the live website unchanged until the owner approves a tested deployment plan.
+1. Verify the baseline against a fresh Supabase project that already has the required application prerequisites (`auth.users` and `public.dark_case_subscriptions`). A new project may incur cost and requires an owner-selected organization and cost approval.
+2. Add a safe administrator bootstrap procedure that maps the approved account by email only when that account already exists; never hard-code a production auth UUID into a reusable migration.
+3. Decide whether to retain this reconstructed baseline as the new canonical starting point or to reconstruct the original historical migration sequence more faithfully. Do not claim it is the original SQL.
+4. Keep production and the live website unchanged until the owner approves a tested deployment plan.
 
 ## Do not treat this document as a backup
 
