@@ -39,12 +39,13 @@ button:hover{filter:brightness(1.12)}
 <a class="back" href="index.html">← Back to Dark Case Audio</a>
 <header>
 <h1>Dark Case Membership</h1>
-<p>One free membership for Dark Case Audio. Join once and use the same account for free crime case files, free paranormal case files, the Crime Forum and the Paranormal Forum.</p>
+<p>Choose the membership that suits you. Start with a free account, or join Dark Case Plus straight away. Both use one Dark Case Audio account.</p>
 </header>
 
 <div id="authArea" class="grid">
 <section class="card">
-<h2>Create your free account</h2>
+<h2>Free membership</h2>
+<p style="color:var(--muted);line-height:1.6;margin-top:-8px;">Create a free account for crime and paranormal case files and access to both forums. You can upgrade to Dark Case Plus whenever you like.</p>
 <form id="signupForm">
 <label for="signupUsername">Choose your username</label>
 <input id="signupUsername" type="text" autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]+" required>
@@ -53,13 +54,29 @@ button:hover{filter:brightness(1.12)}
 <input id="signupEmail" type="email" autocomplete="email" required>
 <label for="signupPassword">Password</label>
 <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required>
-<button type="submit">Create Free Membership</button>
+<button type="submit">Create Free Account</button>
 </form>
 <div id="signupMessage" class="message"></div>
 </section>
 
+<section class="card" style="border-color:#66512b;">
+<h2 style="color:#f3d28b;">Dark Case Plus</h2>
+<p style="color:var(--muted);line-height:1.6;margin-top:-8px;">£3 per month. Three audiobook download credits every paid month. No need to create a free account first.</p>
+<form id="plusSignupForm">
+<label for="plusSignupUsername">Choose your forum username</label>
+<input id="plusSignupUsername" type="text" autocomplete="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_-]+" required>
+<p class="hint">Use 3–20 letters, numbers, underscores or hyphens.</p>
+<label for="plusSignupEmail">Email address</label>
+<input id="plusSignupEmail" type="email" autocomplete="email" required>
+<label for="plusSignupPassword">Password</label>
+<input id="plusSignupPassword" type="password" autocomplete="new-password" minlength="8" required>
+<button type="submit">Create account and join — £3/month</button>
+</form>
+<div id="plusSignupMessage" class="message">Your account will be created first, then you'll continue to secure Stripe checkout.</div>
+</section>
+
 <section class="card">
-<h2>Member login</h2>
+<h2>Already a member? Log in</h2>
 <form id="loginForm">
 <label for="loginEmail">Email address</label>
 <input id="loginEmail" type="email" autocomplete="email" required>
@@ -179,7 +196,7 @@ button:hover{filter:brightness(1.12)}
   }
 
 
-  async function loadDarkCasePlus(session){
+  async function startPlusCheckout(session,button,status){\n    if(!session||!session.access_token){status.textContent="Please log in to continue to checkout.";return;}\n    button.disabled=true;status.textContent="Opening secure Stripe checkout...";\n    try{\n      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-create-checkout",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({})});\n      var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to start checkout.");\n      window.location.href=data.url;\n    }catch(e){status.textContent=e.message||"Unable to start checkout.";button.disabled=false;}\n  }\n\n  async function loadDarkCasePlus(session){
     var status=document.getElementById("plusStatus");
     var history=document.getElementById("plusHistory");
     var button=document.getElementById("plusSubscribeButton");
@@ -275,15 +292,34 @@ button:hover{filter:brightness(1.12)}
   });
 
   document.getElementById("plusSubscribeButton").addEventListener("click",async function(){
-    var button=this;var status=document.getElementById("plusStatus");
-    var sessionResult=await client.auth.getSession();var session=sessionResult.data&&sessionResult.data.session;
-    if(!session){status.textContent="Please log in first.";return;}
-    button.disabled=true;status.textContent="Opening secure Stripe checkout...";
+    var sr=await client.auth.getSession();var session=sr.data&&sr.data.session;
+    await startPlusCheckout(session,this,document.getElementById("plusStatus"));
+  });
+
+  document.getElementById("plusSignupForm").addEventListener("submit",async function(e){
+    e.preventDefault();
+    var button=this.querySelector("button[type=submit]");
+    var message=document.getElementById("plusSignupMessage");
+    var username=document.getElementById("plusSignupUsername").value.trim().toLowerCase();
+    var email=document.getElementById("plusSignupEmail").value.trim();
+    var password=document.getElementById("plusSignupPassword").value;
+    if(!/^[a-z0-9_-]{3,20}$/.test(username)){message.textContent="Please choose a username using 3–20 letters, numbers, underscores or hyphens.";return;}
+    button.disabled=true;message.textContent="Creating your Dark Case Audio account...";
     try{
-      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-create-checkout",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({})});
-      var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to start checkout.");
-      window.location.href=data.url;
-    }catch(e){status.textContent=e.message||"Unable to start checkout.";button.disabled=false;}
+      var result=await client.auth.signUp({email:email,password:password,options:{data:{username:username}}});
+      if(result.error)throw result.error;
+      if(result.data.session){
+        message.textContent="Account created. Taking you to secure checkout...";
+        await startPlusCheckout(result.data.session,button,message);
+      }else{
+        message.textContent="Your account has been created. Please confirm your email, then log in here. We'll take you to Dark Case Plus checkout after you sign in.";
+        button.disabled=false;
+      }
+    }catch(err){
+      var msg=err&&err.message?err.message:"Unable to create your account.";
+      if(msg.toLowerCase().indexOf("profiles_username_key")!==-1)msg="That username is already in use. Please choose another.";
+      message.textContent=msg;button.disabled=false;
+    }
   });
 
   document.getElementById("plusManageButton").addEventListener("click",async function(){
@@ -320,7 +356,7 @@ button:hover{filter:brightness(1.12)}
   });
 
   var params=new URLSearchParams(window.location.search);
-  if(params.get("plus")==="success"){var pm=document.getElementById("plusStatus");if(pm)pm.textContent="Payment submitted. We're confirming your subscription now; refresh this page in a moment to see your credits.";}
+  if(params.get("plus")==="checkout"){var loginNote=document.getElementById("loginMessage");if(loginNote)loginNote.textContent="Log in to continue to your Dark Case Plus checkout.";}\n  if(params.get("plus")==="success"){var pm=document.getElementById("plusStatus");if(pm)pm.textContent="Payment submitted. We're confirming your subscription now; refresh this page in a moment to see your credits.";}
   if(params.get("plus")==="cancelled"){var pm2=document.getElementById("plusStatus");if(pm2)pm2.textContent="Checkout cancelled. No subscription has been started."}
   client.auth.getSession().then(function(result){renderSession(result.data.session)});
   client.auth.onAuthStateChange(function(event,session){renderSession(session)});
