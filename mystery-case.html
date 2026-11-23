@@ -41,6 +41,7 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 <p style="color:var(--muted);margin-top:-5px">Open each item to examine it. Check the source information and any limitations attached to the material.</p>
 <div id="evidence" class="evidence"></div>
 </section>
+<section class="panel" id="questionsPanel"><h2>Questions to consider</h2><p style="color:var(--muted)">Use these prompts to test your interpretation. Your answers are saved with your private conclusion.</p><div id="questionList"></div></section>
 <section class="panel notes" id="notesPanel">
 <h2>Your investigator's notebook</h2>
 <p style="color:var(--muted)">These notes are private to your account. Other members cannot read them.</p>
@@ -99,7 +100,7 @@ const URL="https://inhiiamepxwjtfyqlqir.supabase.co",KEY="sb_publishable_b7MSgk0
 const client=window.supabase.createClient(URL,KEY);
 const $=id=>document.getElementById(id);
 const params=new URLSearchParams(location.search),slug=params.get("case");
-let user=null,caseRow=null,submission=null;
+let user=null,caseRow=null,submission=null,questionData=[];
 function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function message(text){$("notice").textContent=text;$("notice").style.display="block";}
 function setStatus(id,text){$(id).textContent=text;}
@@ -133,6 +134,9 @@ async function load(){
   const pd=await pr.json().catch(()=>({}));
   if(!pr.ok||!pd.active){showLocked();return;}
  }
+ const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
+ if(contentResult.data){$("caseBackground").textContent=contentResult.data.case_background||caseRow.synopsis||"";questionData=Array.isArray(contentResult.data.investigation_questions)?contentResult.data.investigation_questions:[];}
+ $("questionList").innerHTML=questionData.map((q,i)=>`<label style="display:block;font-weight:700;margin:14px 0 6px" for="answer-${esc(q.id||i)}">${i+1}. ${esc(q.question)}</label><textarea id="answer-${esc(q.id||i)}" style="width:100%;min-height:85px;background:#080b10;color:#fff;border:1px solid #424a58;border-radius:8px;padding:11px;font:inherit" maxlength="5000" placeholder="Write your thoughts…"></textarea>`).join("");
  const er=await client.from("mystery_evidence").select("*").eq("case_id",caseRow.id).order("display_order");
  if(er.error){$("evidence").innerHTML='<div class="locked">Evidence could not be loaded. Please refresh and try again.</div>';}else renderEvidence(er.data||[]);
  if(!user){
@@ -147,7 +151,7 @@ async function loadMemberWork(){
  if(nr.data)$("notesText").value=nr.data.notes||"";
  const sr=await client.from("mystery_submissions").select("theory,status,answers").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
  submission=sr.data||null;
- if(submission){$("theoryText").value=submission.theory||"";if(submission.status==="submitted"){ $("submitTheory").textContent="Update my conclusion";$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();}}
+ if(submission){$("theoryText").value=submission.theory||"";questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el&&submission.answers)el.value=submission.answers[q.id]||"";});if(submission.status==="submitted"){ $("submitTheory").textContent="Update my conclusion";$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();}}
 }
 $("saveNotes").addEventListener("click",async()=>{
  if(!user||!caseRow)return;const b=$("saveNotes");b.disabled=true;setStatus("notesStatus","Saving…");
@@ -157,7 +161,8 @@ $("saveNotes").addEventListener("click",async()=>{
 $("submitTheory").addEventListener("click",async()=>{
  if(!user||!caseRow)return;const theory=$("theoryText").value.trim();if(theory.length<20){setStatus("submissionStatus","Please add a little more detail before submitting your conclusion.");return;}
  const b=$("submitTheory");b.disabled=true;setStatus("submissionStatus","Submitting your conclusion…");
- const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:theory,status:"submitted",submitted_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ const answers={};questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el)answers[q.id]=el.value;});
+ const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:theory,answers:answers,status:"submitted",submitted_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
  if(r.error){setStatus("submissionStatus","Could not submit: "+r.error.message);b.disabled=false;return;}
  submission={theory,status:"submitted"};$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();b.disabled=false;b.textContent="Update my conclusion";setStatus("submissionStatus","Your conclusion has been submitted. The discussion and editorial review are now open for you.");
 });
