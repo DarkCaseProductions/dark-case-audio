@@ -71,8 +71,11 @@ document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click"
 $("newCase").onclick=()=>{current=null;clearEditor();$("editor").classList.remove("hidden");$("evidenceEditor").classList.add("hidden");$("editorTitle").textContent="Create a new case";$("editor").scrollIntoView({behavior:"smooth"});};
 $("closeEditor").onclick=()=>$("editor").classList.add("hidden");
 $("saveCase").onclick=async()=>{const slug=$("slug").value.trim(),title=$("title").value.trim();if(!slug||!title||!$("synopsis").value.trim()){status("caseStatusMessage","Please enter a URL slug, title and short introduction.");return;}
-const published=$("caseStatus").value==="published";const row={slug,title,category:$("category").value,subtitle:$("subtitle").value.trim(),synopsis:$("synopsis").value.trim(),hero_image_url:$("hero").value.trim()||null,status:$("caseStatus").value,is_free_preview:$("freePreview").value==="true",published_at:published?new Date().toISOString():null,updated_at:new Date().toISOString()};
-const r=await client.from("mystery_cases").upsert(row,{onConflict:"slug"}).select("id").single();if(r.error){status("caseStatusMessage","Could not save: "+r.error.message);return;}current={id:r.data.id,slug};const questions=$("questions").value.split("\n").map(x=>x.trim()).filter(Boolean).map((question,i)=>({id:"q"+(i+1),question}));
+const published=$("caseStatus").value==="published";const row={slug,title,category:$("category").value,subtitle:$("subtitle").value.trim(),synopsis:$("synopsis").value.trim(),hero_image_url:$("hero").value.trim()||null,status:$( "caseStatus" ).value,is_free_preview:$("freePreview").value==="true",published_at:published?(current?.published_at||new Date().toISOString()):null,updated_at:new Date().toISOString()};
+const r=current?.id
+ ? await client.from("mystery_cases").update(row).eq("id",current.id).select("id").single()
+ : await client.from("mystery_cases").insert(row).select("id").single();
+if(r.error){status("caseStatusMessage","Could not save: "+r.error.message);return;}current={...(current||{}),...row,id:r.data.id};const questions=$("questions").value.split("\n").map(x=>x.trim()).filter(Boolean).map((question,i)=>({id:"q"+(i+1),question}));
 const cr=await client.from("mystery_case_content").upsert({case_id:current.id,case_background:$("background").value.trim()||$("synopsis").value.trim(),investigation_questions:questions,updated_at:new Date().toISOString()},{onConflict:"case_id"});
 if(cr.error){status("caseStatusMessage","Case saved, but background/questions failed: "+cr.error.message);return;}
 status("caseStatusMessage","Case details saved. You can now add evidence and an editorial review.");$("evidenceEditor").classList.remove("hidden");await loadEvidence();await loadCases();};
