@@ -469,6 +469,139 @@ Your browser does not support the audio player.
   s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   s.onload=function(){
     var client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+    // Dark Case Plus downloads directly from the main audiobook catalogue.
+    var plusTitles = {
+      "consumed by fire — the human combustion mystery":"Consumed by Fire — The Human Combustion Mystery",
+      "the paranormal evidence room — the investigator’s guide to real paranormal evidence":"The Paranormal Evidence Room",
+      "the paranormal investigator’s toolkit":"The Paranormal Investigator’s Toolkit",
+      "paranormal files vol.1":"Paranormal Files Vol.1",
+      "uncovering the ghosts of gwrych castle":"Uncovering the Ghosts of Gwrych Castle",
+      "a story of lies: the eleanor williams case":"A Story of Lies: The Eleanor Williams Case",
+      "russell brand: the fall from fame":"Russell Brand: The Fall From Fame",
+      "the art of deception":"The Art of Deception",
+      "the lives i destroyed vol. 1":"The Lives I Destroyed Vol. 1",
+      "the strangest crimes — bizarre british cases that left investigators baffled":"The Strangest Crimes UK",
+      "the forensic files vol.2":"The Forensic Files Vol. 2",
+      "the forensic files vol.1":"The Forensic Files Vol. 1",
+      "murder & homicide vol.1":"Murder & Homicide Vol. 1",
+      "crimes against children vol.1":"Crimes Against Children Vol. 1",
+      "crime & the paranormal vol.1":"Crime & The Paranormal Vol. 1",
+      "the detective vol.2":"THE DETECTIVE Vol. 2",
+      "the detective vol.1":"THE DETECTIVE Vol. 1",
+      "the women who crossed the line":"The Women Who Crossed The Line",
+      "falsely accused - step by step guide":"Falsely Accused - Step By Step Guide",
+      "the essex boys - the case file":"The Essex Boys - The Case File",
+      "before rettendon - patrick tate":"Before Rettendon - Patrick Tate",
+      "before rettendon - craig rolfe":"Before Rettendon - Craig Rolfe",
+      "when an allegation becomes a death sentence":"When An Allegation Becomes a Death Sentence"
+    };
+    var plusBalance = document.createElement("div");
+    plusBalance.id = "dca-plus-balance";
+    plusBalance.style.cssText = "display:none;max-width:1180px;width:92%;margin:0 auto 18px;padding:12px 16px;border:1px solid #454b57;border-radius:10px;background:#141922;color:#fff;font-weight:700;text-align:center";
+    var audioStart = document.getElementById("paranormal-audiobooks");
+    if(audioStart) audioStart.parentNode.insertBefore(plusBalance,audioStart);
+
+    var plusModal = document.createElement("div");
+    plusModal.id = "dca-plus-login-modal";
+    plusModal.hidden = true;
+    plusModal.style.cssText = "position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:18px";
+    plusModal.innerHTML = '<div role="dialog" aria-modal="true" aria-labelledby="dca-plus-modal-title" style="width:min(430px,100%);padding:24px;background:#121722;border:1px solid #454b57;border-radius:15px;box-shadow:0 20px 70px #000;color:#fff"><button type="button" id="dca-plus-modal-close" aria-label="Close" style="float:right;width:auto;margin:0;background:transparent;color:#fff;border:0;font-size:25px;cursor:pointer">×</button><h2 id="dca-plus-modal-title" style="margin:0 0 8px;font-family:Georgia,serif">Sign in to Dark Case Plus</h2><p style="color:#c3c8d1;margin:0 0 16px">Sign in here and download your audiobook without leaving the catalogue.</p><form id="dca-plus-login-form"><label for="dca-plus-email" style="display:block;margin:10px 0 5px">Email address</label><input id="dca-plus-email" type="email" autocomplete="email" required style="width:100%;padding:12px;border-radius:8px;border:1px solid #596273;background:#080b10;color:#fff"><label for="dca-plus-password" style="display:block;margin:10px 0 5px">Password</label><input id="dca-plus-password" type="password" autocomplete="current-password" required style="width:100%;padding:12px;border-radius:8px;border:1px solid #596273;background:#080b10;color:#fff"><button id="dca-plus-login-submit" type="submit" style="width:100%;margin-top:16px;padding:13px;border:0;border-radius:8px;background:#9d2630;color:#fff;font-weight:800;cursor:pointer">Sign in and download</button></form><p id="dca-plus-login-message" role="status" style="color:#f0c6c6;min-height:22px;margin:12px 0 0"></p><p style="margin:8px 0 0;color:#c3c8d1;font-size:.9rem">Not a Plus member? <a href="membership.html" style="color:#fff;font-weight:800">Join Dark Case Plus</a></p></div>';
+    document.body.appendChild(plusModal);
+    function closePlusModal(){plusModal.hidden=true;plusModal.style.display="none";}
+    document.getElementById("dca-plus-modal-close").addEventListener("click",closePlusModal);
+    plusModal.addEventListener("click",function(e){if(e.target===plusModal)closePlusModal();});
+    var pendingPlusTitle = null;
+    var plusButtons = [];
+    function setPlusBalance(data,session){
+      if(!session){plusBalance.style.display="none";return;}
+      plusBalance.style.display="block";
+      if(data&&data.active){
+        plusBalance.textContent="Dark Case Plus · "+data.creditsRemaining+" of 3 audiobook downloads remaining this month";
+      }else{
+        plusBalance.innerHTML='You are signed in, but Dark Case Plus is not active. <a href="membership.html" style="color:#fff;text-decoration:underline">Join or manage your membership</a>';
+      }
+    }
+    async function refreshPlusBalance(session){
+      if(!session){setPlusBalance(null,null);return;}
+      try{
+        var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-plus-status",{headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY}});
+        var data=await response.json();
+        if(response.ok)setPlusBalance(data,session);
+        else setPlusBalance(null,null);
+      }catch(e){setPlusBalance(null,null);}
+    }
+    async function performPlusDownload(title,button){
+      var sr=await client.auth.getSession();
+      var session=sr&&sr.data&&sr.data.session;
+      if(!session){
+        pendingPlusTitle=title;
+        document.getElementById("dca-plus-login-message").textContent="";
+        plusModal.hidden=false;plusModal.style.display="flex";
+        document.getElementById("dca-plus-email").focus();
+        return;
+      }
+      button.disabled=true;
+      var oldText=button.textContent;
+      button.textContent="Preparing download…";
+      var note=button.parentNode.querySelector(".dca-plus-note");
+      if(note)note.textContent="Checking your credits…";
+      try{
+        var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-plus-download",{
+          method:"POST",
+          headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},
+          body:JSON.stringify({title:title})
+        });
+        var data=await response.json();
+        if(!response.ok||!data.downloadUrl)throw new Error(data.error||"Unable to prepare this download.");
+        if(note)note.textContent="Download ready. "+data.creditsRemaining+" credits remaining.";
+        button.textContent="Download started";
+        await refreshPlusBalance(session);
+        window.location.href=data.downloadUrl;
+      }catch(err){
+        if(note)note.textContent=err.message||"Unable to prepare this download.";
+        button.textContent=oldText;
+        button.disabled=false;
+        if((err.message||"").toLowerCase().includes("active dark case plus")||(err.message||"").toLowerCase().includes("no audiobook credits")){
+          if(note)note.innerHTML=(err.message||"")+" <a href='membership.html' style='color:#fff;text-decoration:underline'>Manage Dark Case Plus</a>";
+        }
+      }
+    }
+    Object.keys(plusTitles).forEach(function(key){
+      var found=Array.from(document.querySelectorAll("#paranormal-audiobooks article.card,#crime-audiobooks article.card")).find(function(card){
+        var h=card.querySelector("h3");return h&&h.textContent.trim().toLowerCase().replace(/\\s+/g," ")===key;
+      });
+      if(!found)return;
+      var wrap=document.createElement("div");
+      wrap.className="dca-plus-action";
+      wrap.style.cssText="margin-top:12px;padding-top:10px;border-top:1px solid #343a44";
+      var button=document.createElement("button");
+      button.type="button";button.textContent="Download with Dark Case Plus";
+      button.style.cssText="width:100%;padding:11px 12px;border:1px solid #9d2630;border-radius:8px;background:#35151a;color:#fff;font-weight:800;cursor:pointer";
+      var note=document.createElement("p");note.className="dca-plus-note";note.style.cssText="margin:6px 0 0;color:#c3c8d1;font-size:.82rem;line-height:1.4";
+      note.textContent="Included with Dark Case Plus · uses 1 monthly credit";
+      button.addEventListener("click",function(){performPlusDownload(plusTitles[key],button);});
+      wrap.append(button,note);found.appendChild(wrap);plusButtons.push(button);
+    });
+    document.getElementById("dca-plus-login-form").addEventListener("submit",async function(e){
+      e.preventDefault();
+      var submit=document.getElementById("dca-plus-login-submit");
+      var message=document.getElementById("dca-plus-login-message");
+      submit.disabled=true;message.textContent="Signing in…";
+      try{
+        var result=await client.auth.signInWithPassword({
+          email:document.getElementById("dca-plus-email").value.trim(),
+          password:document.getElementById("dca-plus-password").value
+        });
+        if(result.error)throw result.error;
+        var title=pendingPlusTitle;pendingPlusTitle=null;closePlusModal();
+        await refreshPlusBalance(result.data.session);
+        var target=plusButtons.find(function(b){var card=b.closest("article.card"),h=card&&card.querySelector("h3");return h&&plusTitles[h.textContent.trim().toLowerCase().replace(/\\s+/g," ") ]===title;});
+        if(target)await performPlusDownload(title,target);
+      }catch(err){message.textContent=err.message||"Unable to sign in.";submit.disabled=false;}
+    });
+    client.auth.getSession().then(function(r){refreshPlusBalance(r.data&&r.data.session);});
+    client.auth.onAuthStateChange(function(event,session){refreshPlusBalance(session);});
     var badge=document.getElementById("unreadMessageBadge");
     async function updateUnreadBadge(){
       if(!badge)return;
