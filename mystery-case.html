@@ -53,7 +53,7 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 <p style="color:var(--muted)">Write your assessment using the evidence you have examined. Your conclusion stays private. Submitting it opens the discussion and the editorial review for this case.</p>
 <label for="theoryText" style="display:block;font-weight:700;margin:12px 0 7px">What do you think the evidence shows?</label>
 <textarea id="theoryText" placeholder="Set out your conclusion. Explain which evidence supports it, what challenges it and what remains unanswered…" maxlength="20000"></textarea>
-<button class="btn" id="submitTheory">Submit my conclusion</button><div class="status" id="submissionStatus"></div>
+<button class="btn secondary" id="saveDraft" type="button">Save investigation draft</button> <button class="btn" id="submitTheory">Submit my conclusion</button><div class="status" id="submissionStatus"></div>
 </section>
 <section class="panel" id="reviewPanel" hidden>
 <h2>Editorial review</h2>
@@ -165,6 +165,14 @@ $("submitTheory").addEventListener("click",async()=>{
  const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:theory,answers:answers,status:"submitted",submitted_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
  if(r.error){setStatus("submissionStatus","Could not submit: "+r.error.message);b.disabled=false;return;}
  submission={theory,status:"submitted"};$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();b.disabled=false;b.textContent="Update my conclusion";setStatus("submissionStatus","Your conclusion has been submitted. The discussion and editorial review are now open for you.");
+});
+$("saveDraft").addEventListener("click",async()=>{
+ if(!user||!caseRow)return;
+ const answers={};questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el)answers[q.id]=el.value;});
+ const b=$("saveDraft");b.disabled=true;setStatus("submissionStatus","Saving your investigation draft…");
+ const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:$("theoryText").value,answers:answers,status:"draft",updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ if(r.error){setStatus("submissionStatus","Could not save draft: "+r.error.message);}else{submission={theory:$("theoryText").value,answers:answers,status:"draft"};setStatus("submissionStatus","Your investigation draft has been saved privately. The discussion remains closed until you submit your conclusion.");}
+ b.disabled=false;
 });
 async function loadDiscussion(){
  const r=await client.from("mystery_discussion_posts").select("id,user_id,content,created_at").eq("case_id",caseRow.id).eq("status","visible").order("created_at");
