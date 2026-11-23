@@ -104,7 +104,7 @@ let user=null,caseRow=null,submission=null,questionData=[];
 function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function message(text){$("notice").textContent=text;$("notice").style.display="block";}
 function setStatus(id,text){$(id).textContent=text;}
-function showLocked(){ $("caseTitle").textContent="This investigation is for Dark Case Plus members";$("caseSynopsis").textContent="This case file is not included in the free sample collection."; $("caseBackground").innerHTML='<div class="locked"><h3>Full investigation access</h3><p>Join Dark Case Plus to examine the complete case files, evidence and recordings.</p><a href="membership.html">Explore Dark Case Plus →</a></div>';$("evidence").innerHTML="";["notesPanel","submissionPanel","reviewPanel","discussionPanel"].forEach(id=>$(id).hidden=true); }
+function showLocked(){ $("caseTitle").textContent="This investigation is for Dark Case Plus members";$("caseSynopsis").textContent="This case file is not included in the free sample collection."; $("caseBackground").innerHTML='<div class="locked"><h3>Full investigation access</h3><p>Join Dark Case Plus to examine the complete case files, evidence and recordings.</p><a href="membership.html">Explore Dark Case Plus →</a></div>';$("evidence").innerHTML="";["questionsPanel","notesPanel","submissionPanel","reviewPanel","discussionPanel"].forEach(id=>$(id).hidden=true); }
 function renderEvidence(rows){
  if(!rows.length){$("evidence").innerHTML='<div class="locked"><p>No evidence has been published for this case yet.</p></div>';return;}
  $("evidence").innerHTML=rows.map((e,i)=>{
@@ -140,7 +140,7 @@ async function load(){
  const er=await client.from("mystery_evidence").select("*").eq("case_id",caseRow.id).order("display_order");
  if(er.error){$("evidence").innerHTML='<div class="locked">Evidence could not be loaded. Please refresh and try again.</div>';}else renderEvidence(er.data||[]);
  if(!user){
-  ["notesPanel","submissionPanel","discussionPanel","reviewPanel"].forEach(id=>$(id).hidden=true);
+  ["questionsPanel","notesPanel","submissionPanel","discussionPanel","reviewPanel"].forEach(id=>$(id).hidden=true);
   message('You can examine this free sample without signing in. To save private notes and submit a conclusion, <a href="membership.html">create a free Dark Case account</a>.');
   return;
  }
