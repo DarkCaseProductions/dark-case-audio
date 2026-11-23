@@ -32,6 +32,8 @@ The following records were returned by Supabase, in order:
 | 20261123165337 | gate_mystery_room_discussions_by_membership |
 | 20261123195155 | expose_safe_mystery_admin_check |
 | 20261123202232 | restrict_mystery_room_anon_table_grants |
+| 20261123202346 | restrict_security_definer_rpc_grants |
+| 20261123202405 | harden_profile_signup_trigger_search_path |
 
 ## Current schema inventory
 
@@ -48,6 +50,8 @@ The seven public Mystery Room tables present in the project are:
 Row Level Security was confirmed enabled on all seven tables. Their policies distinguish published case catalogue access, free-preview evidence, active/trialing Plus access, owner-only notes and conclusions, submitted-member discussions and administrator controls.
 
 Anonymous table privileges were tightened in migration `20261123202232_restrict_mystery_room_anon_table_grants`: `anon` now has `SELECT` only on the public catalogue, case background and evidence tables, and has no table privileges on notes, submissions, discussions or reviews. Authenticated users retain the table privileges required by the member and administrator workflows; RLS still governs row access.
+
+The RPC surface was also hardened. Migration `20261123202346_restrict_security_definer_rpc_grants` removes client execution privileges from the trigger-only `public.handle_new_member()` function, changes the intended `public.is_mystery_room_admin()` wrapper to SECURITY INVOKER, and allows only authenticated users to execute that wrapper. Migration `20261123202405_harden_profile_signup_trigger_search_path` gives the signup trigger an empty search path and keeps its profile table reference schema-qualified. A rolled-back test insert into `auth.users` confirmed the trigger still creates the matching profile row after these changes.
 
 The private schema contains `private.mystery_room_admins`, which stores approved administrator user IDs. The private administrator-check function is `private.is_mystery_room_admin()`. The authenticated-only public wrapper is `public.is_mystery_room_admin()`. Both functions use an empty search path and are SECURITY DEFINER. The `anon` role cannot execute either function; authenticated users can execute the public wrapper. The private allow-list is not exposed to ordinary users.
 
@@ -71,7 +75,7 @@ Do not change these publication settings as part of migration recovery without a
 
 ## Recovery work still required
 
-1. Reconstruct the original schema, constraints, indexes, functions, grants and RLS policies as versioned SQL migrations. The anonymous-grant hardening migration is now stored as an applied SQL file in `supabase/migrations/`.
+1. Reconstruct the original schema, constraints, indexes, functions, grants and RLS policies as versioned SQL migrations. The three new hardening migrations are now stored as applied SQL files in `supabase/migrations/`; the original foundational migration bodies are still missing.
 2. Separate the case seed content from schema migrations where practical, and avoid embedding live member IDs or private member data.
 3. Include an explicit, safe administrator bootstrap step that maps the approved account by email only when that account already exists; never hard-code a production auth UUID into a reusable migration.
 4. Recreate the feature in a disposable Supabase project and verify all policies and access paths before calling the migrations portable.
