@@ -9,6 +9,8 @@ Reviewed 23 November 2026.
 - The live website's `main` branch has not been updated by this work.
 - The Mystery Room database schema is already installed in the connected Supabase project.
 - Anonymous table grants have been tightened: anonymous visitors have read-only access to the catalogue, case background and evidence tables; they have no table privileges on member notes, conclusions, discussions or reviews. A test as `anon` sees the two published catalogue cards (the Zodiac appears only as a Plus teaser) and six Enfield preview evidence items.
+- The public Mystery Room admin-check wrapper now runs as SECURITY INVOKER and is executable only by authenticated users. The profile signup trigger is no longer callable as an RPC by client roles and has an empty search path. A rolled-back synthetic signup test confirmed the trigger still creates the profile row.
+- Supabase security advisors no longer flag the Mystery Room admin wrapper or profile signup trigger as exposed SECURITY DEFINER functions. One account-wide warning remains: leaked-password protection is disabled. It has not been changed as part of this feature.
 - A separate Cloudflare Pages preview is still required for end-to-end browser testing of the static website pages.
 - The active-Plus member journey still requires a real account with a currently active or trialing Plus subscription.
 
