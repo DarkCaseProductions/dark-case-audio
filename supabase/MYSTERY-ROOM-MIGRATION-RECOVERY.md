@@ -31,6 +31,7 @@ The following records were returned by Supabase, in order:
 | 20261123154729 | grant_admin_editor_table_privileges |
 | 20261123165337 | gate_mystery_room_discussions_by_membership |
 | 20261123195155 | expose_safe_mystery_admin_check |
+| 20261123202232 | restrict_mystery_room_anon_table_grants |
 
 ## Current schema inventory
 
@@ -46,6 +47,8 @@ The seven public Mystery Room tables present in the project are:
 
 Row Level Security was confirmed enabled on all seven tables. Their policies distinguish published case catalogue access, free-preview evidence, active/trialing Plus access, owner-only notes and conclusions, submitted-member discussions and administrator controls.
 
+Anonymous table privileges were tightened in migration `20261123202232_restrict_mystery_room_anon_table_grants`: `anon` now has `SELECT` only on the public catalogue, case background and evidence tables, and has no table privileges on notes, submissions, discussions or reviews. Authenticated users retain the table privileges required by the member and administrator workflows; RLS still governs row access.
+
 The private schema contains `private.mystery_room_admins`, which stores approved administrator user IDs. The private administrator-check function is `private.is_mystery_room_admin()`. The authenticated-only public wrapper is `public.is_mystery_room_admin()`. Both functions use an empty search path and are SECURITY DEFINER. The `anon` role cannot execute either function; authenticated users can execute the public wrapper. The private allow-list is not exposed to ordinary users.
 
 ## Current case publication state
@@ -60,6 +63,7 @@ Do not change these publication settings as part of migration recovery without a
 ## Verified checks
 
 - Seven public Mystery Room tables have RLS enabled.
+- Anonymous grants were read back after the hardening migration: `SELECT` only on `mystery_cases`, `mystery_case_content` and `mystery_evidence`; no grants on private member or discussion tables.
 - Anonymous and ordinary non-admin access simulations did not reveal Plus-only case material, private conclusions, reviews or discussions.
 - The approved administrator account is on the private allow-list and can manage the Mystery Room using the existing Dark Case Audio login.
 - The membership-status Edge Function `dark-case-plus-status` is active and performs its own bearer-token validation. Its deployed configuration currently has JWT gateway verification disabled; do not change that setting without reviewing the function's manual authentication logic.
@@ -67,7 +71,7 @@ Do not change these publication settings as part of migration recovery without a
 
 ## Recovery work still required
 
-1. Reconstruct the schema, constraints, indexes, functions, grants and RLS policies as versioned SQL migrations.
+1. Reconstruct the original schema, constraints, indexes, functions, grants and RLS policies as versioned SQL migrations. The anonymous-grant hardening migration is now stored as an applied SQL file in `supabase/migrations/`.
 2. Separate the case seed content from schema migrations where practical, and avoid embedding live member IDs or private member data.
 3. Include an explicit, safe administrator bootstrap step that maps the approved account by email only when that account already exists; never hard-code a production auth UUID into a reusable migration.
 4. Recreate the feature in a disposable Supabase project and verify all policies and access paths before calling the migrations portable.
