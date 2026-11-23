@@ -8,7 +8,7 @@ Reviewed 23 November 2026.
 - Pull request #2 remains open, unmerged and in draft.
 - The live website's `main` branch has not been updated by this work.
 - The Mystery Room database schema is already installed in the connected Supabase project.
-- Anonymous table grants have been tightened: anonymous visitors can read only the catalogue, case background and evidence tables; they have no table privileges on member notes, conclusions, discussions or reviews.
+- Anonymous table grants have been tightened: anonymous visitors have read-only access to the catalogue, case background and evidence tables; they have no table privileges on member notes, conclusions, discussions or reviews. A test as `anon` sees the two published catalogue cards (the Zodiac appears only as a Plus teaser) and six Enfield preview evidence items.
 - A separate Cloudflare Pages preview is still required for end-to-end browser testing of the static website pages.
 - The active-Plus member journey still requires a real account with a currently active or trialing Plus subscription.
 
