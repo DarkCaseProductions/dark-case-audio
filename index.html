@@ -569,7 +569,7 @@ Your browser does not support the audio player.
     }
     Object.keys(plusTitles).forEach(function(key){
       var found=Array.from(document.querySelectorAll("#paranormal-audiobooks article.card,#crime-audiobooks article.card")).find(function(card){
-        var h=card.querySelector("h3");return h&&h.textContent.trim().toLowerCase().replace(/\s+/g," ")===key;
+        var h=card.querySelector("h3");return h&&h.innerHTML.replace(/<br\s*\/?\s*>/gi," ").replace(/<[^>]*>/g," ").replace(/&nbsp;/gi," ").replace(/\s+/g," ").trim().toLowerCase()===key;
       });
       if(!found)return;
       var wrap=document.createElement("div");
