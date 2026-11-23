@@ -569,7 +569,7 @@ Your browser does not support the audio player.
     }
     Object.keys(plusTitles).forEach(function(key){
       var found=Array.from(document.querySelectorAll("#paranormal-audiobooks article.card,#crime-audiobooks article.card")).find(function(card){
-        var h=card.querySelector("h3");return h&&h.textContent.trim().toLowerCase().replace(/\\s+/g," ")===key;
+        var h=card.querySelector("h3");return h&&h.textContent.trim().toLowerCase().replace(/\s+/g," ")===key;
       });
       if(!found)return;
       var wrap=document.createElement("div");
@@ -596,7 +596,7 @@ Your browser does not support the audio player.
         if(result.error)throw result.error;
         var title=pendingPlusTitle;pendingPlusTitle=null;closePlusModal();
         await refreshPlusBalance(result.data.session);
-        var target=plusButtons.find(function(b){var card=b.closest("article.card"),h=card&&card.querySelector("h3");return h&&plusTitles[h.textContent.trim().toLowerCase().replace(/\\s+/g," ") ]===title;});
+        var target=plusButtons.find(function(b){var card=b.closest("article.card"),h=card&&card.querySelector("h3");return h&&plusTitles[h.textContent.trim().toLowerCase().replace(/\s+/g," ") ]===title;});
         if(target)await performPlusDownload(title,target);
       }catch(err){message.textContent=err.message||"Unable to sign in.";submit.disabled=false;}
     });
