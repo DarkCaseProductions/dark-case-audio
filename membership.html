@@ -312,7 +312,7 @@ button:hover{filter:brightness(1.12)}
         message.textContent="Account created. Taking you to secure checkout...";
         await startPlusCheckout(result.data.session,button,message);
       }else{
-        message.textContent="Your account has been created. Please confirm your email, then log in here. We'll take you to Dark Case Plus checkout after you sign in.";
+        message.textContent="Your account has been created. Please confirm your email, then log in. Once logged in, return to this page and select Join Dark Case Plus to continue to checkout.";
         button.disabled=false;
       }
     }catch(err){
