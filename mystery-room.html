@@ -62,7 +62,7 @@ let cases=[],category="all";
 function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function render(){
  const rows=cases.filter(c=>category==="all"||c.category===category);
- if(!rows.length){grid.innerHTML='<div class="empty"><h3>New investigations are being prepared.</h3><p>We're putting the first evidence collections together. Check back soon for the opening cases.</p></div>';return;}
+ if(!rows.length){grid.innerHTML='<div class="empty"><h3>New investigations are being prepared.</h3><p>We are putting the first evidence collections together. Check back soon for the opening cases.</p></div>';return;}
  grid.innerHTML=rows.map(c=>{
   const art=c.hero_image_url?'style="background-image:linear-gradient(0deg,#07090dcc,transparent 70%),url(\''+esc(c.hero_image_url)+'\')"':'';
   const access=c.is_free_preview?'Free sample':'Dark Case Plus';
