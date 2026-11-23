@@ -568,8 +568,11 @@ Your browser does not support the audio player.
       }
     }
     Object.keys(plusTitles).forEach(function(key){
-      var found=Array.from(document.querySelectorAll("#paranormal-audiobooks article.card,#crime-audiobooks article.card")).find(function(card){
-        var h=card.querySelector("h3");return h&&h.innerHTML.replace(/<br\s*\/?\s*>/gi," ").replace(/<[^>]*>/g," ").replace(/&nbsp;/gi," ").replace(/\s+/g," ").trim().toLowerCase()===key;
+      var found=null;
+      if(key==="the detective vol.2") found=document.getElementById("audio-the-detective-vol-2");
+      else if(key==="the detective vol.1") found=document.getElementById("audio-the-detective-vol-1");
+      if(!found) found=Array.from(document.querySelectorAll("#paranormal-audiobooks article.card,#crime-audiobooks article.card")).find(function(card){
+        var h=card.querySelector("h3");return h&&h.textContent.replace(/\s+/g," ").trim().toLowerCase()===key;
       });
       if(!found)return;
       var wrap=document.createElement("div");
