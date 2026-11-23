@@ -581,7 +581,7 @@ Your browser does not support the audio player.
       var note=document.createElement("p");note.className="dca-plus-note";note.style.cssText="margin:6px 0 0;color:#c3c8d1;font-size:.82rem;line-height:1.4";
       note.textContent="Included with Dark Case Plus · uses 1 monthly credit";
       button.addEventListener("click",function(){performPlusDownload(plusTitles[key],button);});
-      wrap.append(button,note);found.appendChild(wrap);plusButtons.push(button);
+      wrap.append(button,note);var singlePayLink=found.querySelector('a.button[href*="buy.stripe.com"]');if(singlePayLink)found.insertBefore(wrap,singlePayLink);else found.appendChild(wrap);plusButtons.push(button);
     });
     document.getElementById("dca-plus-login-form").addEventListener("submit",async function(e){
       e.preventDefault();
