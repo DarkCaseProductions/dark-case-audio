@@ -8,6 +8,7 @@ Reviewed 23 November 2026.
 - Pull request #2 remains open, unmerged and in draft.
 - The live website's `main` branch has not been updated by this work.
 - The Mystery Room database schema is already installed in the connected Supabase project.
+- Anonymous table grants have been tightened: anonymous visitors can read only the catalogue, case background and evidence tables; they have no table privileges on member notes, conclusions, discussions or reviews.
 - A separate Cloudflare Pages preview is still required for end-to-end browser testing of the static website pages.
 - The active-Plus member journey still requires a real account with a currently active or trialing Plus subscription.
 
@@ -21,7 +22,7 @@ The live database currently reports the Enfield Poltergeist as a published free 
 - [ ] Verify sign-in, free Enfield sample, private notes, saving a draft conclusion, submitting a conclusion, discussion access and editorial review in a browser.
 - [ ] Verify the Plus-only Zodiac case with a real active/trialing Plus account.
 - [ ] Verify that an expired/cancelled Plus account cannot access the Plus case, its evidence, discussion or review.
-- [ ] Reconstruct and test a portable Supabase migration set in a disposable project.
+- [ ] Reconstruct and test the original schema migrations as a portable Supabase migration set in a disposable project. The applied anonymous-grant hardening migration is now stored under `supabase/migrations/`.
 - [ ] Review the Mystery Room Privacy Policy and Terms in the context of the actual feature and business arrangements.
 - [ ] Owner approval before merging or publishing.
 
