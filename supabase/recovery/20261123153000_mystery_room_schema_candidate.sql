@@ -111,6 +111,35 @@ CREATE INDEX mystery_evidence_case_order_idx ON public.mystery_evidence USING bt
 CREATE INDEX mystery_notes_user_case_idx ON public.mystery_investigation_notes USING btree (user_id, case_id);
 CREATE INDEX mystery_submissions_user_case_idx ON public.mystery_submissions USING btree (user_id, case_id);
 
+create or replace function private.is_mystery_room_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $function$
+  select exists (
+    select 1 from private.mystery_room_admins a
+    where a.user_id = (select auth.uid())
+  );
+$function$;
+
+create or replace function public.is_mystery_room_admin()
+returns boolean
+language sql
+stable
+security invoker
+set search_path = ''
+as $function$
+  select private.is_mystery_room_admin();
+$function$;
+
+revoke all on function private.is_mystery_room_admin() from public, anon;
+grant execute on function private.is_mystery_room_admin() to authenticated;
+revoke all on function public.is_mystery_room_admin() from public, anon;
+grant execute on function public.is_mystery_room_admin() to authenticated;
+
+
 create policy "Accessible case backgrounds are visible" on mystery_case_content as permissive for select to anon, authenticated using ((EXISTS ( SELECT 1
    FROM mystery_cases c
   WHERE ((c.id = mystery_case_content.case_id) AND (c.status = 'published'::text) AND ((c.is_free_preview = true) OR (EXISTS ( SELECT 1
@@ -195,34 +224,6 @@ alter table public.mystery_evidence enable row level security;
 alter table public.mystery_investigation_notes enable row level security;
 alter table public.mystery_submissions enable row level security;
 alter table private.mystery_room_admins enable row level security;
-
-create or replace function private.is_mystery_room_admin()
-returns boolean
-language sql
-stable
-security definer
-set search_path = ''
-as $function$
-  select exists (
-    select 1 from private.mystery_room_admins a
-    where a.user_id = (select auth.uid())
-  );
-$function$;
-
-create or replace function public.is_mystery_room_admin()
-returns boolean
-language sql
-stable
-security invoker
-set search_path = ''
-as $function$
-  select private.is_mystery_room_admin();
-$function$;
-
-revoke all on function private.is_mystery_room_admin() from public, anon;
-grant execute on function private.is_mystery_room_admin() to authenticated;
-revoke all on function public.is_mystery_room_admin() from public, anon;
-grant execute on function public.is_mystery_room_admin() to authenticated;
 
 grant usage on schema private to authenticated;
 revoke all on table private.mystery_room_admins from anon, authenticated;
