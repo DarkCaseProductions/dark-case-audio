@@ -72,7 +72,7 @@ function render(){
 async function load(){
  const {data,error}=await client.from("mystery_cases").select("slug,category,title,synopsis,hero_image_url,is_free_preview,published_at").eq("status","published").order("published_at",{ascending:false});
  if(error){grid.innerHTML='<div class="empty"><h3>Investigations are temporarily unavailable.</h3><p>Please try again shortly.</p></div>';return;}
- cases=data||[];render();
+ cases=(data||[]).sort((a,b)=>Number(Boolean(b.is_free_preview))-Number(Boolean(a.is_free_preview))||new Date(b.published_at||0)-new Date(a.published_at||0));render();
  if(!cases.some(c=>c.is_free_preview)){notice.innerHTML='The first free sample investigation is being prepared. You can already explore the Mystery Room layout; full case access will appear here as investigations are published.';notice.style.display='block';}
 }
 document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));category=b.dataset.category;render();}));
