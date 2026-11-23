@@ -26,10 +26,11 @@ The live database currently reports the Enfield Poltergeist as a published free 
 - [ ] Verify the full Plus unlock journey in the browser with a real active/trialing Plus account. Do not use a live payment solely to complete this test without the owner's approval.
 - [x] Simulated active and cancelled subscriptions for a non-admin member inside rolled-back database transactions. Active access revealed the Zodiac background and all five Plus evidence items; cancelled access revealed only the Enfield background and six preview evidence items. Neither state exposed Zodiac discussions or reviews. No test subscription records were retained.
 - [ ] Confirm the active Plus journey in the browser once a genuine active/trialing account is available.
-- [ ] Reconstruct and test the original schema migrations as a portable Supabase migration set in a disposable project. The applied anonymous-grant hardening migration and the three additional security hardening migrations are stored under `supabase/migrations/`.
-- [ ] Review the Mystery Room Privacy Policy and Terms in the context of the actual feature and business arrangements.
+- [ ] Replay-test the reconstructed schema candidate in a separate clean Supabase project. The candidate and a development-only seed are under `supabase/recovery/`; they have passed a transactional replay against isolated temporary schemas in the connected database, with rollback and no live changes. They depend on the existing application tables `auth.users` and `public.dark_case_subscriptions` and are not yet certified as portable. The three applied security hardening migrations are stored under `supabase/migrations/`.
+- [x] Update the Privacy Policy and Terms on the development branch to describe private investigation records, administrator access, member-visible discussion posts, editorial reviews and moderation.
+- [ ] Final owner/legal review of the Privacy Policy and Terms, including the actual data-retention arrangements and applicable UK data-protection obligations.
 - [ ] Owner approval before merging or publishing.
 
 ## Current known limitations
 
-The migration ledger provides version names but not the original SQL bodies. The migration inventory is recorded in `supabase/MYSTERY-ROOM-MIGRATION-RECOVERY.md`. That inventory is not replayable SQL and is not a database backup. The original migration set must be reconstructed and tested before the project can be described as fully portable.
+The migration ledger provides version names but not the original SQL bodies. The reconstructed baseline and privacy-safe public-content seed are under `supabase/recovery/`, outside the automatic migration directory. Their SQL passed a rolled-back isolated-schema replay, but they are not the verbatim historical migrations and still need a fresh-project integration test. The migration inventory is not a database backup.
