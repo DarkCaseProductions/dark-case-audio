@@ -149,9 +149,9 @@ async function load(){
 async function loadMemberWork(){
  const nr=await client.from("mystery_investigation_notes").select("notes").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
  if(nr.data)$("notesText").value=nr.data.notes||"";
- const sr=await client.from("mystery_submissions").select("theory,status,answers").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
+ const sr=await client.from("mystery_submissions").select("theory,status,answers,submitted_at").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
  submission=sr.data||null;
- if(submission){$("theoryText").value=submission.theory||"";questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el&&submission.answers)el.value=submission.answers[q.id]||"";});if(submission.status==="submitted"){ $("submitTheory").textContent="Update my conclusion";$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();}}
+ if(submission){$("theoryText").value=submission.theory||"";questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el&&submission.answers)el.value=submission.answers[q.id]||"";});if(submission.status==="submitted"){ $("submitTheory").textContent="Update my conclusion";$("saveDraft").textContent="Save changes";$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();}}
 }
 $("saveNotes").addEventListener("click",async()=>{
  if(!user||!caseRow)return;const b=$("saveNotes");b.disabled=true;setStatus("notesStatus","Saving…");
@@ -169,9 +169,11 @@ $("submitTheory").addEventListener("click",async()=>{
 $("saveDraft").addEventListener("click",async()=>{
  if(!user||!caseRow)return;
  const answers={};questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el)answers[q.id]=el.value;});
- const b=$("saveDraft");b.disabled=true;setStatus("submissionStatus","Saving your investigation draft…");
- const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:$("theoryText").value,answers:answers,status:"draft",updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
- if(r.error){setStatus("submissionStatus","Could not save draft: "+r.error.message);}else{submission={theory:$("theoryText").value,answers:answers,status:"draft"};setStatus("submissionStatus","Your investigation draft has been saved privately. The discussion remains closed until you submit your conclusion.");}
+ const preserveSubmitted=submission?.status==="submitted";
+ const nextStatus=preserveSubmitted?"submitted":"draft";
+ const b=$("saveDraft");b.disabled=true;setStatus("submissionStatus",preserveSubmitted?"Saving your changes…":"Saving your investigation draft…");
+ const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:$("theoryText").value,answers:answers,status:nextStatus,submitted_at:preserveSubmitted?(submission.submitted_at||new Date().toISOString()):null,updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ if(r.error){setStatus("submissionStatus","Could not save: "+r.error.message);}else{submission={...submission,theory:$("theoryText").value,answers:answers,status:nextStatus};setStatus("submissionStatus",preserveSubmitted?"Your changes have been saved. Your conclusion remains submitted, so the case discussion stays open.":"Your investigation draft has been saved privately. The discussion remains closed until you submit your conclusion.");}
  b.disabled=false;
 });
 async function loadDiscussion(){
