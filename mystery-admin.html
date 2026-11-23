@@ -53,8 +53,8 @@ const client=window.supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase
 const $=id=>document.getElementById(id);let user=null,current=null;
 function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function status(id,msg){$(id).textContent=msg;}
-async function init(){const s=await client.auth.getSession();user=s.data.session?.user;if(!user){$("account").textContent="Not signed in";$("caseList").innerHTML='<p>Sign in with your Dark Case Audio account to continue. <a href="membership.html">Member sign in</a>.</p>';return;}
-$("account").textContent="Signed in as "+(user.email||"member");await loadCases();}
+async function init(){const s=await client.auth.getSession();user=s.data.session?.user;if(!user){$("account").textContent="Not signed in";$("caseList").innerHTML='<p>Sign in with your Dark Case Audio account to continue. <a href="membership.html">Member sign in</a>.</p>';$("newCase").classList.add("hidden");return;}
+$("account").textContent="Signed in as "+(user.email||"member");const access=await client.rpc("is_mystery_room_admin");if(access.error||access.data!==true){$("caseList").innerHTML='<p>This account is not approved to administer the Mystery Room.</p><p><a href="mystery-room.html">Return to the Mystery Room</a></p>';$("newCase").classList.add("hidden");return;}await loadCases();}
 async function loadCases(){const r=await client.from("mystery_cases").select("id,slug,title,category,status,is_free_preview").order("created_at",{ascending:false});if(r.error){$("caseList").textContent="This account does not have Mystery Room administration access, or the case list could not be loaded.";return;}
 if(!r.data.length){$("caseList").textContent="No cases have been created yet.";return;}
 $("caseList").innerHTML=r.data.map(c=>'<div class="case-row"><div><strong>'+esc(c.title)+'</strong><div class="small">'+esc(c.slug)+' · '+esc(c.category)+' · '+esc(c.status)+' · '+(c.is_free_preview?"Free sample":"Plus")+'</div></div><button class="btn secondary" data-id="'+c.id+'">Edit</button></div>').join("");
