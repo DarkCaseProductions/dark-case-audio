@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mystery Room administration | Dark Case Audio</title>
+<style>
+:root{--bg:#080a0e;--panel:#141a23;--line:#343d49;--text:#f1f2f4;--muted:#aeb5c0;--gold:#c6a66a}*{box-sizing:border-box}body{margin:0;background:#090c11;color:var(--text);font:15px/1.55 Arial,sans-serif}.wrap{width:min(1100px,94%);margin:auto;padding:24px 0 60px}a{color:#e5c98f}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0}h1,h2,h3{font-family:Georgia,serif}h1{font-size:2.2rem;margin:14px 0}h2{margin:0 0 14px}label{display:block;font-weight:700;margin:12px 0 6px}input,select,textarea{width:100%;padding:11px;border:1px solid #46505e;border-radius:8px;background:#080b10;color:#fff;font:inherit}textarea{min-height:120px;resize:vertical}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.btn{padding:10px 15px;border:1px solid #a48a5c;background:#c6a66a;color:#111;border-radius:8px;font-weight:800;cursor:pointer}.btn.secondary{background:#252d38;border-color:#4b5664;color:#fff}.btn.danger{background:#60252a;border-color:#8b343c;color:#fff}.status{color:var(--muted);margin-top:10px;min-height:22px}.case-row,.evidence-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.case-row:first-child,.evidence-row:first-child{border-top:0}.small{font-size:.8rem;color:var(--muted)}.hidden{display:none!important}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}@media(max-width:700px){.grid{grid-template-columns:1fr}.case-row,.evidence-row{align-items:flex-start;flex-direction:column}}
+</style></head>
+<body><main class="wrap">
+<div class="top"><a href="mystery-room.html">← View Mystery Room</a><span id="account"></span></div>
+<h1>Mystery Room administration</h1>
+<p style="color:var(--muted)">Create and maintain case files, evidence, investigation questions and editorial reviews. These controls are protected by database permissions; only approved Mystery Room administrators can save changes.</p>
+<section class="panel"><h2>Published and draft cases</h2><div id="caseList">Checking your access…</div><div class="actions"><button class="btn" id="newCase">Create a new case</button></div><div class="status" id="listStatus"></div></section>
+<section class="panel hidden" id="editor">
+<h2 id="editorTitle">New case</h2>
+<div class="grid">
+<div><label for="slug">Case URL slug</label><input id="slug" placeholder="e.g. enfield-poltergeist-1977"></div>
+<div><label for="category">Department</label><select id="category"><option value="crime">Crime</option><option value="paranormal">Paranormal</option></select></div>
+</div>
+<label for="title">Case title</label><input id="title">
+<label for="subtitle">Subtitle / location / date</label><input id="subtitle">
+<label for="synopsis">Short public introduction</label><textarea id="synopsis"></textarea>
+<label for="hero">Hero image URL (decorative only, not evidence)</label><input id="hero">
+<div class="grid">
+<div><label for="caseStatus">Publication status</label><select id="caseStatus"><option value="draft">Draft – hidden from members</option><option value="published">Published</option><option value="archived">Archived</option></select></div>
+<div><label for="freePreview">Access</label><select id="freePreview"><option value="false">Dark Case Plus</option><option value="true">Free sample</option></select></div>
+</div>
+<label for="background">Full case background</label><textarea id="background" style="min-height:220px"></textarea>
+<label for="questions">Investigation questions (one per line)</label><textarea id="questions" placeholder="What do you regard as the strongest evidence?
+Which parts of the account remain disputed?"></textarea>
+<div class="actions"><button class="btn" id="saveCase">Save case details</button><button class="btn secondary" id="closeEditor">Close</button></div><div class="status" id="caseStatusMessage"></div>
+<div id="evidenceEditor" class="hidden">
+<hr style="border-color:var(--line);margin:25px 0">
+<h2>Evidence library</h2><div id="evidenceList"></div>
+<h3 style="margin-top:22px">Add evidence item</h3>
+<label for="evidenceTitle">Evidence title</label><input id="evidenceTitle">
+<div class="grid"><div><label for="evidenceType">Type</label><select id="evidenceType"><option>document</option><option>photograph</option><option>audio</option><option>video</option><option>timeline</option><option>report</option><option>other</option></select></div><div><label for="evidencePreview">Access</label><select id="evidencePreview"><option value="true">Free preview item</option><option value="false">Plus-only item</option></select></div></div>
+<label for="evidenceDescription">Short description</label><textarea id="evidenceDescription"></textarea>
+<label for="evidenceBody">Evidence text / transcript / notes</label><textarea id="evidenceBody" style="min-height:170px"></textarea>
+<div class="grid"><div><label for="sourceLabel">Source name</label><input id="sourceLabel"></div><div><label for="sourceUrl">Source URL</label><input id="sourceUrl" type="url"></div></div>
+<label for="fileUrl">Media file URL (optional)</label><input id="fileUrl" type="url">
+<label for="displayOrder">Display order</label><input id="displayOrder" type="number" value="10">
+<div class="actions"><button class="btn" id="addEvidence">Add evidence item</button></div><div class="status" id="evidenceStatus"></div>
+<hr style="border-color:var(--line);margin:25px 0">
+<h2>Editorial review</h2>
+<label for="reviewTitle">Review heading</label><input id="reviewTitle">
+<label for="reviewBody">Editorial review</label><textarea id="reviewBody" style="min-height:220px"></textarea>
+<div class="actions"><button class="btn" id="saveReview">Save editorial review</button></div><div class="status" id="reviewStatus"></div>
+</div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+const client=window.supabase.createClient("https://inhiiamepxwjtfyqlqir.supabase.co","sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5");
+const $=id=>document.getElementById(id);let user=null,current=null;
+function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function status(id,msg){$(id).textContent=msg;}
+async function init(){const s=await client.auth.getSession();user=s.data.session?.user;if(!user){$("account").textContent="Not signed in";$("caseList").innerHTML='<p>Sign in with your Dark Case Audio account to continue. <a href="membership.html">Member sign in</a>.</p>';return;}
+$("account").textContent="Signed in as "+(user.email||"member");await loadCases();}
+async function loadCases(){const r=await client.from("mystery_cases").select("id,slug,title,category,status,is_free_preview").order("created_at",{ascending:false});if(r.error){$("caseList").textContent="This account does not have Mystery Room administration access, or the case list could not be loaded.";return;}
+if(!r.data.length){$("caseList").textContent="No cases have been created yet.";return;}
+$("caseList").innerHTML=r.data.map(c=>'<div class="case-row"><div><strong>'+esc(c.title)+'</strong><div class="small">'+esc(c.slug)+' · '+esc(c.category)+' · '+esc(c.status)+' · '+(c.is_free_preview?"Free sample":"Plus")+'</div></div><button class="btn secondary" data-id="'+c.id+'">Edit</button></div>').join("");
+document.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>openCase(b.dataset.id)));}
+function clearEditor(){["slug","title","subtitle","synopsis","hero","background","questions","reviewTitle","reviewBody"].forEach(id=>$(id).value="");$("caseStatus").value="draft";$("freePreview").value="false";$("evidenceList").innerHTML="";}
+async function openCase(id){const r=await client.from("mystery_cases").select("*").eq("id",id).single();if(r.error){status("listStatus",r.error.message);return;}current=r.data;clearEditor();$("editor").classList.remove("hidden");$("evidenceEditor").classList.remove("hidden");$("editorTitle").textContent="Edit: "+current.title;
+["slug","title","subtitle","synopsis"].forEach(k=>$(k).value=current[k]||"");$("category").value=current.category;$("hero").value=current.hero_image_url||"";$("caseStatus").value=current.status;$("freePreview").value=String(current.is_free_preview);
+const cr=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",id).maybeSingle();if(cr.data){$("background").value=cr.data.case_background||"";$("questions").value=(cr.data.investigation_questions||[]).map(q=>q.question).join("\n");}
+const rv=await client.from("mystery_case_reviews").select("review_title,review_body").eq("case_id",id).maybeSingle();if(rv.data){$("reviewTitle").value=rv.data.review_title;$("reviewBody").value=rv.data.review_body;}
+await loadEvidence();}
+async function loadEvidence(){if(!current)return;const r=await client.from("mystery_evidence").select("id,title,evidence_type,is_preview,display_order").eq("case_id",current.id).order("display_order");if(r.error){$("evidenceList").textContent=r.error.message;return;}
+$("evidenceList").innerHTML=(r.data||[]).map(e=>'<div class="evidence-row"><div><strong>'+esc(e.title)+'</strong><div class="small">'+esc(e.evidence_type)+' · '+(e.is_preview?"Free preview":"Plus")+'</div></div><button class="btn danger" data-delete="'+e.id+'">Remove</button></div>').join("")||'<p class="small">No evidence items yet.</p>';
+document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",async()=>{if(!confirm("Remove this evidence item?"))return;const d=await client.from("mystery_evidence").delete().eq("id",b.dataset.delete);if(d.error){status("evidenceStatus",d.error.message);}else{status("evidenceStatus","Evidence item removed.");await loadEvidence();}}));}
+$("newCase").onclick=()=>{current=null;clearEditor();$("editor").classList.remove("hidden");$("evidenceEditor").classList.add("hidden");$("editorTitle").textContent="Create a new case";$("editor").scrollIntoView({behavior:"smooth"});};
+$("closeEditor").onclick=()=>$("editor").classList.add("hidden");
+$("saveCase").onclick=async()=>{const slug=$("slug").value.trim(),title=$("title").value.trim();if(!slug||!title||!$("synopsis").value.trim()){status("caseStatusMessage","Please enter a URL slug, title and short introduction.");return;}
+const published=$("caseStatus").value==="published";const row={slug,title,category:$("category").value,subtitle:$("subtitle").value.trim(),synopsis:$("synopsis").value.trim(),hero_image_url:$("hero").value.trim()||null,status:$("caseStatus").value,is_free_preview:$("freePreview").value==="true",published_at:published?new Date().toISOString():null,updated_at:new Date().toISOString()};
+const r=await client.from("mystery_cases").upsert(row,{onConflict:"slug"}).select("id").single();if(r.error){status("caseStatusMessage","Could not save: "+r.error.message);return;}current={id:r.data.id,slug};const questions=$("questions").value.split("\n").map(x=>x.trim()).filter(Boolean).map((question,i)=>({id:"q"+(i+1),question}));
+const cr=await client.from("mystery_case_content").upsert({case_id:current.id,case_background:$("background").value.trim()||$("synopsis").value.trim(),investigation_questions:questions,updated_at:new Date().toISOString()},{onConflict:"case_id"});
+if(cr.error){status("caseStatusMessage","Case saved, but background/questions failed: "+cr.error.message);return;}
+status("caseStatusMessage","Case details saved. You can now add evidence and an editorial review.");$("evidenceEditor").classList.remove("hidden");await loadEvidence();await loadCases();};
+$("addEvidence").onclick=async()=>{if(!current){status("evidenceStatus","Save the case details first.");return;}const title=$("evidenceTitle").value.trim();if(!title){status("evidenceStatus","Enter an evidence title.");return;}
+const row={case_id:current.id,title,evidence_type:$("evidenceType").value,description:$("evidenceDescription").value.trim(),body:$("evidenceBody").value.trim(),source_label:$("sourceLabel").value.trim(),source_url:$("sourceUrl").value.trim()||null,file_url:$("fileUrl").value.trim()||null,is_preview:$("evidencePreview").value==="true",display_order:Number($("displayOrder").value)||0};
+const r=await client.from("mystery_evidence").insert(row);if(r.error){status("evidenceStatus","Could not add evidence: "+r.error.message);return;}
+["evidenceTitle","evidenceDescription","evidenceBody","sourceLabel","sourceUrl","fileUrl"].forEach(id=>$(id).value="");status("evidenceStatus","Evidence item added.");await loadEvidence();};
+$("saveReview").onclick=async()=>{if(!current){status("reviewStatus","Save the case details first.");return;}const review_title=$("reviewTitle").value.trim(),review_body=$("reviewBody").value.trim();if(!review_title||!review_body){status("reviewStatus","Enter both a heading and review.");return;}
+const r=await client.from("mystery_case_reviews").upsert({case_id:current.id,review_title,review_body},{onConflict:"case_id"});status("reviewStatus",r.error?"Could not save review: "+r.error.message:"Editorial review saved.");};
+init();
+})();
+</script></body></html>
