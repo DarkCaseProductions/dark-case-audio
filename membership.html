@@ -196,7 +196,17 @@ button:hover{filter:brightness(1.12)}
   }
 
 
-  async function startPlusCheckout(session,button,status){\n    if(!session||!session.access_token){status.textContent="Please log in to continue to checkout.";return;}\n    button.disabled=true;status.textContent="Opening secure Stripe checkout...";\n    try{\n      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-create-checkout",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({})});\n      var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to start checkout.");\n      window.location.href=data.url;\n    }catch(e){status.textContent=e.message||"Unable to start checkout.";button.disabled=false;}\n  }\n\n  async function loadDarkCasePlus(session){
+  async function startPlusCheckout(session,button,status){
+    if(!session||!session.access_token){status.textContent="Please log in to continue to checkout.";return;}
+    button.disabled=true;status.textContent="Opening secure Stripe checkout...";
+    try{
+      var response=await fetch(SUPABASE_URL+"/functions/v1/dark-case-create-checkout",{method:"POST",headers:{Authorization:"Bearer "+session.access_token,apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({})});
+      var data=await response.json();if(!response.ok||!data.url)throw new Error(data.error||"Unable to start checkout.");
+      window.location.href=data.url;
+    }catch(e){status.textContent=e.message||"Unable to start checkout.";button.disabled=false;}
+  }
+
+  async function loadDarkCasePlus(session){
     var status=document.getElementById("plusStatus");
     var history=document.getElementById("plusHistory");
     var button=document.getElementById("plusSubscribeButton");
@@ -356,7 +366,8 @@ button:hover{filter:brightness(1.12)}
   });
 
   var params=new URLSearchParams(window.location.search);
-  if(params.get("plus")==="checkout"){var loginNote=document.getElementById("loginMessage");if(loginNote)loginNote.textContent="Log in to continue to your Dark Case Plus checkout.";}\n  if(params.get("plus")==="success"){var pm=document.getElementById("plusStatus");if(pm)pm.textContent="Payment submitted. We're confirming your subscription now; refresh this page in a moment to see your credits.";}
+  if(params.get("plus")==="checkout"){var loginNote=document.getElementById("loginMessage");if(loginNote)loginNote.textContent="Log in to continue to your Dark Case Plus checkout.";}
+  if(params.get("plus")==="success"){var pm=document.getElementById("plusStatus");if(pm)pm.textContent="Payment submitted. We're confirming your subscription now; refresh this page in a moment to see your credits.";}
   if(params.get("plus")==="cancelled"){var pm2=document.getElementById("plusStatus");if(pm2)pm2.textContent="Checkout cancelled. No subscription has been started."}
   client.auth.getSession().then(function(result){renderSession(result.data.session)});
   client.auth.onAuthStateChange(function(event,session){renderSession(session)});
