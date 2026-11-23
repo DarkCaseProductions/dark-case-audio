@@ -41,14 +41,14 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 <p style="color:var(--muted);margin-top:-5px">Open each item to examine it. Check the source information and any limitations attached to the material.</p>
 <div id="evidence" class="evidence"></div>
 </section>
-<section class="panel" id="questionsPanel"><h2>Questions to consider</h2><p style="color:var(--muted)">Use these prompts to test your interpretation. Your answers are saved with your private conclusion.</p><div id="questionList"></div></section>
-<section class="panel notes" id="notesPanel">
+<section class="panel" id="questionsPanel" hidden><h2>Questions to consider</h2><p style="color:var(--muted)">Use these prompts to test your interpretation. Your answers are saved with your private conclusion.</p><div id="questionList"></div></section>
+<section class="panel notes" id="notesPanel" hidden>
 <h2>Your investigator's notebook</h2>
 <p style="color:var(--muted)">These notes are private to your account. Other members cannot read them.</p>
 <textarea id="notesText" placeholder="Record observations, questions, contradictions and details you want to revisit…" maxlength="20000"></textarea>
 <button class="btn" id="saveNotes">Save private notes</button><div class="status" id="notesStatus"></div>
 </section>
-<section class="panel submission" id="submissionPanel">
+<section class="panel submission" id="submissionPanel" hidden>
 <h2>Your conclusion</h2>
 <p style="color:var(--muted)">Write your assessment using the evidence you have examined. Your conclusion stays private. Submitting it opens the discussion and the editorial review for this case.</p>
 <label for="theoryText" style="display:block;font-weight:700;margin:12px 0 7px">What do you think the evidence shows?</label>
@@ -134,6 +134,7 @@ async function load(){
   const pd=await pr.json().catch(()=>({}));
   if(!pr.ok||!pd.active){showLocked();return;}
  }
+ ["questionsPanel","notesPanel","submissionPanel"].forEach(id=>$(id).hidden=false);
  const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
  if(contentResult.data){$("caseBackground").textContent=contentResult.data.case_background||caseRow.synopsis||"";questionData=Array.isArray(contentResult.data.investigation_questions)?contentResult.data.investigation_questions:[];}
  $("questionList").innerHTML=questionData.map((q,i)=>`<label style="display:block;font-weight:700;margin:14px 0 6px" for="answer-${esc(q.id||i)}">${i+1}. ${esc(q.question)}</label><textarea id="answer-${esc(q.id||i)}" style="width:100%;min-height:85px;background:#080b10;color:#fff;border:1px solid #424a58;border-radius:8px;padding:11px;font:inherit" maxlength="5000" placeholder="Write your thoughts…"></textarea>`).join("");
