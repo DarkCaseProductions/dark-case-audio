@@ -14,7 +14,7 @@ Reviewed 23 November 2026.
 - Supabase security advisors no longer flag the Mystery Room admin wrapper or profile signup trigger as exposed SECURITY DEFINER functions. One account-wide warning remains: leaked-password protection is disabled. It has not been changed as part of this feature.
 - Browser testing already completed by the owner covers visitors without membership, free members, the Enfield free sample, private notes/conclusions and the relevant access restrictions. Do not ask the owner to repeat those tests.
 - The Plus status page now successfully loads subscription status and audiobook download history in the preview. The owner's test account is recognised as cancelled, so it correctly does not receive Plus access.
-- Four browser-facing Stripe/Plus Edge Functions now have CORS configured for the live site and the exact current Pages preview URL. Their deployed source files are tracked under `supabase/functions/` on this branch. If a new hash-specific Pages preview URL is used, its exact origin must be added before browser calls from that URL will work.
+- Four browser-facing Stripe/Plus Edge Functions now have CORS configured for the live site and the stable `mystery-room-build.dark-case-audio-mystery-preview.pages.dev` branch-preview address. Their deployed source files are tracked under `supabase/functions/` on this branch. Use the stable branch-preview address for future testing; hash-specific deployment URLs are not automatically allowed.
 - The active-Plus member journey still requires a real account with a currently active or trialing Plus subscription. No active or trialing subscription was present in the database during this review.
 
 ## Publication and access
