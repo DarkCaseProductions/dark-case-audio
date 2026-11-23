@@ -130,9 +130,18 @@ async function load(){
  $("caseBackground").textContent=caseRow.case_background||caseRow.synopsis||"Case background is being prepared.";
  if(!caseRow.is_free_preview&&!user){showLocked();return;}
  if(!caseRow.is_free_preview&&user){
-  const pr=await fetch(URL+"/functions/v1/dark-case-plus-status",{headers:{Authorization:"Bearer "+(await client.auth.getSession()).data.session?.access_token,apikey:KEY}});
-  const pd=await pr.json().catch(()=>({}));
-  if(!pr.ok||!pd.active){showLocked();return;}
+  try {
+   const session=(await client.auth.getSession()).data.session;
+   if(!session?.access_token){showLocked();return;}
+   const pr=await fetch(URL+"/functions/v1/dark-case-plus-status",{headers:{Authorization:"Bearer "+session.access_token,apikey:KEY}});
+   const pd=await pr.json().catch(()=>({}));
+   if(!pr.ok||!pd.active){showLocked();return;}
+  } catch (err) {
+   console.error("Mystery Room membership check failed",err);
+   showLocked();
+   message('We could not verify Dark Case Plus access just now. The Plus case remains locked. Please refresh or <a href="membership.html">check your membership</a>.');
+   return;
+  }
  }
  ["questionsPanel","notesPanel","submissionPanel"].forEach(id=>$(id).hidden=false);
  const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
