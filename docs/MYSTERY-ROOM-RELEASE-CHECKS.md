@@ -13,7 +13,7 @@ Reviewed 23 November 2026.
 - The public Mystery Room admin-check wrapper runs as SECURITY INVOKER and is executable only by authenticated users. The profile signup trigger is not callable as an RPC by client roles and has an empty search path. A rolled-back synthetic signup test confirmed the trigger still creates the profile row.
 - Supabase security advisors no longer flag the Mystery Room admin wrapper or profile signup trigger as exposed SECURITY DEFINER functions. One account-wide warning remains: leaked-password protection is disabled. It has not been changed as part of this feature.
 - Browser testing already completed by the owner covers visitors without membership, free members, the Enfield free sample, private notes/conclusions and the relevant access restrictions. Do not ask the owner to repeat those tests.
-- The Plus status page now successfully loads subscription status and audiobook download history in the preview. The owner's test account is recognised as cancelled, so it correctly does not receive Plus access.
+- The Plus status page now successfully loads subscription status and audiobook download history in the preview. The owner's test account is recognised as cancelled. It is also on the private Mystery Room administrator allow-list, so it is not suitable for testing ordinary member RLS restrictions.
 - Four browser-facing Stripe/Plus Edge Functions now have CORS configured for the live site and the stable `mystery-room-build.dark-case-audio-mystery-preview.pages.dev` branch-preview address. Their deployed source files are tracked under `supabase/functions/` on this branch. Use the stable branch-preview address for future testing; hash-specific deployment URLs are not automatically allowed.
 - The active-Plus member journey still requires a real account with a currently active or trialing Plus subscription. No active or trialing subscription was present in the database during this review.
 
@@ -23,8 +23,9 @@ The live database currently reports the Enfield Poltergeist as a published free 
 
 ## Remaining release blockers
 
-- [ ] Verify the Plus-only Zodiac case with a real active/trialing Plus account. Do not use a live payment solely to complete this test without the owner's approval.
-- [ ] Verify that an expired/cancelled Plus account cannot access the Plus case, its evidence, discussion or review. The membership page currently confirms the test account is cancelled; the earlier free-member restriction checks are already complete.
+- [ ] Verify the full Plus unlock journey in the browser with a real active/trialing Plus account. Do not use a live payment solely to complete this test without the owner's approval.
+- [x] Simulated active and cancelled subscriptions for a non-admin member inside rolled-back database transactions. Active access revealed the Zodiac background and all five Plus evidence items; cancelled access revealed only the Enfield background and six preview evidence items. Neither state exposed Zodiac discussions or reviews. No test subscription records were retained.
+- [ ] Confirm the active Plus journey in the browser once a genuine active/trialing account is available.
 - [ ] Reconstruct and test the original schema migrations as a portable Supabase migration set in a disposable project. The applied anonymous-grant hardening migration and the three additional security hardening migrations are stored under `supabase/migrations/`.
 - [ ] Review the Mystery Room Privacy Policy and Terms in the context of the actual feature and business arrangements.
 - [ ] Owner approval before merging or publishing.
