@@ -1,5 +1,7 @@
 {
   "name": "dark-case-nowplaying",
   "main": "worker.js",
-  "compatibility_date": "2026-10-05"
+  "compatibility_date": "2026-10-05",
+  "previews": {} // Enable Cloudflare preview builds
 }
+

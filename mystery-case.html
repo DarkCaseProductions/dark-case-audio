@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Case investigation | The Mystery Room</title>
+<meta name="description" content="Examine the evidence and record your own findings in a Dark Case Audio Mystery Room investigation.">
+<style>
+:root{--bg:#080a0e;--panel:#121720;--panel2:#0d1118;--text:#f1f2f4;--muted:#aeb5c0;--line:#303744;--gold:#c6a66a;--red:#9e2933}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#252a33 0,#0b0e14 38%,#06070a 100%);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.65}
+.wrap{width:min(1080px,92%);margin:auto;padding:22px 0 60px}.back{color:#ddd;text-decoration:none;font-weight:700}.back:hover{color:#fff}
+.hero{margin:24px 0;padding:clamp(24px,4vw,42px);border:1px solid #39414c;border-radius:16px;background:linear-gradient(90deg,#07090ded,#0b0f17c9),var(--hero-image,linear-gradient(135deg,#252d39,#090b10));background-size:cover;background-position:center}
+.eyebrow{font-size:.75rem;letter-spacing:2px;color:var(--gold);font-weight:800;text-transform:uppercase}.hero h1{font:clamp(2.1rem,5vw,3.5rem)/1.08 Georgia,serif;margin:9px 0}.hero p{max-width:780px;color:#d0d3d9;margin:0}.meta{color:#aeb5c0;font-size:.84rem;margin-top:13px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:20px;align-items:start}.main,.side{min-width:0}.panel{background:linear-gradient(180deg,#171d27,#10141b);border:1px solid var(--line);border-radius:13px;padding:21px;margin-bottom:17px}.panel h2{font:1.55rem Georgia,serif;margin:0 0 13px}.panel h3{font:1.2rem Georgia,serif;margin:0 0 8px}
+.notice{display:none;padding:13px 15px;border-radius:9px;border:1px solid #594c34;background:#1d1a14;color:#e8d7b7;margin:16px 0}.notice a{color:#f0d8a7;font-weight:800}
+.evidence{display:grid;gap:12px}.item{border:1px solid #343d49;border-radius:10px;background:#0d121a;overflow:hidden}.item summary{cursor:pointer;padding:14px 16px;font-weight:800;list-style:none;display:flex;justify-content:space-between;gap:10px}.item summary::-webkit-details-marker{display:none}.item summary:after{content:"+";color:var(--gold);font-size:1.2rem}.item[open] summary:after{content:"−"}.item-content{padding:0 16px 16px;color:#d0d3d9}.item-content p{white-space:pre-wrap}.source{font-size:.82rem;color:#9fa8b5;border-top:1px solid #2a323e;padding-top:10px;margin-top:12px;overflow-wrap:anywhere}.source a{color:#e0c58f}.item audio,.item video{display:block;width:100%;margin-top:10px}.notes textarea,.submission textarea,.discussion textarea{width:100%;min-height:125px;resize:vertical;background:#080b10;color:#fff;border:1px solid #424a58;border-radius:8px;padding:12px;font:inherit}.submission textarea{min-height:180px}.btn{border:1px solid #8c744a;background:linear-gradient(#c9aa70,#9d804e);color:#111;border-radius:8px;padding:11px 16px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.5;cursor:wait}.secondary{background:#202630;border:1px solid #47515f;color:#eee}.status{color:var(--muted);font-size:.88rem;margin-top:10px;min-height:1.3em}.side .panel{position:sticky;top:15px}.steps{padding-left:19px;color:#c4cad3}.steps li{margin:7px 0}.discussion-post{border-top:1px solid #303744;padding:13px 0}.discussion-post:first-child{border-top:0}.discussion-post p{white-space:pre-wrap;margin:5px 0}.discussion-post .by{font-size:.8rem;color:#aeb5c0}
+.locked{background:#151920;border:1px solid #5a4b32;border-radius:12px;padding:20px}.locked h3{font:1.35rem Georgia,serif;margin:0 0 8px}.locked p{color:#c2c8d1}.locked a{color:#f0d8a7;font-weight:800}
+footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;padding-top:22px;color:#9299a4;font-size:.88rem}footer a{color:#cbd0d8}
+[hidden]{display:none!important}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side .panel{position:static}.wrap{width:94%}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<a class="back" href="mystery-room.html">← Back to The Mystery Room</a>
+<div id="notice" class="notice"></div>
+<header class="hero" id="caseHero">
+<div class="eyebrow" id="caseCategory">Investigation file</div>
+<h1 id="caseTitle">Loading case…</h1>
+<p id="caseSynopsis"></p>
+<div class="meta" id="caseMeta"></div>
+</header>
+<div class="layout">
+<div class="main">
+<section class="panel">
+<h2>Case background</h2>
+<div id="caseBackground" style="color:#d0d3d9">Loading the case information…</div>
+</section>
+<section class="panel">
+<h2>Evidence library</h2>
+<p style="color:var(--muted);margin-top:-5px">Open each item to examine it. Check the source information and any limitations attached to the material.</p>
+<div id="evidence" class="evidence"></div>
+</section>
+<section class="panel" id="questionsPanel" hidden><h2>Questions to consider</h2><p style="color:var(--muted)">Use these prompts to test your interpretation. Your answers are saved with your private conclusion.</p><div id="questionList"></div></section>
+<section class="panel notes" id="notesPanel" hidden>
+<h2>Your investigator's notebook</h2>
+<p style="color:var(--muted)">These notes are private to your account. Other members cannot read them.</p>
+<textarea id="notesText" placeholder="Record observations, questions, contradictions and details you want to revisit…" maxlength="20000"></textarea>
+<button class="btn" id="saveNotes">Save private notes</button><div class="status" id="notesStatus"></div>
+</section>
+<section class="panel submission" id="submissionPanel" hidden>
+<h2>Your conclusion</h2>
+<p style="color:var(--muted)">Write your assessment using the evidence you have examined. Your conclusion stays private. Submitting it opens the discussion and the editorial review for this case.</p>
+<label for="theoryText" style="display:block;font-weight:700;margin:12px 0 7px">What do you think the evidence shows?</label>
+<textarea id="theoryText" placeholder="Set out your conclusion. Explain which evidence supports it, what challenges it and what remains unanswered…" maxlength="20000"></textarea>
+<button class="btn secondary" id="saveDraft" type="button">Save investigation draft</button> <button class="btn" id="submitTheory">Submit my conclusion</button><div class="status" id="submissionStatus"></div>
+</section>
+<section class="panel" id="reviewPanel" hidden>
+<h2>Editorial review</h2>
+<div id="reviewContent"></div>
+</section>
+<section class="panel discussion" id="discussionPanel" hidden>
+<h2>Case discussion</h2>
+<p style="color:var(--muted)">You have submitted your own conclusion. You can now compare findings with other members. Keep discussion focused on evidence and avoid presenting allegations as established facts.</p>
+<div id="discussionPosts"></div>
+<label for="discussionText" style="display:block;font-weight:700;margin:15px 0 7px">Add to the discussion</label>
+<textarea id="discussionText" placeholder="Share your interpretation or ask a question about the evidence…" maxlength="10000"></textarea>
+<button class="btn" id="postDiscussion">Post to case discussion</button><div class="status" id="discussionStatus"></div>
+</section>
+</div>
+<aside class="side">
+<section class="panel">
+<h2>Investigation guide</h2>
+<ol class="steps">
+<li>Read the case background.</li>
+<li>Open and examine the evidence.</li>
+<li>Keep private notes as you go.</li>
+<li>Submit your own conclusion.</li>
+<li>Compare findings in the discussion.</li>
+<li>Read the editorial review.</li>
+</ol>
+</section>
+<section class="panel">
+<h3>Evidence standards</h3>
+<p style="color:var(--muted);font-size:.9rem;margin:0">Each item should identify its source where possible. Reporting, recollections, allegations and independently verified records will be labelled clearly. An unexplained event is not automatically proof of a paranormal cause.</p>
+</section>
+<section class="panel" id="membershipPanel">
+<h3>Dark Case Plus</h3>
+<p style="color:var(--muted);font-size:.9rem">Full investigations are included with Dark Case Plus. The free sample can be explored without a subscription.</p>
+<a class="btn" style="display:block;text-align:center;text-decoration:none" href="membership.html">View membership</a>
+</section>
+</aside>
+</div>
+<footer><a href="mystery-room.html">The Mystery Room</a> · <a href="membership.html">Membership</a> · <a href="index.html">Dark Case Audio</a><br>© Dark Case Audio / Dark Case Productions</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+const URL="https://inhiiamepxwjtfyqlqir.supabase.co",KEY="sb_publishable_b7MSgk0__De2h0ZPtjK1QQ_3D6RBUt5";
+const client=window.supabase.createClient(URL,KEY);
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search),slug=params.get("case");
+let user=null,caseRow=null,submission=null,questionData=[];
+function esc(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function message(text){$("notice").innerHTML=text;$("notice").style.display="block";}
+function setStatus(id,text){$(id).textContent=text;}
+function showLocked(){ $("caseTitle").textContent="This investigation is for Dark Case Plus members";$("caseSynopsis").textContent="This case file is not included in the free sample collection."; $("caseBackground").innerHTML='<div class="locked"><h3>Full investigation access</h3><p>Join Dark Case Plus to examine the complete case files, evidence and recordings.</p><a href="membership.html">Explore Dark Case Plus →</a></div>';$("evidence").innerHTML="";["questionsPanel","notesPanel","submissionPanel","reviewPanel","discussionPanel"].forEach(id=>$(id).hidden=true); }
+function renderEvidence(rows){
+ if(!rows.length){$("evidence").innerHTML='<div class="locked"><p>No evidence has been published for this case yet.</p></div>';return;}
+ $("evidence").innerHTML=rows.map((e,i)=>{
+  let media="";
+  if(e.file_url&&e.evidence_type==="audio")media='<audio controls preload="none" src="'+esc(e.file_url)+'"></audio>';
+  else if(e.file_url&&e.evidence_type==="video")media='<video controls preload="metadata" src="'+esc(e.file_url)+'"></video>';
+  else if(e.file_url&&e.evidence_type==="photograph")media='<p><a class="source" target="_blank" rel="noopener" href="'+esc(e.file_url)+'">Open image evidence</a></p>';
+  let source=e.source_url?'<div class="source">Source: <a href="'+esc(e.source_url)+'" target="_blank" rel="noopener">'+esc(e.source_label||e.source_url)+'</a></div>':(e.source_label?'<div class="source">Source: '+esc(e.source_label)+'</div>':'<div class="source">Source details have not yet been added.</div>');
+  return '<details class="item"><summary><span>'+String(i+1).padStart(2,"0")+' · '+esc(e.title)+'</span><span style="font-size:.72rem;color:#b9a477;text-transform:uppercase">'+esc(e.evidence_type)+'</span></summary><div class="item-content">'+(e.description?'<p>'+esc(e.description)+'</p>':'')+(e.body?'<p>'+esc(e.body)+'</p>':'')+media+source+'</div></details>';
+ }).join("");
+}
+async function load(){
+ if(!slug){message("No case was selected. Return to The Mystery Room and choose an investigation.");$("caseTitle").textContent="No case selected";return;}
+ const sr=await client.auth.getSession();user=sr.data.session?.user||null;
+ const cr=await client.from("mystery_cases").select("*").eq("slug",slug).eq("status","published").maybeSingle();
+ if(cr.error||!cr.data){showLocked();return;}
+ caseRow=cr.data;
+ $("caseCategory").textContent=caseRow.category==="crime"?"Crime investigation":"Paranormal investigation";
+ $("caseTitle").textContent=caseRow.title;
+ $("caseSynopsis").textContent=caseRow.synopsis||"";
+ $("caseMeta").textContent=(caseRow.is_free_preview?"Free sample investigation":"Dark Case Plus investigation")+(caseRow.published_at?" · Published "+new Date(caseRow.published_at).toLocaleDateString("en-GB"):"");
+ if(caseRow.hero_image_url)$("caseHero").style.setProperty("--hero-image","linear-gradient(90deg,#07090ded,#0b0f17c9),url('"+caseRow.hero_image_url.replace(/'/g,"%27")+"')");
+ $("caseBackground").textContent=caseRow.case_background||caseRow.synopsis||"Case background is being prepared.";
+ if(!caseRow.is_free_preview&&!user){showLocked();return;}
+ if(!caseRow.is_free_preview&&user){
+  try {
+   const session=(await client.auth.getSession()).data.session;
+   if(!session?.access_token){showLocked();return;}
+   const pr=await fetch(URL+"/functions/v1/dark-case-plus-status",{headers:{Authorization:"Bearer "+session.access_token,apikey:KEY}});
+   const pd=await pr.json().catch(()=>({}));
+   if(!pr.ok||!pd.active){showLocked();return;}
+  } catch (err) {
+   console.error("Mystery Room membership check failed",err);
+   showLocked();
+   message('We could not verify Dark Case Plus access just now. The Plus case remains locked. Please refresh or <a href="membership.html">check your membership</a>.');
+   return;
+  }
+ }
+ ["questionsPanel","notesPanel","submissionPanel"].forEach(id=>$(id).hidden=false);
+ const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
+ if(contentResult.data){$("caseBackground").textContent=contentResult.data.case_background||caseRow.synopsis||"";questionData=Array.isArray(contentResult.data.investigation_questions)?contentResult.data.investigation_questions:[];}
+ $("questionList").innerHTML=questionData.map((q,i)=>`<label style="display:block;font-weight:700;margin:14px 0 6px" for="answer-${esc(q.id||i)}">${i+1}. ${esc(q.question)}</label><textarea id="answer-${esc(q.id||i)}" style="width:100%;min-height:85px;background:#080b10;color:#fff;border:1px solid #424a58;border-radius:8px;padding:11px;font:inherit" maxlength="5000" placeholder="Write your thoughts…"></textarea>`).join("");
+ const er=await client.from("mystery_evidence").select("*").eq("case_id",caseRow.id).order("display_order");
+ if(er.error){$("evidence").innerHTML='<div class="locked">Evidence could not be loaded. Please refresh and try again.</div>';}else renderEvidence(er.data||[]);
+ if(!user){
+  ["questionsPanel","notesPanel","submissionPanel","discussionPanel","reviewPanel"].forEach(id=>$(id).hidden=true);
+  message('You can examine this free sample without signing in. To save private notes and submit a conclusion, <a href="membership.html">create a free Dark Case account</a>.');
+  return;
+ }
+ await loadMemberWork();
+}
+async function loadMemberWork(){
+ const nr=await client.from("mystery_investigation_notes").select("notes").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
+ if(nr.data)$("notesText").value=nr.data.notes||"";
+ const sr=await client.from("mystery_submissions").select("theory,status,answers,submitted_at").eq("case_id",caseRow.id).eq("user_id",user.id).maybeSingle();
+ submission=sr.data||null;
+ if(submission){$("theoryText").value=submission.theory||"";questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el&&submission.answers)el.value=submission.answers[q.id]||"";});if(submission.status==="submitted"){ $("submitTheory").textContent="Update my conclusion";$("saveDraft").textContent="Save changes";$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();}}
+}
+$("saveNotes").addEventListener("click",async()=>{
+ if(!user||!caseRow)return;const b=$("saveNotes");b.disabled=true;setStatus("notesStatus","Saving…");
+ const r=await client.from("mystery_investigation_notes").upsert({case_id:caseRow.id,user_id:user.id,notes:$("notesText").value,updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ setStatus("notesStatus",r.error?"Could not save notes: "+r.error.message:"Your private notes have been saved.");b.disabled=false;
+});
+$("submitTheory").addEventListener("click",async()=>{
+ if(!user||!caseRow)return;const theory=$("theoryText").value.trim();if(theory.length<20){setStatus("submissionStatus","Please add a little more detail before submitting your conclusion.");return;}
+ const b=$("submitTheory");b.disabled=true;setStatus("submissionStatus","Submitting your conclusion…");
+ const answers={};questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el)answers[q.id]=el.value;});
+ const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:theory,answers:answers,status:"submitted",submitted_at:new Date().toISOString(),updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ if(r.error){setStatus("submissionStatus","Could not submit: "+r.error.message);b.disabled=false;return;}
+ submission={theory,status:"submitted"};$("discussionPanel").hidden=false;await loadDiscussion();await loadReview();b.disabled=false;b.textContent="Update my conclusion";setStatus("submissionStatus","Your conclusion has been submitted. The discussion and editorial review are now open for you.");
+});
+$("saveDraft").addEventListener("click",async()=>{
+ if(!user||!caseRow)return;
+ const answers={};questionData.forEach(q=>{const el=$("answer-"+(q.id||""));if(el)answers[q.id]=el.value;});
+ const preserveSubmitted=submission?.status==="submitted";
+ const nextStatus=preserveSubmitted?"submitted":"draft";
+ const b=$("saveDraft");b.disabled=true;setStatus("submissionStatus",preserveSubmitted?"Saving your changes…":"Saving your investigation draft…");
+ const r=await client.from("mystery_submissions").upsert({case_id:caseRow.id,user_id:user.id,theory:$("theoryText").value,answers:answers,status:nextStatus,submitted_at:preserveSubmitted?(submission.submitted_at||new Date().toISOString()):null,updated_at:new Date().toISOString()},{onConflict:"case_id,user_id"});
+ if(r.error){setStatus("submissionStatus","Could not save: "+r.error.message);}else{submission={...submission,theory:$("theoryText").value,answers:answers,status:nextStatus};setStatus("submissionStatus",preserveSubmitted?"Your changes have been saved. Your conclusion remains submitted, so the case discussion stays open.":"Your investigation draft has been saved privately. The discussion remains closed until you submit your conclusion.");}
+ b.disabled=false;
+});
+async function loadDiscussion(){
+ const r=await client.from("mystery_discussion_posts").select("id,user_id,content,created_at").eq("case_id",caseRow.id).eq("status","visible").order("created_at");
+ if(r.error){$("discussionPosts").textContent="The discussion could not be loaded.";return;}
+ const ids=[...new Set((r.data||[]).map(p=>p.user_id))];
+ let names={};
+ if(ids.length){const pr=await client.from("profiles").select("id,username").in("id",ids);(pr.data||[]).forEach(p=>names[p.id]=p.username||"Member");}
+ $("discussionPosts").innerHTML=(r.data||[]).length?(r.data||[]).map(p=>'<article class="discussion-post"><div class="by">'+esc(names[p.user_id]||"Member")+' · '+new Date(p.created_at).toLocaleString("en-GB")+'</div><p>'+esc(p.content)+'</p></article>').join(""):'<p style="color:#aeb5c0">No one has started this case discussion yet. You can open it with the first post.</p>';
+}
+async function loadReview(){
+ const r=await client.from("mystery_case_reviews").select("review_title,review_body").eq("case_id",caseRow.id).maybeSingle();
+ if(r.data){$("reviewPanel").hidden=false;$("reviewContent").innerHTML='<h3>'+esc(r.data.review_title)+'</h3><div style="white-space:pre-wrap;color:#d0d3d9">'+esc(r.data.review_body)+'</div>';}
+}
+$("postDiscussion").addEventListener("click",async()=>{
+ const content=$("discussionText").value.trim();if(!content)return;const b=$("postDiscussion");b.disabled=true;setStatus("discussionStatus","Posting…");
+ const r=await client.from("mystery_discussion_posts").insert({case_id:caseRow.id,user_id:user.id,content});
+ if(r.error){setStatus("discussionStatus","Could not post: "+r.error.message);b.disabled=false;return;}
+ $("discussionText").value="";await loadDiscussion();setStatus("discussionStatus","Your post has been added.");b.disabled=false;
+});
+load();
+})();
+</script>
+</body>
+</html>
