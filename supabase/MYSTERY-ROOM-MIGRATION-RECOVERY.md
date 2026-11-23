@@ -56,7 +56,7 @@ The private schema contains `private.mystery_room_admins`, which stores approved
 The current database state was checked directly:
 
 - **The Enfield Poltergeist** — `published`, free preview enabled. Six evidence entries are marked as preview.
-- **The Zodiac Killer: The Four Confirmed Attacks** — `published`, free preview disabled. All five evidence entries are marked Plus-only. This case is not a draft in the current database, despite the original migration name containing the word `draft`. Its content is protected by the published-case access policies and should only be available to members with an eligible active/trialing Plus subscription.
+- **The Zodiac Killer: The Four Confirmed Attacks** — `published`, free preview disabled. All five evidence entries are marked Plus-only. This case is not a draft in the current database, despite the original migration name containing the word `draft`. Its public catalogue card/title and synopsis are visible as a Plus teaser; the full case background and evidence remain protected for eligible active/trialing Plus members.
 
 Do not change these publication settings as part of migration recovery without an explicit content decision.
 
