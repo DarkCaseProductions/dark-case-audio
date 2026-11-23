@@ -66,7 +66,7 @@ function render(){
  grid.innerHTML=rows.map(c=>{
   const art=c.hero_image_url?'style="background-image:linear-gradient(0deg,#07090dcc,transparent 70%),url(\''+esc(c.hero_image_url)+'\')"':'';
   const access=c.is_free_preview?'Free sample':'Dark Case Plus';
-  return '<article class="case"><div class="case-art" '+art+'><span>'+esc(c.category)+' investigation</span></div><div class="case-body"><div class="tag">'+access+'</div><h3>'+esc(c.title)+'</h3><p class="case-location">📍 '+esc(c.subtitle||"Location details in case file")+'</p><p>'+esc(c.synopsis)+'</p><div class="case-foot"><span class="tag">'+(c.category==='crime'?'Crime':'Paranormal')+'</span><a class="open" href="mystery-case.html?case='+encodeURIComponent(c.slug)+'">Open case →</a></div></div></article>';
+  return '<article class="case"><div class="case-art" '+art+'><span>' + (c.subtitle&&c.subtitle.startsWith("Cryptozoology")?"Cryptozoology":esc(c.category)) + ' investigation</span></div><div class="case-body"><div class="tag">'+access+'</div><h3>'+esc(c.title)+'</h3><p class="case-location">📍 '+esc(c.subtitle||"Location details in case file")+'</p><p>'+esc(c.synopsis)+'</p><div class="case-foot"><span class="tag">'+(c.category==='crime'?'Crime':'Paranormal')+'</span><a class="open" href="mystery-case.html?case='+encodeURIComponent(c.slug)+'">Open case →</a></div></div></article>';
  }).join("");
 }
 async function load(){
