@@ -112,6 +112,7 @@ function renderEvidence(rows){
   if(e.file_url&&e.evidence_type==="audio")media='<audio controls preload="none" src="'+esc(e.file_url)+'"></audio>';
   else if(e.file_url&&e.evidence_type==="video")media='<video controls preload="metadata" src="'+esc(e.file_url)+'"></video>';
   else if(e.file_url&&e.evidence_type==="photograph")media='<p><a class="source" target="_blank" rel="noopener" href="'+esc(e.file_url)+'">Open image evidence</a></p>';
+  else if(e.file_url&&e.evidence_type==="document")media='<p><a class="btn secondary" style="display:inline-block;text-decoration:none;margin-top:8px" target="_blank" rel="noopener" href="'+esc(e.file_url)+'" download>Download investigator pack ↗</a></p>';
   let source=e.source_url?'<div class="source">Source: <a href="'+esc(e.source_url)+'" target="_blank" rel="noopener">'+esc(e.source_label||e.source_url)+'</a></div>':(e.source_label?'<div class="source">Source: '+esc(e.source_label)+'</div>':'<div class="source">Source details have not yet been added.</div>');
   return '<details class="item"><summary><span>'+String(i+1).padStart(2,"0")+' · '+esc(e.title)+'</span><span style="font-size:.72rem;color:#b9a477;text-transform:uppercase">'+esc(e.evidence_type)+'</span></summary><div class="item-content">'+(e.description?'<p>'+esc(e.description)+'</p>':'')+(e.body?'<p>'+esc(e.body)+'</p>':'')+media+source+'</div></details>';
  }).join("");
