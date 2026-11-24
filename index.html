@@ -232,35 +232,10 @@ footer a{color:#c9cdd3}
 .app-download-badge img{display:block;width:100%;height:auto}
 .app-download a:focus-visible{outline:3px solid #fff;outline-offset:5px;border-radius:8px}
 
-/* Mystery Room homepage banner */
-.mystery-home-banner{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 auto 26px;padding:23px 28px;overflow:hidden;border:1px solid #414956;border-radius:16px;background:linear-gradient(105deg,rgba(8,10,14,.98) 0%,rgba(17,21,29,.96) 58%,rgba(35,14,19,.94) 100%);box-shadow:0 15px 36px rgba(0,0,0,.38)}
-.mystery-home-banner:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 82% 50%,rgba(190,25,34,.2),transparent 38%),linear-gradient(90deg,transparent 45%,rgba(0,0,0,.15))}
-.mystery-home-copy{min-width:0;max-width:760px;flex:1 1 520px}
-.mystery-home-kicker{margin:0 0 8px;color:#e34b53;font-size:.72rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;line-height:1.4}
-.mystery-home-banner h2{margin:0 0 10px;color:#fff;font-family:Georgia,serif;font-size:clamp(1.65rem,3vw,2.25rem);line-height:1.12}
-.mystery-home-banner p{margin:0;color:#c4c9d2;font-size:.94rem;line-height:1.55}
-.mystery-home-action{flex:0 0 auto;display:flex;align-items:center;gap:16px}
-.mystery-home-emblem{width:94px;height:94px;object-fit:contain;filter:drop-shadow(0 5px 16px rgba(0,0,0,.55))}
-.mystery-home-button{display:inline-flex;align-items:center;justify-content:center;min-width:178px;padding:12px 18px;border:1px solid #ff4b52;border-radius:9px;background:linear-gradient(180deg,#e52b33,#a90e16);color:#fff;text-decoration:none;font-weight:900;box-shadow:0 8px 20px rgba(215,25,32,.22);transition:filter .2s,transform .2s;text-align:center}
-.mystery-home-button:hover{filter:brightness(1.12);transform:translateY(-2px)}
-.mystery-home-button:focus-visible{outline:3px solid #fff;outline-offset:4px}
-/* Phone and narrow WebView layouts: force the copy and action onto separate full-width rows. */
-@media(max-width:1000px){
-  .mystery-home-banner{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:16px!important;padding:20px 18px!important}
-  .mystery-home-copy{display:block!important;flex:0 0 auto!important;width:100%!important;max-width:none!important;min-width:0!important}
-  .mystery-home-kicker{font-size:.7rem!important;letter-spacing:1.4px!important;line-height:1.45!important;white-space:normal!important}
-  .mystery-home-banner h2{font-size:clamp(1.55rem,5vw,2rem)!important;line-height:1.12!important;margin:0 0 10px!important;overflow-wrap:normal!important}
-  .mystery-home-banner p{display:block!important;width:100%!important;font-size:.92rem!important;line-height:1.55!important;white-space:normal!important;overflow-wrap:break-word!important}
-  .mystery-home-action{display:flex!important;flex:0 0 auto!important;width:100%!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:14px!important}
-  .mystery-home-emblem{display:block!important;flex:0 0 68px!important;width:68px!important;height:68px!important}
-  .mystery-home-button{display:inline-flex!important;flex:0 1 250px!important;width:auto!important;max-width:250px!important;min-width:0!important;padding:13px 16px!important;font-size:.9rem!important;line-height:1.25!important;white-space:normal!important}
-}
-@media(max-width:380px){
-  .mystery-home-banner{padding:16px 13px!important;gap:13px!important}
-  .mystery-home-action{gap:10px!important}
-  .mystery-home-emblem{flex-basis:56px!important;width:56px!important;height:56px!important}
-  .mystery-home-button{font-size:.82rem!important;padding:11px 10px!important}
-}
+/* Mystery Room homepage artwork banner */
+.mystery-home-banner{display:block;width:min(1180px,92%);margin:0 auto 30px;overflow:hidden;border:1px solid #414956;border-radius:16px;box-shadow:0 18px 44px rgba(0,0,0,.42);background:#090c12;transition:transform .2s,box-shadow .2s}
+.mystery-home-banner:hover{transform:translateY(-2px);box-shadow:0 22px 52px rgba(0,0,0,.52)}
+.mystery-home-banner img{display:block;width:100%;height:auto;max-width:100%}
 </style>
 <meta name="description" content="Dark Case Audio brings together true crime, real crime cases, investigative case files, audiobooks, ebooks and paranormal investigations from the UK and around the world.">
 <link rel="canonical" href="https://darkcaseaudio.com/">
@@ -312,17 +287,9 @@ footer a{color:#c9cdd3}
   </a>
 </section>
 
-<section class="mystery-home-banner container" aria-labelledby="mystery-home-title" style="display:block!important;width:min(1180px,92%)!important">
-  <div class="mystery-home-copy" style="display:block!important;width:100%!important;max-width:none!important;min-width:0!important">
-    <p class="mystery-home-kicker">Dark Case Plus · Investigations and community</p>
-    <h2 id="mystery-home-title">Enter the Mystery Room</h2>
-    <p>Step inside real investigations. Open case files, examine the evidence, follow timelines, question witness accounts and piece together what really happened. Share your theories, compare findings and challenge other members’ conclusions — the investigation doesn’t end when you reach the last page.</p>
-    <div class="mystery-home-action" style="display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:16px!important;width:100%!important;margin-top:18px!important">
-      <img class="mystery-home-emblem" src="DCA_%20Noir%20Evidence%20Room%20Emblem.png" alt="Dark Case Mystery Room emblem" style="display:block!important;flex:0 0 68px!important;width:68px!important;height:68px!important">
-      <a class="mystery-home-button" href="mystery-room.html" style="display:inline-flex!important;flex:0 1 250px!important;width:auto!important;max-width:250px!important;min-width:0!important;text-align:center!important;white-space:normal!important">Enter the Mystery Room</a>
-    </div>
-  </div>
-</section>
+<a class="mystery-home-banner container" href="mystery-room.html" aria-label="Enter the Dark Case Audio Mystery Room">
+  <img src="Dark%20Case%20Audio%20Investigation%20Desk.png" alt="The Mystery Room — real investigations, evidence files, case videos, community discussions and your own investigator notebook. Reach your own conclusion.">
+</a>
 
 <section id="dragon-family-premiere" class="dragon-premiere" aria-label="The Dragon Family premiere">
   <div class="dragon-premiere-art">
