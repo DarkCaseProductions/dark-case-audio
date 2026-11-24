@@ -73,7 +73,7 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 <section class="panel" id="downloadPackPanel" hidden>
 <h3>Download investigator pack</h3>
 <p style="color:var(--muted);font-size:.9rem">Take the case background, evidence register, investigation questions and working sheets with you as a PDF.</p>
-<a class="btn" id="downloadPack" style="display:block;text-align:center;text-decoration:none" href="#" target="_blank" rel="noopener">Download case PDF ↗</a>
+<a class="btn" id="downloadPack" style="display:block;text-align:center;text-decoration:none" href="#" rel="noopener">Download case PDF ↗</a>
 </section>
 <section class="panel">
 <h2>Investigation guide</h2>
@@ -151,7 +151,34 @@ async function load(){
   }
  }
  const packLink = URL+"/functions/v1/mystery-investigator-pack?slug="+encodeURIComponent(caseRow.slug);
- $("downloadPack").href = packLink;
+ const packButton = $("downloadPack");
+ packButton.href = packLink;
+ packButton.onclick = async (event) => {
+  event.preventDefault();
+  packButton.setAttribute("aria-busy","true");
+  packButton.textContent = "Preparing your PDF…";
+  try {
+   const session = (await client.auth.getSession()).data.session;
+   const headers = {"apikey":KEY};
+   if (session?.access_token) headers.Authorization = "Bearer "+session.access_token;
+   const response = await fetch(packLink,{headers});
+   if (!response.ok) throw new Error(await response.text() || "The PDF could not be generated.");
+   const blob = await response.blob();
+   const objectUrl = URL.createObjectURL(blob);
+   const download = document.createElement("a");
+   download.href = objectUrl;
+   download.download = caseRow.slug+"-investigator-pack.pdf";
+   document.body.appendChild(download);
+   download.click();
+   download.remove();
+   setTimeout(()=>URL.revokeObjectURL(objectUrl),30000);
+  } catch (error) {
+   message("The investigator PDF could not be downloaded: "+esc(error.message||error));
+  } finally {
+   packButton.removeAttribute("aria-busy");
+   packButton.textContent = "Download case PDF ↗";
+  }
+ };
  $("downloadPackPanel").hidden = false;
  ["questionsPanel","notesPanel","submissionPanel"].forEach(id=>$(id).hidden=false);
  const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
