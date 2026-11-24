@@ -85,8 +85,8 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 <p style="color:var(--muted);font-size:.9rem;margin:0">Each item should identify its source where possible. Reporting, recollections, allegations and independently verified records will be labelled clearly. An unexplained event is not automatically proof of a paranormal cause.</p>
 </section>
 <section class="panel" id="membershipPanel">
-<h3>Dark Case Plus</h3>
-<p style="color:var(--muted);font-size:.9rem">Full investigations are included with Dark Case Plus. The free sample can be explored without a subscription.</p>
+<h3 id="membershipTitle">Dark Case Plus</h3>
+<p id="membershipCopy" style="color:var(--muted);font-size:.9rem">Full investigations are included with Dark Case Plus. The free sample includes the complete set of investigation tools.</p>
 <a class="btn" style="display:block;text-align:center;text-decoration:none" href="membership.html">View membership</a>
 </section>
 </aside>
@@ -125,7 +125,8 @@ async function load(){
  $("caseCategory").textContent=caseRow.category==="crime"?"Crime investigation":"Paranormal investigation";
  $("caseTitle").textContent=caseRow.title;
  $("caseSynopsis").textContent=caseRow.synopsis||"";
- $("caseMeta").textContent=(caseRow.is_free_preview?"Free sample investigation":"Dark Case Plus investigation")+(caseRow.published_at?" · Published "+new Date(caseRow.published_at).toLocaleDateString("en-GB"):"");
+ $("caseMeta").textContent=(caseRow.is_free_preview?"Free sample · Full investigation tools":"Dark Case Plus investigation")+(caseRow.published_at?" · Published "+new Date(caseRow.published_at).toLocaleDateString("en-GB"):"");
+ if(caseRow.is_free_preview){$("membershipTitle").textContent="Try the full investigation experience";$("membershipCopy").textContent="This free sample includes the same investigation tools as Dark Case Plus: private notes, saved drafts, conclusions, case discussions and editorial review. A free account lets you save your work. Dark Case Plus unlocks the rest of the investigations.";}
  if(caseRow.hero_image_url)$("caseHero").style.setProperty("--hero-image","linear-gradient(90deg,#07090ded,#0b0f17c9),url('"+caseRow.hero_image_url.replace(/'/g,"%27")+"')");
  $("caseBackground").textContent=caseRow.case_background||caseRow.synopsis||"Case background is being prepared.";
  if(!caseRow.is_free_preview&&!user){showLocked();return;}
