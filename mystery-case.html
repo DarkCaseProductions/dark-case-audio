@@ -69,6 +69,12 @@ footer{text-align:center;border-top:1px solid var(--line);margin-top:45px;paddin
 </section>
 </div>
 <aside class="side">
+
+<section class="panel" id="downloadPackPanel" hidden>
+<h3>Download investigator pack</h3>
+<p style="color:var(--muted);font-size:.9rem">Take the case background, evidence register, investigation questions and working sheets with you as a PDF.</p>
+<a class="btn" id="downloadPack" style="display:block;text-align:center;text-decoration:none" href="#" target="_blank" rel="noopener">Download case PDF ↗</a>
+</section>
 <section class="panel">
 <h2>Investigation guide</h2>
 <ol class="steps">
@@ -144,6 +150,9 @@ async function load(){
    return;
   }
  }
+ const packLink = URL+"/functions/v1/mystery-investigator-pack?slug="+encodeURIComponent(caseRow.slug);
+ $("downloadPack").href = packLink;
+ $("downloadPackPanel").hidden = false;
  ["questionsPanel","notesPanel","submissionPanel"].forEach(id=>$(id).hidden=false);
  const contentResult=await client.from("mystery_case_content").select("case_background,investigation_questions").eq("case_id",caseRow.id).maybeSingle();
  if(contentResult.data){$("caseBackground").textContent=contentResult.data.case_background||caseRow.synopsis||"";questionData=Array.isArray(contentResult.data.investigation_questions)?contentResult.data.investigation_questions:[];}
