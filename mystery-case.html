@@ -117,11 +117,43 @@ function renderEvidence(rows){
   if(e.file_url&&e.evidence_type==="audio")media='<audio controls preload="none" src="'+esc(e.file_url)+'"></audio>';
   else if(e.evidence_type==="video"){if(e.file_url){media='<video controls preload="metadata" src="'+esc(e.file_url)+'"></video>';}else if(e.source_url){const yt=e.source_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);if(yt)media='<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/'+yt[1]+'" title="'+esc(e.title)+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';}}
   else if(e.file_url&&e.evidence_type==="photograph")media='<p><a class="source" target="_blank" rel="noopener" href="'+esc(e.file_url)+'">Open image evidence</a></p>';
-  else if(e.file_url&&e.evidence_type==="document")media='<p><a class="btn secondary" style="display:inline-block;text-decoration:none;margin-top:8px" target="_blank" rel="noopener" href="'+esc(e.file_url)+'" download>Download investigator pack ↗</a></p>';
+  else if(e.file_url&&e.evidence_type==="document"&&(String(e.title||"").toLowerCase().includes("investigator pack")||e.file_url.includes("/functions/v1/mystery-investigator-pack")))media='<p><a class="btn secondary mystery-pack-download" style="display:inline-block;text-decoration:none;margin-top:8px" href="#" data-pack-url="'+esc(e.file_url)+'">Download investigator pack ↗</a></p>';
+  else if(e.file_url&&e.evidence_type==="document")media='<p><a class="btn secondary" style="display:inline-block;text-decoration:none;margin-top:8px" target="_blank" rel="noopener" href="'+esc(e.file_url)+'" download>Download document ↗</a></p>';
   let source=e.source_url?'<div class="source">Source: <a href="'+esc(e.source_url)+'" target="_blank" rel="noopener">'+esc(e.source_label||e.source_url)+'</a></div>':(e.source_label?'<div class="source">Source: '+esc(e.source_label)+'</div>':'<div class="source">Source details have not yet been added.</div>');
   return '<details class="item"><summary><span>'+String(i+1).padStart(2,"0")+' · '+esc(e.title)+'</span><span style="font-size:.72rem;color:#b9a477;text-transform:uppercase">'+esc(e.evidence_type)+'</span></summary><div class="item-content">'+(e.description?'<p>'+esc(e.description)+'</p>':'')+(e.body?'<p>'+esc(e.body)+'</p>':'')+media+source+'</div></details>';
  }).join("");
 }
+$("evidence").addEventListener("click",async(event)=>{
+ const link=event.target.closest("a.mystery-pack-download");
+ if(!link)return;
+ event.preventDefault();
+ if(link.getAttribute("aria-busy")==="true")return;
+ const original=link.textContent;
+ link.setAttribute("aria-busy","true");
+ link.textContent="Preparing your PDF…";
+ try{
+  const session=(await client.auth.getSession()).data.session;
+  const headers={"apikey":KEY};
+  if(session?.access_token)headers.Authorization="Bearer "+session.access_token;
+  const response=await fetch(link.dataset.packUrl,{headers});
+  if(!response.ok)throw new Error((await response.text())||"The PDF could not be generated.");
+  const blob=await response.blob();
+  const objectUrl=window.URL.createObjectURL(blob);
+  const download=document.createElement("a");
+  download.href=objectUrl;
+  download.download=(caseRow?.slug||"mystery-room")+"-investigator-pack.pdf";
+  document.body.appendChild(download);
+  download.click();
+  download.remove();
+  setTimeout(()=>window.URL.revokeObjectURL(objectUrl),30000);
+ }catch(error){
+  message("The investigator PDF could not be downloaded: "+esc(error.message||error));
+ }finally{
+  link.removeAttribute("aria-busy");
+  link.textContent=original;
+ }
+});
+
 async function load(){
  if(!slug){message("No case was selected. Return to The Mystery Room and choose an investigation.");$("caseTitle").textContent="No case selected";return;}
  const sr=await client.auth.getSession();user=sr.data.session?.user||null;
