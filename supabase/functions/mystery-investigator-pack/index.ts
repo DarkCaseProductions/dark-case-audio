@@ -168,7 +168,7 @@ Deno.serve(async (req: Request) => {
     // Plus-only packs must follow the same membership gate as the case page.
     if (!c.is_free_preview) {
       const auth = req.headers.get("Authorization") || "";
-      const token = auth.replace(/^Bearer\\s+/i, "");
+      const token = auth.replace(/^Bearer\s+/i, "");
       if (!token || token === auth) {
         return new Response("Sign in to download this investigator pack.", { status: 401, headers: cors });
       }
